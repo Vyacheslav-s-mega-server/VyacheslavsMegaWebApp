@@ -66,7 +66,7 @@ namespace VyacheslavsMegaWebApp.Controllers
             int targetPort = port ?? 25588;
             if (User.Identity?.IsAuthenticated == true)
             {
-                var user = await _userManager.GetUserAsync(User);
+                VmsIdentityUser? user = await _userManager.GetUserAsync(User);
                 if (user != null)
                 {
                     if (!user.EmailConfirmed)
@@ -90,8 +90,8 @@ namespace VyacheslavsMegaWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmLauncherAuth(int port)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            VmsIdentityUser? user = await _userManager.GetUserAsync(User);
+            if (user is null)
             {
                 return RedirectToAction(nameof(Login), new { launcherPort = port });
             }
@@ -208,26 +208,15 @@ namespace VyacheslavsMegaWebApp.Controllers
                 return Unauthorized(_localizer[NotAuthorized]);
 
             var roles = await _userManager.GetRolesAsync(user);
-            string roleBadge = roles.Contains("Admin") ? "Администратор" : (roles.Contains("Moderator") ? "Модератор" : "Игрок VEC");
+            string roleBadge = roles.Contains("Admin") ? "Администратор" : (roles.Contains("Moderator") ? "Модератор" : "Игрок VMS");
 
-            var sessions = _db.LauncherSessions
-                .Where(s => s.UserId == user.Id)
-                .OrderByDescending(s => s.ExpiresAt)
-                .Select(s => new LauncherSessionInfo
-                {
-                    SessionKey = s.SessionKey,
-                    ExpiresAt = s.ExpiresAt
-                })
-                .ToList();
-
-            var model = new AccountSettingsViewModel
+            AccountSettingsViewModel model = new AccountSettingsViewModel
             {
                 Username = user.UserName,
                 Email = user.Email ?? "",
                 EmailConfirmed = user.EmailConfirmed,
                 UserId = user.Id,
-                RoleBadge = roleBadge,
-                LauncherSessions = sessions
+                RoleBadge = roleBadge
             };
 
             return View(model);
@@ -241,11 +230,11 @@ namespace VyacheslavsMegaWebApp.Controllers
                 return Unauthorized(_localizer[NotAuthorized]);
 
             var roles = await _userManager.GetRolesAsync(user);
-            string roleBadge = roles.Contains("Admin") ? "Администратор" : (roles.Contains("Moderator") ? "Модератор" : "Игрок VEC");
+            string roleBadge = roles.Contains("Admin") ? "Администратор" : (roles.Contains("Moderator") ? "Модератор" : "Игрок VMS");
 
-            var equippedCapeId = _skinStorage.DetectEquippedCapeId(user.UserName);
+            string? equippedCapeId = _skinStorage.DetectEquippedCapeId(user.UserName);
 
-            var availableCapes = new List<CapeItemViewModel>
+            List<CapeItemViewModel> availableCapes = new List<CapeItemViewModel>
             {
                 new CapeItemViewModel
                 {
@@ -259,15 +248,7 @@ namespace VyacheslavsMegaWebApp.Controllers
                 }
             };
 
-            var sessions = _db.LauncherSessions
-                .Where(s => s.UserId == user.Id)
-                .OrderByDescending(s => s.ExpiresAt)
-                .Select(s => new LauncherSessionInfo
-                {
-                    SessionKey = s.SessionKey,
-                    ExpiresAt = s.ExpiresAt
-                })
-                .ToList();
+            
 
             var (siteName, mcUser, createdAt) = _skinStorage.GetUserProfileData(user.UserName);
 
@@ -330,7 +311,6 @@ namespace VyacheslavsMegaWebApp.Controllers
                 BannerUrl = _skinStorage.GetBannerUrl(user.UserName),
                 HasCustomBanner = _skinStorage.HasCustomBanner(user.UserName),
                 AvailableCapes = availableCapes,
-                LauncherSessions = sessions,
                 Friends = friendsList,
                 IncomingRequests = incomingList,
                 OutgoingRequests = outgoingList

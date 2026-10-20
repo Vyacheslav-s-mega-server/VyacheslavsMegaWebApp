@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace VyacheslavsMegaWebApp.Service
 {
-    public class LaunchTicket
+    public class LauncherTicket
     {
         public string TicketId { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
@@ -12,15 +12,15 @@ namespace VyacheslavsMegaWebApp.Service
         public bool IsUsed { get; set; }
     }
 
-    public class LaunchTicketService
+    public class LauncherTicketService
     {
-        private readonly ConcurrentDictionary<string, LaunchTicket> _tickets = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, LauncherTicket> _tickets = new(StringComparer.OrdinalIgnoreCase);
 
-        public LaunchTicket CreateTicket(string username, string hwid, TimeSpan? ttl = null)
+        public LauncherTicket CreateTicket(string username, string hwid, TimeSpan? ttl = null)
         {
             CleanupExpired();
 
-            var ticket = new LaunchTicket
+            var ticket = new LauncherTicket
             {
                 TicketId = Guid.NewGuid().ToString("N"),
                 Username = username.Trim(),

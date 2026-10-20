@@ -9,29 +9,34 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VyacheslavsMegaWebApp.Api.Models;
 using VyacheslavsMegaWebApp.Data;
 using VyacheslavsMegaWebApp.Data.Entities;
 using VyacheslavsMegaWebApp.Data.Entities.Identity;
+using VyacheslavsMegaWebApp.Data.Repositories;
 using VyacheslavsMegaWebApp.Service;
 
 namespace VyacheslavsMegaWebApp.Api.Controllers
 {
     [ApiController]
-    public class LaunchApiController : ControllerBase
+    public class LauncherApiController : ControllerBase
     {
-        private readonly LaunchTicketService _ticketService;
-        private readonly AppDbContext _db;
+        private readonly LauncherTicketService _ticketService;
+        private readonly LauncherSessionRepository _sessionRepository;
+        private readonly ClientBuildsRepository _buildsRepository;
         private readonly UserManager<VmsIdentityUser> _userManager;
         private readonly IWebHostEnvironment _env;
 
-        public LaunchApiController(
-            LaunchTicketService ticketService,
-            AppDbContext db,
+        public LauncherApiController(
+            LauncherTicketService ticketService,
+            LauncherSessionRepository sessionRepository,
+            ClientBuildsRepository buildsRepository,
             UserManager<VmsIdentityUser> userManager,
             IWebHostEnvironment env)
         {
             _ticketService = ticketService;
-            _db = db;
+            _sessionRepository = sessionRepository;
+            _buildsRepository = buildsRepository;
             _userManager = userManager;
             _env = env;
         }
@@ -49,20 +54,19 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             if (string.IsNullOrWhiteSpace(model.Username))
                 return BadRequest(new { error = "Username required." });
 
-            var cleanUser = Path.GetFileNameWithoutExtension(model.Username).Trim();
-            var user = await _userManager.FindByNameAsync(cleanUser);
-            if (user == null)
+            string cleanUser = Path.GetFileNameWithoutExtension(model.Username).Trim();
+            VmsIdentityUser? user = await _userManager.FindByNameAsync(cleanUser);
+            if (user is null)
                 return NotFound(new { error = "User not found." });
 
             if (!string.IsNullOrWhiteSpace(model.SessionKey))
             {
-                var keyHash = SHA256.HashData(Encoding.UTF8.GetBytes(model.SessionKey));
-                var session = await _db.LauncherSessions.FirstOrDefaultAsync(s => s.SessionKeyHash == keyHash || s.SessionKey == model.SessionKey);
-                if (session == null || session.ExpiresAt < DateTime.UtcNow || session.UserId != user.Id)
+                LauncherSession? session = await _sessionRepository.GetSessionByKey(model.SessionKey);
+                if (session is null || session.ExpiresAt < DateTime.UtcNow || session.UserId != user.Id)
                     return Unauthorized(new { error = "Invalid or expired session." });
             }
 
-            var ticket = _ticketService.CreateTicket(cleanUser, model.Hwid ?? string.Empty);
+            LauncherTicket ticket = _ticketService.CreateTicket(cleanUser, model.Hwid ?? string.Empty);
             return Ok(new
             {
                 success = true,
@@ -72,16 +76,10 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             });
         }
 
-        public class VerifyTicketModel
-        {
-            public string Ticket { get; set; } = string.Empty;
-            public string Username { get; set; } = string.Empty;
-        }
-
         [HttpPost("api/launch/verify-ticket")]
         public IActionResult VerifyTicket([FromBody] VerifyTicketModel model)
         {
-            var valid = _ticketService.ValidateAndConsumeTicket(model.Ticket, model.Username);
+            bool valid = _ticketService.ValidateAndConsumeTicket(model.Ticket, model.Username);
             if (!valid)
                 return BadRequest(new { valid = false, error = "Invalid or expired ticket." });
 
@@ -94,7 +92,7 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             if (string.IsNullOrWhiteSpace(username))
                 return BadRequest(new { active = false });
 
-            var active = _ticketService.HasActiveTicketForUser(username.Trim());
+            bool active = _ticketService.HasActiveTicketForUser(username.Trim());
             return Ok(new { active, username = username.Trim() });
         }
 
@@ -110,24 +108,11 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             });
         }
 
-        public class ManifestFileEntry
-        {
-            public string Path { get; set; } = string.Empty;
-            public string FileName { get; set; } = string.Empty;
-            public string Sha256 { get; set; } = string.Empty;
-            public long Size { get; set; }
-            public bool IsRequired { get; set; } = true;
-            public string DownloadUrl { get; set; } = string.Empty;
-            public string Category { get; set; } = "Core";
-            public string DisplayName { get; set; } = string.Empty;
-            public string Description { get; set; } = string.Empty;
-        }
-
         [HttpGet("api/builds/{slug}/manifest")]
         public async Task<IActionResult> GetBuildManifest(string slug)
         {
-            var cleanSlug = string.IsNullOrWhiteSpace(slug) ? "vec-fabric-1-21-11" : slug.Trim().ToLowerInvariant();
-            var files = await GetManifestDataAsync(cleanSlug);
+            string cleanSlug = string.IsNullOrWhiteSpace(slug) ? "vec-fabric-1-21-11" : slug.Trim().ToLowerInvariant();
+            List<ManifestFileEntry> files = await GetManifestDataAsync(cleanSlug);
             return Ok(new
             {
                 build = cleanSlug,
@@ -147,11 +132,11 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
 
         private async Task<List<ManifestFileEntry>> GetManifestDataAsync(string cleanSlug)
         {
-            var dbFiles = await _db.ClientBuildFiles.Where(f => f.BuildSlug == cleanSlug).ToListAsync();
+            List<ClientBuildFile> dbFiles = await _buildsRepository.GetBuildFilesBySlug(cleanSlug);
 
             if (dbFiles.Count == 0)
             {
-                var defaults = new List<ClientBuildFile>
+                List<ClientBuildFile> defaults = new List<ClientBuildFile>
                 {
                     new() { BuildSlug = cleanSlug, RelativePath = "mods/fabric-api.jar", FileName = "fabric-api.jar", Sha256 = "", FileSizeBytes = 0, IsRequired = true, Category = "Core", DisplayName = "Fabric API", Description = "Базовый модуль хуков и событий Fabric 1.21.11" },
                     new() { BuildSlug = cleanSlug, RelativePath = "mods/voicechat-fabric.jar", FileName = "voicechat-fabric.jar", Sha256 = "", FileSizeBytes = 0, IsRequired = true, Category = "Core", DisplayName = "Simple Voice Chat", Description = "Позиционный голосовой 3D чат сервера VEC" },
@@ -161,28 +146,27 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
                     new() { BuildSlug = cleanSlug, RelativePath = "mods/appleskin-fabric.jar", FileName = "appleskin-fabric.jar", Sha256 = "", FileSizeBytes = 0, IsRequired = false, Category = "Utility", DisplayName = "AppleSkin", Description = "Показ насыщения еды и очков голода" }
                 };
 
-                _db.ClientBuildFiles.AddRange(defaults);
-                await _db.SaveChangesAsync();
+                await _buildsRepository.AddBuildFiles(defaults);
                 dbFiles = defaults;
             }
 
-            var root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-            var buildDir = Path.Combine(root, "builds", cleanSlug);
+            string root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+            string buildDir = Path.Combine(root, "builds", cleanSlug);
 
-            var result = new List<ManifestFileEntry>();
-            using var sha = SHA256.Create();
+            List<ManifestFileEntry> result = new List<ManifestFileEntry>();
+            using SHA256 sha = SHA256.Create();
 
             foreach (var dbf in dbFiles)
             {
-                var localFile = Path.Combine(buildDir, dbf.RelativePath.Replace('/', Path.DirectorySeparatorChar));
-                var fileSha = dbf.Sha256;
-                var fileSize = dbf.FileSizeBytes;
+                string localFile = Path.Combine(buildDir, dbf.RelativePath.Replace('/', Path.DirectorySeparatorChar));
+                string fileSha = dbf.Sha256;
+                long fileSize = dbf.FileSizeBytes;
 
                 if (System.IO.File.Exists(localFile))
                 {
-                    var fi = new FileInfo(localFile);
+                    FileInfo fi = new FileInfo(localFile);
                     fileSize = fi.Length;
-                    using var stream = System.IO.File.OpenRead(localFile);
+                    using FileStream stream = System.IO.File.OpenRead(localFile);
                     fileSha = BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
                 }
 

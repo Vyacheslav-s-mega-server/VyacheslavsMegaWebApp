@@ -5,7 +5,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using VyacheslavsMegaWebApp.Api.Models;
+using VyacheslavsMegaWebApp.Data.Entities;
 using VyacheslavsMegaWebApp.Data.Entities.Identity;
+using VyacheslavsMegaWebApp.Data.JSON.Configuration;
+using VyacheslavsMegaWebApp.Data.JSON.Configuration.MinecraftServer;
+using VyacheslavsMegaWebApp.Data.JSON.Configuration.Security;
 using VyacheslavsMegaWebApp.Data.Repositories;
 using VyacheslavsMegaWebApp.Service;
 
@@ -18,22 +22,19 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
         private readonly LauncherSessionRepository _sessionRepository;
         private readonly YggdrasilService _yggdrasil;
         private readonly SkinStorageService _skinStorage;
-        private readonly IConfiguration _config;
-        private readonly LaunchTicketService _launchTicketService;
+        private readonly LauncherTicketService _launchTicketService;
 
         public YggdrasilApiController(
             UserManager<VmsIdentityUser> userManager,
             LauncherSessionRepository sessionRepository,
             YggdrasilService yggdrasil,
             SkinStorageService skinStorage,
-            IConfiguration config,
-            LaunchTicketService launchTicketService)
+            LauncherTicketService launchTicketService)
         {
             _userManager = userManager;
             _sessionRepository = sessionRepository;
             _yggdrasil = yggdrasil;
             _skinStorage = skinStorage;
-            _config = config;
             _launchTicketService = launchTicketService;
         }
 
@@ -48,7 +49,7 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
         [HttpGet("/api/yggdrasil")]
         public IActionResult GetMeta()
         {
-            var configuredDomains = _config.GetSection("Server:SkinDomains").Get<string[]>() ?? new[] { "localhost", "127.0.0.1", "109.248.157.54", "95.59.233.227" };
+            string[] skinDomains = MinecraftServerData.SkinDomains.ToArray();
 
             var meta = new
             {
@@ -57,7 +58,7 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
                 implementationVersion = "2.0.0"
             };
 
-            return Ok(new YggdrasilMetaResponse(meta, configuredDomains, _yggdrasil.GetPublicKeyPem()));
+            return Ok(new YggdrasilMetaResponse(meta, skinDomains, _yggdrasil.GetPublicKeyPem()));
         }
 
         [HttpPost("/authserver/authenticate")]
@@ -69,23 +70,23 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
                 return StatusCode(403, new { error = "ForbiddenOperationException", errorMessage = "Invalid credentials. Invalid username or password." });
             }
 
-            var cleanUser = req.Username.Trim();
-            var user = await _userManager.FindByNameAsync(cleanUser);
-            if (user == null || _userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash!, req.Password) == PasswordVerificationResult.Failed)
+            string cleanUser = req.Username.Trim();
+            VmsIdentityUser? user = await _userManager.FindByNameAsync(cleanUser);
+            if (user is null || _userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash!, req.Password) == PasswordVerificationResult.Failed)
             {
                 return StatusCode(403, new { error = "ForbiddenOperationException", errorMessage = "Invalid credentials. Invalid username or password." });
             }
 
-            var clientToken = string.IsNullOrWhiteSpace(req.ClientToken) ? Guid.NewGuid().ToString("N") : req.ClientToken;
-            var sessionKey = await _sessionRepository.CreateSessionKey(user, clientToken);
-            var cleanId = user.Id.Replace("-", "");
+            string clientToken = string.IsNullOrWhiteSpace(req.ClientToken) ? Guid.NewGuid().ToString("N") : req.ClientToken;
+            string sessionKey = await _sessionRepository.CreateSessionKey(user, clientToken);
+            string cleanId = user.Id.Replace("-", "");
 
-            var profile = new ProfileDto(cleanId, user.UserName!);
-            var model = _skinStorage.GetSkinModel(user.UserName!);
-            var skinUrl = $"{BaseUrl}/api/skin/{Uri.EscapeDataString(user.UserName!)}.png";
-            var capeUrl = _skinStorage.HasCape(user.UserName!) ? $"{BaseUrl}/api/cape/{Uri.EscapeDataString(user.UserName!)}.png" : null;
+            ProfileDto profile = new ProfileDto(cleanId, user.UserName!);
+            string model = _skinStorage.GetSkinModel(user.UserName!);
+            string skinUrl = $"{BaseUrl}/api/skin/{Uri.EscapeDataString(user.UserName!)}.png";
+            string? capeUrl = _skinStorage.HasCape(user.UserName!) ? $"{BaseUrl}/api/cape/{Uri.EscapeDataString(user.UserName!)}.png" : null;
 
-            var userDto = new UserDto(cleanId, user.UserName!, user.UserName, model, skinUrl, capeUrl);
+            UserDto userDto = new UserDto(cleanId, user.UserName!, user.UserName, model, skinUrl, capeUrl);
 
             return Ok(new AuthResponse(
                 sessionKey,
@@ -106,7 +107,7 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
                 return StatusCode(403, new { error = "ForbiddenOperationException", errorMessage = "Invalid token." });
             }
 
-            var isValid = await _sessionRepository.ValidateSession(req.AccessToken);
+            bool isValid = await _sessionRepository.ValidateSession(req.AccessToken);
             if (!isValid)
             {
                 return StatusCode(403, new { error = "ForbiddenOperationException", errorMessage = "Invalid token." });
@@ -119,28 +120,26 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
         [HttpPost("/api/yggdrasil/authserver/refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshRequest req)
         {
-            if (string.IsNullOrWhiteSpace(req.AccessToken))
+            LauncherSession? session = await _sessionRepository.GetSessionByKey(req.AccessToken);
+            
+            if (session is null || session.User is null)
             {
                 return StatusCode(403, new { error = "ForbiddenOperationException", errorMessage = "Invalid token." });
             }
 
-            var session = await _sessionRepository.RefreshSession(req.AccessToken, req.ClientToken);
-            if (session == null || session.User == null)
-            {
-                return StatusCode(403, new { error = "ForbiddenOperationException", errorMessage = "Invalid token." });
-            }
+            string sessionKey = await _sessionRepository.RefreshSession(req.AccessToken, req.ClientToken);
 
-            var user = session.User;
-            var cleanId = user.Id.Replace("-", "");
-            var profile = new ProfileDto(cleanId, user.UserName!);
-            var model = _skinStorage.GetSkinModel(user.UserName!);
-            var skinUrl = $"{BaseUrl}/api/skin/{Uri.EscapeDataString(user.UserName!)}.png";
-            var capeUrl = _skinStorage.HasCape(user.UserName!) ? $"{BaseUrl}/api/cape/{Uri.EscapeDataString(user.UserName!)}.png" : null;
+            VmsIdentityUser user = session.User;
+            string cleanId = user.Id.Replace("-", "");
+            ProfileDto profile = new ProfileDto(cleanId, user.UserName!);
+            string model = _skinStorage.GetSkinModel(user.UserName!);
+            string skinUrl = $"{BaseUrl}/api/skin/{Uri.EscapeDataString(user.UserName!)}.png";
+            string? capeUrl = _skinStorage.HasCape(user.UserName!) ? $"{BaseUrl}/api/cape/{Uri.EscapeDataString(user.UserName!)}.png" : null;
 
-            var userDto = new UserDto(cleanId, user.UserName!, user.UserName, model, skinUrl, capeUrl);
+            UserDto userDto = new UserDto(cleanId, user.UserName!, user.UserName, model, skinUrl, capeUrl);
 
             return Ok(new AuthResponse(
-                session.SessionKey,
+                sessionKey,
                 session.ClientToken ?? Guid.NewGuid().ToString("N"),
                 profile,
                 new List<ProfileDto> { profile },
@@ -171,8 +170,7 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
                 return StatusCode(403, new { error = "ForbiddenOperationException", errorMessage = "Invalid parameters." });
             }
 
-            var ok = await _sessionRepository.SetServerId(req.AccessToken, req.ServerId);
-            if (!ok)
+            if (!await _sessionRepository.SetServerId(req.AccessToken, req.ServerId))
             {
                 return StatusCode(403, new { error = "ForbiddenOperationException", errorMessage = "Invalid token." });
             }
@@ -189,25 +187,24 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
                 return NoContent();
             }
 
-            var user = await _sessionRepository.GetUserByServerId(username, serverId);
-            if (user == null)
+            VmsIdentityUser? user = await _sessionRepository.GetUserByServerId(username, serverId);
+            if (user is null)
             {
                 user = await _userManager.FindByNameAsync(username);
             }
 
-            if (user == null)
+            if (user is null)
             {
                 return NoContent();
             }
 
-            var enforceTicket = _config.GetValue<bool>("Security:EnforceLaunchTicket", true);
-            if (enforceTicket && !_launchTicketService.HasActiveTicketForUser(user.UserName!))
+            if (SecuritySettings.EnforceLauncherTicket && !_launchTicketService.HasActiveTicketForUser(user.UserName!))
             {
                 return NoContent();
             }
 
-            var cleanId = user.Id.Replace("-", "");
-            var prop = _yggdrasil.BuildTexturesProperty(user.UserName!, cleanId, BaseUrl);
+            string cleanId = user.Id.Replace("-", "");
+            PropertyDto prop = _yggdrasil.BuildTexturesProperty(user.UserName!, cleanId, BaseUrl);
 
             return Ok(new HasJoinedResponse(cleanId, user.UserName!, new List<PropertyDto> { prop }));
         }
@@ -221,16 +218,16 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
                 return NoContent();
             }
 
-            var cleanId = id.Replace("-", "");
-            var user = await _userManager.FindByIdAsync(id);
+            string cleanId = id.Replace("-", "");
+            VmsIdentityUser? user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 user = await _userManager.FindByNameAsync(id);
             }
 
-            var name = user?.UserName ?? id;
-            var userId = user?.Id ?? cleanId;
-            var prop = _yggdrasil.BuildTexturesProperty(name, userId, BaseUrl);
+            string name = user?.UserName ?? id;
+            string userId = user?.Id ?? cleanId;
+            PropertyDto prop = _yggdrasil.BuildTexturesProperty(name, userId, BaseUrl);
 
             return Ok(new HasJoinedResponse(cleanId, name, new List<PropertyDto> { prop }));
         }

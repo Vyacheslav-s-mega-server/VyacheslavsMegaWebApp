@@ -119,7 +119,7 @@ internal class Program
         builder.Services.AddTransient<EmailService>();
         builder.Services.AddTransient<LauncherSessionRepository>();
         builder.Services.AddTransient<SkinStorageService>();
-        builder.Services.AddSingleton<LaunchTicketService>();
+        builder.Services.AddSingleton<LauncherTicketService>();
         builder.Services.AddSingleton<YggdrasilService>();
         builder.Services.AddSingleton<AppResourcesManager>();
 

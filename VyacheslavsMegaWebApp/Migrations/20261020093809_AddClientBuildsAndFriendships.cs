@@ -6,13 +6,34 @@ using MySql.EntityFrameworkCore.Metadata;
 
 namespace VyacheslavsMegaWebApp.Migrations
 {
+    /// <inheritdoc />
     public partial class AddClientBuildsAndFriendships : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Contacts_AspNetUsers_UserId",
-                table: "Contacts");
+            string tableName = "Contacts";
+            string constraintName = "FK_Contacts_AspNetUsers_UserId";
+
+            migrationBuilder.Sql(
+            $@"
+                SET @sql = IF(
+                    EXISTS (
+                        SELECT 1 
+                        FROM information_schema.table_constraints 
+                        WHERE constraint_schema = DATABASE() 
+                          AND table_name = '{tableName}' 
+                          AND constraint_name = '{constraintName}' 
+                          AND constraint_type = 'FOREIGN KEY'
+                    ), 
+                    'ALTER TABLE `{tableName}` DROP FOREIGN KEY `{constraintName}`;', 
+                    'SELECT ''Foreign key does not exist'';'
+                );
+
+                PREPARE stmt FROM @sql;
+                EXECUTE stmt;
+                DEALLOCATE PREPARE stmt;
+            ");
 
             migrationBuilder.AlterColumn<string>(
                 name: "YellowHint",
@@ -145,8 +166,8 @@ namespace VyacheslavsMegaWebApp.Migrations
             migrationBuilder.AlterColumn<byte[]>(
                 name: "SessionKeyHash",
                 table: "LauncherSessions",
-                type: "longblob",
-                nullable: true,
+                type: "varbinary(3072)",
+                nullable: false,
                 oldClrType: typeof(byte[]),
                 oldType: "longblob");
 
@@ -161,12 +182,6 @@ namespace VyacheslavsMegaWebApp.Migrations
                 table: "LauncherSessions",
                 type: "longtext",
                 nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "SessionKey",
-                table: "LauncherSessions",
-                type: "longtext",
-                nullable: false);
 
             migrationBuilder.AlterColumn<string>(
                 name: "UserId",
@@ -230,25 +245,11 @@ namespace VyacheslavsMegaWebApp.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.UpdateData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "03d4ba1e-afef-4e77-849d-295bd86148db",
-                column: "ConcurrencyStamp",
-                value: "93be00d7-848a-4096-aa47-a77de16ba3b7");
-
-            migrationBuilder.UpdateData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "db158bac-48d4-47c3-a6b0-c6d8b5c9ee55",
-                column: "ConcurrencyStamp",
-                value: "1332e53a-1128-4026-a736-02d3a746aea6");
-
-            migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "d4bc75a9-ca48-45aa-a3f2-2ea5886ce303",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
-                values: new object[] { "820045f5-4da5-49ff-a0b9-be470b99de50", "AQAAAAIAAYagAAAAEOzhpzGzZixJ4x4Tfgo8f99JBG5Y2HoGPe4OrSRYDtUVrDonlHDlYd9pka3FDYbvbg==", "d94d396f-9ccc-491a-ac5f-9e85b17871a1" });
+                values: new object[] { "958cef03-4205-4adb-bc9f-85bf0291c544", "AQAAAAIAAYagAAAAEMkiRESPpwYF/7p1G/0jkJ4+HRuGXhvj4YuDs4QT2590mQ/pZ9wR4a84aOSEIYSyMA==", "1e7b369b-4631-4e38-a482-207e18fd7e2b" });
 
             migrationBuilder.UpdateData(
                 table: "MainPageData",
@@ -256,6 +257,11 @@ namespace VyacheslavsMegaWebApp.Migrations
                 keyValue: 1,
                 columns: new[] { "AboutTag", "AboutText", "AboutTitle", "Feature1Desc", "Feature1Title", "Feature2Desc", "Feature2Title", "Feature3Desc", "Feature3Title", "Subtitle", "TitleAccent" },
                 values: new object[] { "О ПРОЕКТЕ VEC", null, "Сервер, сделанный для людей", null, "Собственный лаунчер VEC", null, "Честная игра без донат-мусора", null, "Стабильность и защита", null, "ИДЕАЛЬНЫЙ МИР" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LauncherSessions_SessionKeyHash",
+                table: "LauncherSessions",
+                column: "SessionKeyHash");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Friendships_AddresseeId",
@@ -274,6 +280,8 @@ namespace VyacheslavsMegaWebApp.Migrations
                 principalTable: "AspNetUsers",
                 principalColumn: "Id");
         }
+
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
@@ -285,6 +293,10 @@ namespace VyacheslavsMegaWebApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "Friendships");
+
+            migrationBuilder.DropIndex(
+                name: "IX_LauncherSessions_SessionKeyHash",
+                table: "LauncherSessions");
 
             migrationBuilder.DropColumn(
                 name: "AboutTag",
@@ -336,10 +348,6 @@ namespace VyacheslavsMegaWebApp.Migrations
 
             migrationBuilder.DropColumn(
                 name: "ServerId",
-                table: "LauncherSessions");
-
-            migrationBuilder.DropColumn(
-                name: "SessionKey",
                 table: "LauncherSessions");
 
             migrationBuilder.AlterColumn<string>(
@@ -415,10 +423,8 @@ namespace VyacheslavsMegaWebApp.Migrations
                 table: "LauncherSessions",
                 type: "longblob",
                 nullable: false,
-                defaultValue: new byte[0],
                 oldClrType: typeof(byte[]),
-                oldType: "longblob",
-                oldNullable: true);
+                oldType: "varbinary(3072)");
 
             migrationBuilder.AlterColumn<string>(
                 name: "UserId",
@@ -429,20 +435,6 @@ namespace VyacheslavsMegaWebApp.Migrations
                 oldClrType: typeof(string),
                 oldType: "varchar(255)",
                 oldNullable: true);
-
-            migrationBuilder.UpdateData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "03d4ba1e-afef-4e77-849d-295bd86148db",
-                column: "ConcurrencyStamp",
-                value: null);
-
-            migrationBuilder.UpdateData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "db158bac-48d4-47c3-a6b0-c6d8b5c9ee55",
-                column: "ConcurrencyStamp",
-                value: null);
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",

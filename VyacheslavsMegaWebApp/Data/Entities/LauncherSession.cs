@@ -7,8 +7,8 @@ namespace VyacheslavsMegaWebApp.Data.Entities
 {
     public class LauncherSession : Base.EntityGuid
     {
-        public string SessionKey { get; set; } = string.Empty;
-        public byte[]? SessionKeyHash { get; set; }
+        //public string SessionKey { get; set; } = string.Empty;
+        public required byte[] SessionKeyHash { get; set; }
         public string UserId { get; set; } = string.Empty;
         public DateTime ExpiresAt { get; set; }
         public string? ClientToken { get; set; }
