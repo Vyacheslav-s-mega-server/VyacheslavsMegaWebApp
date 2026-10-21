@@ -1,173 +1,309 @@
-﻿@model MainPageViewModel
+@model MainPageViewModel
 
-<div class="intro" id="intro">
-    <div class="container">
+<section class="intro" id="intro">
+    <div class="intro__container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                @Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Title) ? "ОТКРОЙ СВОЙ" : Model.MainPageData.Title)<br>
+                <span class="hero-title__accent">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.TitleAccent) ? "ИДЕАЛЬНЫЙ МИР" : Model.MainPageData.TitleAccent)</span>
+            </h1>
 
-        <div class="intro__container">
-            <div class="intro__title-container">
-                <style>
-                    .intro__title::after {
-                        content: "@Html.Raw(Model.MainPageData.YellowHint)";
-                    }
-                </style>
-                <h1 class="intro__title">@Html.Raw(@Model.MainPageData.Title)</h1>
-            </div>
+            <p class="hero-subtitle">
+                @if (string.IsNullOrWhiteSpace(Model.MainPageData.Subtitle))
+                {
+                    <strong class="hero-subtitle__bold">Мега Сервер Вячеслава</strong> @:— уникальный мир Minecraft со своим лаунчером, честным выживанием и сплочённым комьюнити без донатного дисбаланса.
+                }
+                else
+                {
+                    @Html.Raw(Model.MainPageData.Subtitle)
+                }
+            </p>
 
-            <div class="intro__info-container">
-                <div class="intro__info-block intro__info-block--shrink">
-                    <h3 class="intro__info-title">Состояние сервера</h3>
-
-                    @if (Model.MainPageData.ShowErrorMessage)
+            <div class="hero-row">
+                @if (Model.DownloadButtons != null && Model.DownloadButtons.Any())
+                {
+                    @foreach (var btn in Model.DownloadButtons)
                     {
-                        <p class="intro__info-text intro__info-text--error">@Model.MainPageData.ErrorMessage</p>
+                        var btnUrl = btn.IsResourceLocal && !btn.Url.StartsWith("/") && !btn.Url.StartsWith("http") ? "/" + btn.Url : btn.Url;
+                        var isDownloadFile = btn.IsResourceLocal || btn.Url.EndsWith(".exe") || btn.Url.EndsWith(".zip") || btn.Url.EndsWith(".jar");
+                        <a href="@btnUrl" class="btn-download" @(isDownloadFile ? "download" : "") @(!btn.IsResourceLocal ? "target=\"_blank\" rel=\"noopener\"" : "")>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>@(string.IsNullOrWhiteSpace(btn.Title) ? "Скачать лаунчер" : btn.Title)</span>
+                        </a>
                     }
-                    <p class="intro__info-text">IP: @Model.MainPageData.ServerAddress</p>
-                    <p class="intro__info-text">Версия: @Model.MainPageData.ServerVersion</p>
-                    @if(Model.MCServerStat.Available && Model.MCServerStat.IsOnline)
+                }
+                else
+                {
+                    <a href="/downloads/VEC_Setup.exe" class="btn-download" download>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>Скачать лаунчер</span>
+                    </a>
+                }
+
+
+                <div class="ip-pill" onclick="copyServerIp('@Model.MainPageData.ServerAddress')" title="Нажмите, чтобы скопировать IP">
+                    <span class="ip-pill__text" id="serverIpText">@Model.MainPageData.ServerAddress</span>
+                    <button type="button" class="ip-pill__copy" id="copyIpBtn" aria-label="Скопировать">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                    @if (Model.MCServerStat.Available && Model.MCServerStat.IsOnline)
                     {
-                        <p class="intro__info-text">Игроков онлайн: @Model.MCServerStat.Players.Online/@Model.MCServerStat.Players.Max</p>
+                        <span class="ip-pill__players">@Model.MCServerStat.Players.Online / @Model.MCServerStat.Players.Max</span>
+                    }
+                    else
+                    {
+                        <span class="ip-pill__players">0 / 20</span>
                     }
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                @if (Model.DownloadButtons.Any())
-                {
-                    <div class="intro__info-block">
-                        <h3 class="intro__info-title">Полезные ресурсы</h3>
-                        @foreach (DownloadButton button in Model.DownloadButtons)
+<section class="section-dossier" id="about">
+    <div class="container">
+        <div class="dossier-grid">
+            <div class="dossier-brochure">
+                <div class="brochure-header">
+                    <span class="brochure-tag">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.AboutTag) ? "О ПРОЕКТЕ VEC" : Model.MainPageData.AboutTag)</span>
+                    <h2 class="brochure-title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.AboutTitle) ? "Сервер, сделанный для людей" : Model.MainPageData.AboutTitle)</h2>
+                </div>
+
+                <div class="brochure-intro">
+                    <p>
+                        @if (string.IsNullOrWhiteSpace(Model.MainPageData.AboutText))
                         {
-                            @if (button.IsResourceLocal)
+                            <strong>Vyacheslav's Mega Server</strong> @:— Minecraft сервер организации «Vyacheslav's Engineering Company» (VEC), созданный на платформе <a class="brochure-link" href="https://kpvk.edu.kz/" target="_blank" rel="noopener">Костанайского высшего политехнического колледжа</a> самим Вячеславом.
+                        }
+                        else
+                        {
+                            @Html.Raw(Model.MainPageData.AboutText)
+                        }
+                    </p>
+                </div>
+
+                <div class="brochure-points">
+                    <div class="brochure-item">
+                        <div class="brochure-item__content">
+                            <h4 class="brochure-item__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature1Title) ? "Собственный лаунчер VEC" : Model.MainPageData.Feature1Title)</h4>
+                            <p class="brochure-item__desc">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature1Desc) ? "Мгновенный вход в игру, автоматическая синхронизация модов и полная оптимизация клиента под любой компьютер." : Model.MainPageData.Feature1Desc)</p>
+                        </div>
+                    </div>
+
+                    <div class="brochure-item">
+                        <div class="brochure-item__content">
+                            <h4 class="brochure-item__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature2Title) ? "Честная игра без донат-мусора" : Model.MainPageData.Feature2Title)</h4>
+                            <p class="brochure-item__desc">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature2Desc) ? "Никаких платных админок, креатива или ломающих баланс команд. Все игроки равны перед законами мира." : Model.MainPageData.Feature2Desc)</p>
+                        </div>
+                    </div>
+
+                    <div class="brochure-item">
+                        <div class="brochure-item__content">
+                            <h4 class="brochure-item__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature3Title) ? "Стабильность и защита" : Model.MainPageData.Feature3Title)</h4>
+                            <p class="brochure-item__desc">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature3Desc) ? "Выделенный сервер с постоянным TPS 20.0, регулярными резервными копиями мира и защитой от вредителей." : Model.MainPageData.Feature3Desc)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dossier-founder-card">
+                <div class="founder-chair-stage">
+                    <img class="founder-chair-img" src="~/img/vyacheslav-chair.png" alt="Вячеслав на кресле с ноутом" />
+                </div>
+
+                <div class="founder-info-block">
+                    <div class="founder-title-row">
+                        <div>
+                            <h3 class="founder-title-name">Вячеслав <span class="founder-title-handle">[Evray]</span></h3>
+                            <span class="founder-title-role">Создатель и архитектор VEC</span>
+                        </div>
+                    </div>
+
+                    <p class="founder-quote-text">
+                        «@(Model.Creator != null && !string.IsNullOrWhiteSpace(Model.Creator.DescriptionLarge) ? Model.Creator.DescriptionLarge : "Проект является полностью некоммерческим — прибыли я от него не получаю. Всё, что мы делаем, идёт исключительно на развитие сервера, хостинга и нашего комьюнити.")»
+                    </p>
+
+                    <div class="founder-links-row">
+                        @if (Model.Creator != null && Model.Creator.Links != null)
+                        {
+                            @foreach (ContactLink link in Model.Creator.Links)
                             {
-                                <a href="~/@button.Url">
-                                    <button class="mc-button mc-button--wide" type="button">
-                                        <span class="mc-button__title">@button.Title</span>
-                                    </button>
-                                </a>
-                            }
-                            else
-                            {
-                                <a href="@button.Url">
-                                    <button class="mc-button mc-button--wide" type="button">
-                                        <span class="mc-button__title">@button.Title</span>
-                                    </button>
+                                var desc = (link.Description ?? "").ToLower();
+                                string iconClass = "bx bx-link-external";
+                                string brandClass = "pill--default";
+                                if (desc.Contains("телеграм") || desc.Contains("telegram") || desc.Contains("тг"))
+                                {
+                                    iconClass = "bx bxl-telegram";
+                                    brandClass = "pill--telegram";
+                                }
+                                else if (desc.Contains("дискорд") || desc.Contains("discord") || desc.Contains("дс"))
+                                {
+                                    iconClass = "bx bxl-discord-alt";
+                                    brandClass = "pill--discord";
+                                }
+                                else if (desc.Contains("вк") || desc.Contains("vk"))
+                                {
+                                    iconClass = "bx bxl-vk";
+                                    brandClass = "pill--vk";
+                                }
+
+                                <a class="founder-contact-pill @brandClass" href="@Html.Raw(link.Url)" target="_blank" rel="noopener">
+                                    <i class="@iconClass founder-contact-pill__icon"></i>
+                                    <div class="founder-contact-pill__labels">
+                                        <span class="founder-contact-pill__desc">@link.Description</span>
+                                        <span class="founder-contact-pill__nick">@link.Content</span>
+                                    </div>
+                                    <i class='bx bx-chevron-right founder-contact-pill__arrow'></i>
                                 </a>
                             }
                         }
                     </div>
-                }
-            </div>
-        </div>
-
-    </div>
-</div>
-
-@if (Model.MediaLinks.Any(l => l.ShowLink))
-{
-    <div class="block-stripe">
-        @foreach (ServerMediaLink link in Model.MediaLinks.Where(l => l.ShowLink))
-        {
-        <div class="iconed-link">
-            @if (link.HasLogo)
-            {
-                <img class="iconed-link__icon" src="~/@link.LogoFullPath" />
-            }
-            <a href="@link.Url">@link.Content</a>
-        </div>
-        }
-    </div>
-}
-
-<div class="block block--about" id="about">
-    <div class="container">
-        <div class="section">
-            <h2 class="section__title">О проекте</h2>
-            <p>
-                @Html.Raw(Model.MainPageData.Description)
-            </p>
-            <p>
-                Присоединяйтесь к нам по адресу @Model.MainPageData.ServerAddress и станьте частью нашего мира!
-            </p>
-        </div>
-    </div>
-</div>
-
-<div class="block block--contacts" id="contacts">
-    <div class="container">
-        <div class="section">
-            <h2 class="section__title">Контакты</h2>
-            <div class="contact">
-                <img class="contact__image" src="~/img/Evray.png" />
-                <div>
-                    <p>Вячеслав (Evray), создатель и администратор сервера</p>
-                    <ul>
-                        @foreach (ContactLink link in Model.Creator.Links)
-                        {
-                            <li>@link.Description<a class="white" href="@Html.Raw(link.Url)">@link.Content</a></li>
-                        }
-                    </ul>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 @if (Model.PartnersData.Any(p => p.ShowPartner))
 {
-    <div class="block block--partners">
+    var activePartners = Model.PartnersData.Where(p => p.ShowPartner).ToList();
+    <section class="section-partners" id="partners">
         <div class="container">
-            <div class="section">
-                <h2 class="section__title">Наши партнёры</h2>
-                <div class="horizontal-scroller horizontal-scroller--index">
-                    <div class="horizontal-scroller__arrow-container horizontal-scroller__arrow-container--start"
-                    id="HScrollerToStart">
-                        <div class="horizontal-scroller__arrow-left"></div>
-                        <div class="horizontal-scroller__arrow-left"></div>
-                    </div>
-                    <div class="horizontal-scroller__arrow-container horizontal-scroller__arrow-container--prev"
-                    id="HScrollerPrev">
-                        <div class="horizontal-scroller__arrow-left"></div>
-                    </div>
+            <div class="partners-head">
+                <span class="partners-tag">ЭКОСИСТЕМА</span>
+                <h2 class="partners-title">Партнёры проекта VEC</h2>
+                <p class="partners-desc">Проекты, медиа и сервисы, поддерживающие наше сообщество</p>
+            </div>
 
-                    <div class="horizontal-scroller__content" id="HScrollerContent">
+            <div class="partner-carousel-stage">
+                <button type="button" class="carousel-arrow carousel-arrow--prev" id="partnerPrevBtn" aria-label="Предыдущий партнёр">
+                    <i class='bx bx-chevron-left'></i>
+                </button>
 
-                        @foreach (Partner partner in Model.PartnersData.Where(p => p.ShowPartner))
-                        {
-                            <div class="partner-card">
-                                <img class="partner-card__logo" src="~/@partner.LogoFullPath" />
-                                <span class="partner-card__line"></span>
-                                <div class="partner-card__text-container">
+                <div class="partner-showcase-container">
+                    @for (int i = 0; i < activePartners.Count; i++)
+                    {
+                        var partner = activePartners[i];
+                        <div class="partner-showcase-slide @(i == 0 ? "is-active" : "")" data-slide-index="@i">
+                            <div class="partner-showcase-card">
+                                <div class="partner-showcase-card__media">
+                                    <img class="partner-showcase-card__img" src="~/@partner.LogoFullPath" alt="@partner.Name" />
+                                </div>
 
-                                    <h3 class="partner-card__title">@partner.Name</h3>
-                                    <p class="partner-card__subtitle">@partner.Subtitle</p>
-                                    <p class="partner-card__text">@partner.Description</p>
+                                <div class="partner-showcase-card__body">
+                                    <div class="partner-showcase-card__head">
+                                        <span class="partner-showcase-card__sub">@partner.Subtitle</span>
+                                        <h3 class="partner-showcase-card__name">@partner.Name</h3>
+                                    </div>
 
-                                    @if (partner.Links.Any())
-                                    {
-                                        <p class="partner-card__text">Контакты партнёра:</p>
-                                        <ul>
-                                            @foreach (PartnerLink link in partner.Links)
-                                            {
-                                                <li>@link.Description<a class="white" href="@Html.Raw(link.Url)">@link.Content</a></li>
-                                            }
-                                        </ul>
-                                    }
+                                    <p class="partner-showcase-card__desc">@partner.Description</p>
+
+                                    <div class="partner-showcase-card__footer">
+                                        @if (partner.Links.Any())
+                                        {
+                                            var link = partner.Links.First();
+                                            <a class="partner-showcase-card__btn" href="@Html.Raw(link.Url)" target="_blank" rel="noopener">
+                                                <span>@link.Content</span>
+                                                <i class='bx bx-link-external'></i>
+                                            </a>
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                        }
-                    </div>
-
-                    <div class="horizontal-scroller__arrow-container horizontal-scroller__arrow-container--next"
-                    id="HScrollerNext">
-                        <div class="horizontal-scroller__arrow-right"></div>
-                    </div>
-                    <div class="horizontal-scroller__arrow-container horizontal-scroller__arrow-container--end"
-                    id="HScrollerToEnd">
-                        <div class="horizontal-scroller__arrow-right"></div>
-                        <div class="horizontal-scroller__arrow-right"></div>
-                    </div>
+                        </div>
+                    }
                 </div>
+
+                <button type="button" class="carousel-arrow carousel-arrow--next" id="partnerNextBtn" aria-label="Следующий партнёр">
+                    <i class='bx bx-chevron-right'></i>
+                </button>
+            </div>
+
+            <div class="partner-carousel-dots" id="partnerDots">
+                @for (int i = 0; i < activePartners.Count; i++)
+                {
+                    <button type="button" class="carousel-dot @(i == 0 ? "is-active" : "")" data-dot-index="@i" aria-label="Слайд @(i + 1)"></button>
+                }
             </div>
         </div>
-    </div>
+    </section>
 }
 
-<script src="~/js/horizontal-scroller.js"></script>
+<script>
+function copyServerIp(ip) {
+    navigator.clipboard.writeText(ip).then(function() {
+        const addr = document.getElementById('serverIpText');
+        if (addr) {
+            const old = addr.innerText;
+            addr.innerText = 'Скопировано';
+            setTimeout(() => {
+                addr.innerText = old;
+            }, 1800);
+        }
+    });
+}
+
+(function initInfinitePartnersCarousel() {
+    const slides = document.querySelectorAll('.partner-showcase-slide');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const prevBtn = document.getElementById('partnerPrevBtn');
+    const nextBtn = document.getElementById('partnerNextBtn');
+    if (!slides.length) return;
+
+    let currentIndex = 0;
+    const total = slides.length;
+    let isAnimating = false;
+
+    function goToSlide(targetIndex, direction) {
+        if (isAnimating) return;
+        if (targetIndex === currentIndex) return;
+        isAnimating = true;
+
+        const currentSlide = slides[currentIndex];
+        const nextSlide = slides[targetIndex];
+
+        nextSlide.classList.remove('slide-from-left', 'slide-from-right');
+        if (direction === 'prev') {
+            nextSlide.classList.add('slide-from-left');
+        } else {
+            nextSlide.classList.add('slide-from-right');
+        }
+
+        currentSlide.classList.remove('is-active');
+        nextSlide.classList.add('is-active');
+
+        dots.forEach(function(dot, idx) {
+            dot.classList.toggle('is-active', idx === targetIndex);
+        });
+
+        currentIndex = targetIndex;
+
+        setTimeout(function() {
+            isAnimating = false;
+        }, 320);
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            const prevIdx = (currentIndex - 1 + total) % total;
+            goToSlide(prevIdx, 'prev');
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            const nextIdx = (currentIndex + 1) % total;
+            goToSlide(nextIdx, 'next');
+        });
+    }
+
+    dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            const idx = parseInt(this.getAttribute('data-dot-index'), 10);
+            if (!isNaN(idx) && idx !== currentIndex) {
+                goToSlide(idx, idx < currentIndex ? 'prev' : 'next');
+            }
+        });
+    });
+})();
+</script>

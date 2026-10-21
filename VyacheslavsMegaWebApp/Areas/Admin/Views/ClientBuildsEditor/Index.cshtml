@@ -1,0 +1,74 @@
+@model List<VyacheslavsMegaWebApp.Data.Entities.ClientBuildFile>
+
+<div class="block block--first">
+    <div class="container">
+        <div class="section">
+            <h2 class="section__title section__title--main">Управление клиентом (Моды, Шейдеры, Ресурспаки)</h2>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="mc-table-container" style="color: #27ae60; font-weight: bold; margin-bottom: 10px;">
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="mc-table-container" style="color: #c0392b; font-weight: bold; margin-bottom: 10px;">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="mc-table-container">
+                <table class="mc-table mc-table--wide">
+                    <tr class="mc-table--center-aligment">
+                        <td>Название</td>
+                        <td>Категория</td>
+                        <td>Источник</td>
+                        <td>Файл (.jar / .zip)</td>
+                        <td>Размер</td>
+                        <td>SHA-256</td>
+                        <td>Обязательный</td>
+                        <td colspan="3">Действия</td>
+                    </tr>
+                    @foreach (var mod in Model)
+                    {
+                        <tr>
+                            <td>@mod.DisplayName</td>
+                            <td>@mod.Category</td>
+                            <td>@(mod.SourceType == "Modrinth" || mod.DownloadUrl?.StartsWith("http") == true ? "Modrinth" : "Локально")</td>
+                            <td>@mod.FileName</td>
+                            <td>@(mod.FileSizeBytes > 0 ? $"{(mod.FileSizeBytes / 1024.0 / 1024.0):F2} МБ" : "—")</td>
+                            <td>@(string.IsNullOrEmpty(mod.Sha256) ? "—" : mod.Sha256[..Math.Min(12, mod.Sha256.Length)] + "...")</td>
+                            <td class="mc-table--center-aligment">
+                                <label class="mc-checkbox">
+                                    <input class="mc-checkbox__input" type="checkbox" checked="@mod.IsRequired" disabled />
+                                    <span class="mc-checkbox__box"></span>
+                                </label>
+                            </td>
+                            <td>
+                                <a asp-action="ModDetails" asp-route-id="@mod.Id">Редактировать</a>
+                            </td>
+                            <td>
+                                <a asp-action="ToggleRequired" asp-route-id="@mod.Id">
+                                    @(mod.IsRequired ? "Сделать опц." : "Сделать обяз.")
+                                </a>
+                            </td>
+                            <td>
+                                <a asp-action="DeleteMod" asp-route-id="@mod.Id" onclick="confirmRemove(event)">Удалить</a>
+                            </td>
+                        </tr>
+                    }
+                    <tr class="mc-table--center-aligment">
+                        <td colspan="10"><a asp-action="ModDetails">Добавить новый компонент (Мод / Шейдер / Ресурспак)</a></td>
+                    </tr>
+                </table>
+            </div>
+
+            <p class="back-link">
+                <a asp-area="Admin" asp-controller="Home" asp-action="Index">Назад</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/navigation-confirmation.js"></script>

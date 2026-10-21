@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using VyacheslavsMegaWebApp.Data.Entities.Base;
@@ -24,10 +24,10 @@ namespace VyacheslavsMegaWebApp.Data.Entities
         #region Navigations
 
         [Display(Name = "Пользователь")]
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
         [ValidateNever]
-        public virtual VmsIdentityUser User { get; set; }
+        public virtual VmsIdentityUser? User { get; set; }
 
         [ValidateNever]
         public virtual ICollection<ContactLink> Links { get; set; } = new List<ContactLink>();

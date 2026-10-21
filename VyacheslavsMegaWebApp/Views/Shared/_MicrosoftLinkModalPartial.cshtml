@@ -1,0 +1,303 @@
+<style>
+#msLinkModal,
+#msLinkModal * {
+    font-family: 'minecraft', sans-serif !important;
+    text-shadow: none !important;
+    filter: none !important;
+    box-sizing: border-box;
+}
+
+#msLinkModal .ms-modal-window {
+    max-width: 500px;
+    width: 92%;
+    background: #11141a;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 12px;
+    padding: 24px;
+    box-sizing: border-box;
+    color: #f3f4f6;
+    position: relative;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.85) !important;
+}
+
+#msLinkModal .ms-modal-title {
+    font-family: 'minecraft-title', 'minecraft', sans-serif !important;
+    font-size: 18px;
+    color: #ffffff;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+#msLinkModal #msUserCodeDisplay {
+    font-family: 'minecraft', monospace !important;
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    color: #fbbf24 !important;
+    letter-spacing: 4px !important;
+    line-height: 1.2 !important;
+    user-select: all;
+    margin-bottom: 14px;
+    text-shadow: none !important;
+}
+
+#msLinkModal .ms-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    border: 1px solid transparent;
+    line-height: 1.4;
+}
+
+#msLinkModal .ms-btn--secondary {
+    background: #1f2532;
+    border-color: #374151;
+    color: #e5e7eb;
+}
+#msLinkModal .ms-btn--secondary:hover {
+    background: #2b3345;
+    border-color: #4b5563;
+    color: #ffffff;
+}
+
+#msLinkModal .ms-btn--primary {
+    background: #2563eb;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+#msLinkModal .ms-btn--primary:hover {
+    background: #1d4ed8;
+    border-color: #60a5fa;
+    color: #ffffff;
+}
+
+@@keyframes msModalSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<div id="msLinkModal" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); z-index: 99999;">
+    <div class="ms-modal-window">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 14px; margin-bottom: 18px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
+                    <rect x="13" y="1" width="10" height="10" fill="#7FBA00"/>
+                    <rect x="1" y="13" width="10" height="10" fill="#00A4EF"/>
+                    <rect x="13" y="13" width="10" height="10" fill="#FFB900"/>
+                </svg>
+                <h3 class="ms-modal-title" style="margin: 0; font-size: 18px; color: #ffffff; font-weight: 700; letter-spacing: 0.5px;">
+                    Привязка лицензии Microsoft
+                </h3>
+            </div>
+            <button type="button" onclick="closeMsLinkModal()" style="background: transparent; border: none; color: #9ca3af; font-size: 26px; cursor: pointer; line-height: 1; padding: 0 4px;">&times;</button>
+        </div>
+
+        <!-- Step 1: Loading init -->
+        <div id="msLinkStepInit" style="text-align: center; padding: 32px 0;">
+            <div style="width: 36px; height: 36px; margin: 0 auto 16px; border: 3px solid rgba(255,255,255,0.12); border-top-color: #fbbf24; border-radius: 50%; animation: msModalSpin 0.8s linear infinite;"></div>
+            <div style="color: #9ca3af; font-size: 14px; font-weight: 500;">Генерация одноразового защищенного кода Microsoft...</div>
+        </div>
+
+        <!-- Step 2: Show code and verification link -->
+        <div id="msLinkStepActive" style="display: none;">
+            <div style="font-size: 14px; color: #e5e7eb; margin-bottom: 16px; line-height: 1.5; font-weight: 400;">
+                Перейдите по ссылке на сайт Microsoft и введите код:
+            </div>
+
+            <div style="background: #161b24; border: 1px solid #283040; border-radius: 8px; padding: 20px 16px; text-align: center; margin-bottom: 18px;">
+                <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 600;">Одноразовый код</div>
+                <div id="msUserCodeDisplay">
+                    --------
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" class="ms-btn ms-btn--secondary" onclick="copyMsUserCode()">
+                        <i class='bx bx-copy'></i> <span id="msCopyBtnText">Скопировать код</span>
+                    </button>
+                    <a id="msOpenLinkBtn" href="https://microsoft.com/link" target="_blank" rel="noopener noreferrer" class="ms-btn ms-btn--primary">
+                        <span>Открыть microsoft.com/link ↗</span>
+                    </a>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px; background: rgba(30, 58, 138, 0.25); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px;">
+                <div style="width: 18px; height: 18px; border: 2px solid rgba(59, 130, 246, 0.3); border-top-color: #60a5fa; border-radius: 50%; animation: msModalSpin 0.8s linear infinite; flex-shrink: 0;"></div>
+                <div style="font-size: 13px; color: #bfdbfe; font-weight: 500;" id="msPollingStatusText">
+                    Ожидание подтверждения на сайте Microsoft...
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Success -->
+        <div id="msLinkStepSuccess" style="display: none; text-align: center; padding: 24px 0;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; display: inline-flex; align-items: center; justify-content: center; color: #10b981; font-size: 26px; margin-bottom: 14px; font-weight: 700;">
+                ✓
+            </div>
+            <div id="msSuccessTitle" style="font-size: 18px; color: #ffffff; font-weight: 700; margin-bottom: 8px;">Лицензия успешно привязана!</div>
+            <div id="msSuccessDetails" style="font-size: 14px; color: #9ca3af; margin-bottom: 16px;">Официальные плащи Mojang импортированы в ваш гардероб.</div>
+        </div>
+
+        <!-- Error state -->
+        <div id="msLinkErrorBox" style="display: none; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; color: #fca5a5; font-size: 13px; line-height: 1.4;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 14px;">
+            <button type="button" class="ms-btn ms-btn--secondary" onclick="closeMsLinkModal()">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let msPollTimer = null;
+    let msActiveDeviceCode = null;
+    let msIsPolling = false;
+
+    async function startMicrosoftLink() {
+        const modal = document.getElementById('msLinkModal');
+        const stepInit = document.getElementById('msLinkStepInit');
+        const stepActive = document.getElementById('msLinkStepActive');
+        const stepSuccess = document.getElementById('msLinkStepSuccess');
+        const errBox = document.getElementById('msLinkErrorBox');
+
+        modal.style.display = 'flex';
+        stepInit.style.display = 'block';
+        stepActive.style.display = 'none';
+        stepSuccess.style.display = 'none';
+        errBox.style.display = 'none';
+
+        if (msPollTimer) {
+            clearInterval(msPollTimer);
+            msPollTimer = null;
+        }
+
+        try {
+            const resp = await fetch('/Account/StartMicrosoftDeviceCode');
+            let data = null;
+            try {
+                data = await resp.json();
+            } catch (jsonErr) {
+                stepInit.style.display = 'none';
+                errBox.style.display = 'block';
+                errBox.textContent = 'Ошибка ответа сервера (HTTP ' + resp.status + ').';
+                return;
+            }
+
+            if (!resp.ok || !data.success) {
+                stepInit.style.display = 'none';
+                errBox.style.display = 'block';
+                errBox.textContent = data.error || ('Не удалось начать авторизацию (HTTP ' + resp.status + ').');
+                return;
+            }
+
+            msActiveDeviceCode = data.deviceCode;
+            document.getElementById('msUserCodeDisplay').textContent = data.userCode;
+            const openLinkBtn = document.getElementById('msOpenLinkBtn');
+            if (openLinkBtn && data.verificationUri) {
+                openLinkBtn.href = data.verificationUri;
+            }
+
+            stepInit.style.display = 'none';
+            stepActive.style.display = 'block';
+
+            const intervalMs = Math.max(5000, (data.interval || 5) * 1000);
+            msPollTimer = setInterval(pollMicrosoftStatus, intervalMs);
+        } catch (err) {
+            stepInit.style.display = 'none';
+            errBox.style.display = 'block';
+            errBox.textContent = 'Ошибка сети при обращении к серверу: ' + (err.message || err);
+        }
+    }
+
+    async function pollMicrosoftStatus() {
+        if (!msActiveDeviceCode || msIsPolling) return;
+        msIsPolling = true;
+
+        try {
+            const form = new FormData();
+            form.append('deviceCode', msActiveDeviceCode);
+
+            const resp = await fetch('/Account/PollMicrosoftDeviceCode', {
+                method: 'POST',
+                body: form
+            });
+
+            const data = await resp.json();
+
+            if (data.status === 'pending') {
+                return;
+            }
+
+            if (msPollTimer) {
+                clearInterval(msPollTimer);
+                msPollTimer = null;
+            }
+
+            if (data.status === 'success') {
+                document.getElementById('msLinkStepActive').style.display = 'none';
+                document.getElementById('msLinkStepSuccess').style.display = 'block';
+                document.getElementById('msSuccessTitle').textContent = `Лицензия Minecraft (${data.gamertag}) подтверждена!`;
+                document.getElementById('msSuccessDetails').textContent = `Импортировано плащей: ${data.capes ? data.capes.length : 0}. Обновление страницы...`;
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1600);
+            } else {
+                const errBox = document.getElementById('msLinkErrorBox');
+                errBox.style.display = 'block';
+                errBox.textContent = data.error || 'Ошибка проверки лицензии.';
+                document.getElementById('msPollingStatusText').textContent = 'Проверка остановлена из-за ошибки.';
+            }
+        } catch (e) {
+            console.warn('Poll error:', e);
+        } finally {
+            msIsPolling = false;
+        }
+    }
+
+    function closeMsLinkModal() {
+        if (msPollTimer) {
+            clearInterval(msPollTimer);
+            msPollTimer = null;
+        }
+        document.getElementById('msLinkModal').style.display = 'none';
+    }
+
+    function copyMsUserCode() {
+        const code = document.getElementById('msUserCodeDisplay').textContent.trim();
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.getElementById('msCopyBtnText');
+                btn.textContent = 'Скопировано!';
+                setTimeout(() => { btn.textContent = 'Скопировать код'; }, 2000);
+            });
+        }
+    }
+
+    async function unlinkMicrosoftLicense() {
+        if (!confirm('Вы уверены, что хотите отвязать официальную лицензию Microsoft? Импортированные плащи Mojang перестанут быть доступны.')) {
+            return;
+        }
+
+        try {
+            const resp = await fetch('/Account/UnlinkMicrosoftLicense', { method: 'POST' });
+            const data = await resp.json();
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert(data.error || 'Не удалось отвязать лицензию.');
+            }
+        } catch (e) {
+            alert('Ошибка сети.');
+        }
+    }
+    const unlinkMicrosoftAccount = unlinkMicrosoftLicense;
+</script>

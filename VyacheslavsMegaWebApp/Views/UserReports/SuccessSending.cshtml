@@ -1,11 +1,33 @@
-﻿<link rel="stylesheet" href="~/css/pages/report.css" />
+@{
+    ViewData["Title"] = "Отчёт отправлен - Vyacheslav's Mega Server";
+}
 
-<div class="block block--first block--report">
-    <div class="container">
-        <div class="section section--centered">
-            <h2 class="section__title">Форма отправлена</h2>
-            <p>Спасибо за ваш отзыв, администрация починит неисправность в ближайшее время</p>
-            <a href="/">Вернуться на главную старницу</a>
-        </div> 
+<div class="report-page">
+    <div class="report-container">
+        <div class="report-card report-card--success">
+            <div class="report-success-icon">
+                <i class='bx bx-check-circle'></i>
+            </div>
+
+            <span class="donation-hero__badge">ОБРАЩЕНИЕ ПРИНЯТО</span>
+            <h1 class="donation-hero__title" style="font-size: 32px !important;">
+                ОТЧЁТ <span class="hero-title__accent">ОТПРАВЛЕН</span>
+            </h1>
+
+            <p class="report-desc">
+                Спасибо за обратную связь! Администрация проверит логи и починит неисправность в ближайшее время.
+            </p>
+
+            <div class="report-success-actions">
+                <a href="/" class="btn-download">
+                    <i class='bx bx-home-alt'></i>
+                    <span>На главную</span>
+                </a>
+                <a asp-action="New" class="btn-secondary">
+                    <i class='bx bx-plus-circle'></i>
+                    <span>Новое обращение</span>
+                </a>
+            </div>
+        </div>
     </div>
 </div>

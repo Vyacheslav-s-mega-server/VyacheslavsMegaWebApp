@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using VyacheslavsMegaWebApp.Areas.Admin.Models;
 using VyacheslavsMegaWebApp.Data.Entities;
 using VyacheslavsMegaWebApp.Data.Repositories;
@@ -62,8 +62,6 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        //Purposes editor
 
         public async Task<IActionResult> TransactionPurposesIndex()
         {

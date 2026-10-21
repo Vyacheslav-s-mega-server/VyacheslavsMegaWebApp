@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Identity;
 using System.Globalization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using VyacheslavsMegaWebApp.Data;
 using VyacheslavsMegaWebApp.Data.Entities.Identity;
 using VyacheslavsMegaWebApp.Data.JSON.Configuration;
@@ -13,25 +14,28 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-
-        configurationBuilder.AddJsonFile("appsettings.json")
+        new ConfigurationBuilder()
+            .SetBasePath(builder.Environment.ContentRootPath)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()
             .Build()
             .Bind("Project", new ProjectConfig());
-       
-        // Add services to the container.
+
         builder.Services.AddAuthorization(x =>
             x.AddPolicy("AdminAreaPolicy", policy => policy.RequireRole("Admin")));
 
         builder.Services.AddControllersWithViews(x =>
             x.Conventions.Add(new AdminAreaAutorization("Admin", "AdminAreaPolicy")));
 
+        builder.Services.AddSingleton<System.Text.Encodings.Web.HtmlEncoder>(
+            System.Text.Encodings.Web.HtmlEncoder.Create(System.Text.Unicode.UnicodeRanges.All));
+
         builder.Services.AddDbContext<AppDbContext>();
 
         builder.Services.AddIdentity<VmsIdentityUser, IdentityRole>(options =>
         {
+            options.SignIn.RequireConfirmedEmail = true;
             options.User.RequireUniqueEmail = true;
             options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
             options.Password.RequireDigit = false;
@@ -56,10 +60,7 @@ internal class Program
 
         builder.Services.Configure<RequestLocalizationOptions>(options =>
         {
-            options.SupportedCultures = new[]
-            {
-                new CultureInfo("ru-RU"),
-            };
+            options.SupportedCultures = new[] { new CultureInfo("ru-RU") };
             options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("ru-RU");
         });
 
@@ -76,24 +77,34 @@ internal class Program
         builder.Services.AddTransient<DownloadButtonsRepository>();
         builder.Services.AddTransient<EmailService>();
         builder.Services.AddTransient<LauncherSessionRepository>();
+        builder.Services.AddTransient<ClientBuildFilesRepository>();
+        builder.Services.AddTransient<FriendshipsRepository>();
+        builder.Services.AddTransient<CapesRepository>();
+        builder.Services.AddTransient<SkinStorageService>();
+        builder.Services.AddSingleton<LaunchTicketService>();
+        builder.Services.AddSingleton<YggdrasilService>();
         builder.Services.AddSingleton<AppResourcesManager>();
+        builder.Services.AddSingleton<ModrinthService>();
+        builder.Services.AddHttpClient<MinecraftLicenseService>();
 
         var app = builder.Build();
 
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            try { db.Database.Migrate(); } catch { }
+            try { db.Database.ExecuteSqlRaw("ALTER TABLE `ClientBuildFiles` ADD COLUMN `BannerUrl` longtext NULL;"); } catch { }
+            try { DataSeeder.Seed(db, app.Environment); } catch { }
+        }
+
         app.UseRequestLocalization();
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsProduction())
         {
             app.UseExceptionHandler("/Home/Error");
-
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
+            app.UseHttpsRedirection();
         }
-
-        app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
-
-        app.UseHttpsRedirection();
         app.UseStaticFiles();
 
         app.UseRouting();
@@ -104,6 +115,7 @@ internal class Program
 
         app.MapControllerRoute("admin", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
         app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+        app.MapControllers();
 
         app.Run();
     }

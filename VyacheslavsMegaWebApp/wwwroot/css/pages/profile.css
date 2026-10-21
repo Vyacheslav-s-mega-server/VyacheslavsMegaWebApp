@@ -1,0 +1,1317 @@
+/* ========================================================
+   VEC MEGA SERVER — PROFILE PAGE (MINECRAFT BUSINESS STYLE)
+   ======================================================== */
+
+.profile-page {
+    min-height: 100vh;
+    padding: 115px 0 80px 0;
+    background-color: #111319;
+    position: relative;
+    font-family: 'minecraft', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #e5e7eb;
+    -webkit-font-smoothing: antialiased;
+}
+
+.profile-container {
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Clear crisp text with zero text-shadow anywhere */
+.profile-page * {
+    text-shadow: none !important;
+}
+
+/* Status Notifications */
+.mc-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-radius: 0;
+    font-size: 14px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+}
+
+.mc-status-bar--success {
+    background: #064e3b;
+    border-color: #059669;
+    color: #a7f3d0;
+}
+
+.mc-status-bar--danger {
+    background: #450a0a;
+    border-color: #dc2626;
+    color: #fecaca;
+}
+
+/* ========================================================
+   Profile Header Card with Customizable Banner
+   ======================================================== */
+
+.profile-header-card {
+    background: #161922;
+    border: 2px solid #232730;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-banner {
+    height: 220px;
+    width: 100%;
+    background-color: #1a1d26;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    transition: background-image 0.2s ease-in-out;
+}
+
+.profile-banner__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(17,19,25,0.88) 100%);
+    pointer-events: none;
+}
+
+.profile-banner__actions {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    gap: 8px;
+    z-index: 5;
+}
+
+.banner-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(17, 19, 25, 0.88);
+    border: 1px solid #3c4048;
+    color: #f3f4f6;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+}
+
+.banner-btn:hover {
+    background: #161922;
+    border-color: #f59e0b;
+    color: #ffffff;
+}
+
+/* User Identity Bar (overlapping banner) */
+.profile-identity-bar {
+    padding: 0 28px 22px 28px;
+    display: flex;
+    align-items: flex-end;
+    gap: 22px;
+    position: relative;
+    flex-wrap: wrap;
+}
+
+.profile-avatar-container {
+    margin-top: -60px;
+    position: relative;
+    z-index: 4;
+}
+
+.profile-avatar-frame {
+    width: 110px;
+    height: 110px;
+    min-width: 110px;
+    background: #111319;
+    border: 3px solid #232730;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-avatar-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: pixelated;
+    display: block;
+}
+
+.profile-avatar-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    color: #ffffff;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.profile-avatar-overlay i {
+    font-size: 22px;
+}
+
+.profile-avatar-frame:hover .profile-avatar-overlay {
+    opacity: 1;
+}
+
+.profile-identity-info {
+    flex: 1;
+    min-width: 240px;
+}
+
+.profile-name-row {
+    margin-bottom: 6px;
+}
+
+.profile-username {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.profile-meta-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.profile-meta-line .meta-sep {
+    color: #4b5563;
+}
+
+.profile-meta-line .meta-item {
+    color: #d1d5db;
+}
+
+.email-unconfirmed-subtle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #9ca3af;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s;
+}
+
+.email-unconfirmed-subtle:hover {
+    color: #ffffff;
+}
+
+/* ========================================================
+   Sidebar & Tabs Layout
+   ======================================================== */
+
+.profile-main-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .profile-main-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Sidebar navigation (Icons only here!) */
+.profile-sidebar {
+    background: #161922;
+    border: 2px solid #232730;
+    padding: 12px;
+}
+
+.profile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.profile-nav__btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #9ca3af;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+}
+
+.profile-nav__btn i {
+    font-size: 18px;
+}
+
+.profile-nav__btn:hover {
+    background: #1a1d26;
+    border-color: #2b303c;
+    color: #ffffff;
+}
+
+.profile-nav__btn.active {
+    background: #1f232d;
+    border-color: #3e4758;
+    color: #ffffff;
+}
+
+/* Tab panes */
+.profile-tab-pane {
+    display: none;
+}
+
+.profile-tab-pane.active {
+    display: block;
+}
+
+/* Cards (No icons in titles!) */
+.profile-card {
+    background: #161922;
+    border: 2px solid #232730;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+}
+
+.profile-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #232730;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.profile-card__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================================
+   Tab 1: Profile Form & Friends
+   ======================================================== */
+
+.profile-identity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.identity-card {
+    background: #111319;
+    border: 2px solid #232730;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: border-color 0.15s ease;
+}
+
+.identity-card:focus-within {
+    border-color: #3f4553;
+}
+
+.identity-card--mc {
+    border-color: #26332a;
+}
+
+.identity-card--mc:focus-within {
+    border-color: #10b981;
+}
+
+.identity-card__badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #1e222b;
+}
+
+.badge-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #232732;
+    color: #e5e7eb;
+    border: 1px solid #374151;
+}
+
+.badge-tag--mc {
+    background: #0f351e;
+    color: #34d399;
+    border-color: #059669;
+}
+
+.badge-desc {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.identity-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.identity-card__label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.identity-card__hint {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.identity-actions {
+    margin-top: 8px;
+}
+
+.field__input-profile {
+    width: 100%;
+    background: #111319;
+    border: 1px solid #2b303c;
+    color: #ffffff;
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.field__input-profile:focus {
+    border-color: #f59e0b;
+}
+
+.friends-search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    max-width: 520px;
+}
+
+.friends-empty-placeholder {
+    padding: 28px;
+    background: #111319;
+    border: 1px dashed #2b303c;
+    text-align: center;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ========================================================
+   Tab 2: Wardrobe (3D + Skin + Capes)
+   ======================================================== */
+
+.wardrobe-top-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .wardrobe-top-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.viewer-viewport-box {
+    background: #111319;
+    border: 2px solid #232730;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.viewer-canvas-frame {
+    background: #0d0e13;
+    border: 1px solid #1f232d;
+    position: relative;
+    width: 100%;
+    height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#skinCanvas {
+    display: block;
+    cursor: grab;
+}
+
+#skinCanvas:active {
+    cursor: grabbing;
+}
+
+.viewer-loading {
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 19, 25, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #9ca3af;
+    font-size: 13px;
+    z-index: 10;
+}
+
+.viewer-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #232730;
+    border-top-color: #f59e0b;
+    border-radius: 50%;
+    animation: mcSpin 0.7s linear infinite;
+}
+
+@keyframes mcSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Controls directly under 3D Model */
+.viewer-under-controls {
+    width: 100%;
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.under-control-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: #0d0f14;
+    border: 1px solid #1f232d;
+    padding: 6px 10px;
+}
+
+.under-control-label {
+    font-size: 11px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Official Minecraft Switch Style (<label for="switch" id="labelSwitch">) */
+.mc-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    vertical-align: middle;
+}
+
+.mc-toggle input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    pointer-events: none;
+}
+
+.mc-toggle__track {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 22px;
+    background: #141720;
+    border: 2px solid #3c4250;
+    box-sizing: border-box;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.mc-toggle__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+/* Checked state (ON) - Minecraft Green */
+.mc-toggle input[type="checkbox"]:checked + .mc-toggle__track {
+    background: #15803d;
+    border-color: #22c55e;
+}
+
+.mc-toggle input[type="checkbox"]:checked + .mc-toggle__track .mc-toggle__thumb {
+    transform: translateX(22px);
+    background: #ffffff;
+}
+
+.mc-toggle:hover .mc-toggle__track {
+    border-color: #9ca3af;
+}
+
+.mc-toggle input[type="checkbox"]:checked:hover + .mc-toggle__track {
+    border-color: #4ade80;
+}
+
+/* Skin Management Form */
+.skin-upload-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.skin-drop-field {
+    background: #111319;
+    border: 2px dashed #2b303c;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.skin-drop-field.dragover {
+    border-color: #4ade80;
+    background: #181b24;
+}
+
+.skin-drop-field__icon {
+    font-size: 36px;
+    color: #9ca3af;
+}
+
+.skin-drop-field__label {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.skin-drop-field__filename {
+    font-size: 12px;
+    color: #34d399;
+    word-break: break-all;
+}
+
+.skin-controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    background: #111319;
+    border: 1px solid #232730;
+    padding: 14px 18px;
+}
+
+.skin-action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+/* Official Minecraft Capes Panel (Matching user screenshot) */
+.mc-capes-card {
+    position: relative;
+    border-top: 2px solid #22c55e !important;
+    padding: 24px 20px 20px 20px;
+    background: #191b22;
+}
+
+.mc-capes-card__tab {
+    position: absolute;
+    top: -24px;
+    left: -2px;
+    background: #191b22;
+    border: 2px solid #22c55e;
+    border-bottom: 2px solid #191b22;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #22c55e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    user-select: none;
+}
+
+.mc-capes-card__header {
+    margin-bottom: 18px;
+}
+
+.mc-capes-card__title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #e5e7eb;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 6px 0;
+}
+
+.mc-capes-card__desc {
+    font-size: 12px;
+    color: #9ca3af;
+    line-height: 1.45;
+    margin: 0;
+}
+
+.mc-capes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .mc-capes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.mc-cape-item {
+    background: #23252d;
+    border: 1px solid #323642;
+    padding: 12px 8px 8px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+.mc-cape-item:hover {
+    background: #2a2d37;
+    border-color: #454a5a;
+}
+
+.mc-cape-item.selected {
+    background: #272a34;
+    border-color: #555c70;
+}
+
+.mc-cape-item__preview {
+    width: 100%;
+    height: 94px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mc-cape-item__dashed-frame {
+    width: 44px;
+    height: 70px;
+    border: 2px dashed #5a6072;
+}
+
+.mc-cape-item__canvas {
+    width: 44px;
+    height: 70px;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    display: block;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.mc-cape-item__footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    width: 100%;
+    padding-top: 8px;
+    border-top: 1px solid #2d313d;
+}
+
+.mc-radio-circle {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #6b7280;
+    border-radius: 50%;
+    background: #14161d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    position: relative;
+    transition: border-color 0.15s;
+}
+
+.mc-cape-item.selected .mc-radio-circle {
+    border-color: #22c55e;
+}
+
+.mc-cape-item.selected .mc-radio-circle::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+    position: absolute;
+}
+
+.mc-cape-item__name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #d1d5db;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 110px;
+}
+
+.mc-cape-item.selected .mc-cape-item__name {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Common Buttons */
+.panel-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+}
+
+.panel-btn--primary {
+    background: #f59e0b;
+    color: #000000;
+    font-weight: 600;
+}
+
+.panel-btn--primary:hover {
+    background: #d97706;
+    color: #000000;
+}
+
+.panel-btn--active {
+    background: #064e3b;
+    border-color: #059669;
+    color: #34d399;
+}
+
+.panel-btn--secondary {
+    background: #111319;
+    border-color: #3c4048;
+    color: #d1d5db;
+}
+
+.panel-btn--secondary:hover {
+    background: #1f232d;
+    border-color: #f59e0b;
+    color: #ffffff;
+}
+
+.panel-btn--ghost {
+    background: transparent;
+    border-color: #2b303c;
+    color: #9ca3af;
+}
+
+.panel-btn--ghost:hover {
+    border-color: #3c4048;
+    color: #ffffff;
+}
+
+.panel-btn--danger {
+    background: #450a0a;
+    border-color: #dc2626;
+    color: #f87171;
+}
+
+.panel-btn--danger:hover {
+    background: #7f1d1d;
+    color: #ffffff;
+}
+
+/* ========================================================
+   Minimalist Image Crop Modals
+   ======================================================== */
+
+.crop-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 20000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.crop-modal-backdrop.open {
+    display: flex;
+}
+
+.crop-modal-window {
+    background: #161922;
+    border: 2px solid #232730;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+}
+
+.crop-modal-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid #232730;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.crop-modal-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin: 0;
+}
+
+.crop-modal-close {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.crop-modal-close:hover {
+    color: #ffffff;
+}
+
+.crop-modal-body {
+    padding: 16px;
+    max-height: 440px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d0e13;
+    overflow: hidden;
+}
+
+.crop-modal-body img {
+    max-width: 100%;
+    max-height: 380px;
+    display: block;
+}
+
+.crop-modal-footer {
+    padding: 12px 18px;
+    border-top: 1px solid #232730;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* ================= Friends System Styles ================= */
+.friends-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.friends-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.friends-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 8px;
+    background: #232836;
+    border: 1px solid #32394a;
+    color: #e5e7eb;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 999px;
+}
+
+.friends-subnav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #11141c;
+    padding: 4px;
+    border: 1px solid #232836;
+    border-radius: 6px;
+}
+
+.friends-subtab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.friends-subtab-btn:hover {
+    color: #ffffff;
+    background: #1a1e29;
+}
+
+.friends-subtab-btn.active {
+    background: #222735;
+    border-color: #353c4d;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.subtab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: #2b3142;
+    border-radius: 999px;
+    font-size: 11px;
+    color: #cbd5e1;
+}
+
+.subtab-count--alert {
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.friends-search-container {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.friends-search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.friends-search-icon {
+    position: absolute;
+    left: 14px;
+    color: #64748b;
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.friends-search-input {
+    flex: 1;
+    padding-left: 40px !important;
+    background: #12151d !important;
+    border: 1px solid #252b3a !important;
+    color: #f1f5f9 !important;
+    border-radius: 6px;
+    height: 42px;
+}
+
+.friends-search-input:focus {
+    border-color: #4b5563 !important;
+    outline: none;
+}
+
+.friends-search-results {
+    margin-top: 10px;
+    padding: 12px;
+    background: #10131a;
+    border: 1px solid #242938;
+    border-radius: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.friends-searching-state,
+.friends-empty-search {
+    padding: 14px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.friends-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.friends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.friend-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: #12151d;
+    border: 1px solid #232836;
+    border-radius: 8px;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.friend-card:hover {
+    border-color: #333a4c;
+    background: #141822;
+}
+
+.friend-card--search {
+    background: #141720;
+    border-color: #262c3b;
+}
+
+.friend-card__left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.friend-card__avatar-wrap {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    background: #1b202c;
+    border: 1px solid #2e3547;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.friend-card__avatar-wrap canvas {
+    display: block;
+    image-rendering: pixelated;
+}
+
+.friend-card__meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.friend-card__name {
+    color: #f1f5f9;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.15s ease;
+}
+
+.friend-card__name:hover {
+    color: #60a5fa;
+}
+
+.friend-card__nick {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.friend-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-friend-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.btn-friend-action--profile {
+    background: #1e2330;
+    border-color: #2e3649;
+    color: #e2e8f0;
+}
+
+.btn-friend-action--profile:hover {
+    background: #282f42;
+    color: #ffffff;
+    border-color: #3e4860;
+}
+
+.btn-friend-action--remove {
+    background: #1e2330;
+    border-color: #2e3649;
+    color: #94a3b8;
+    padding: 6px 9px;
+}
+
+.btn-friend-action--remove:hover {
+    background: #2c2428;
+    border-color: #5c323f;
+    color: #f87171;
+}
+
+.btn-friend-action--accept {
+    background: #15803d;
+    border-color: #22c55e;
+    color: #ffffff;
+}
+
+.btn-friend-action--accept:hover {
+    background: #16a34a;
+}
+
+.btn-friend-action--reject {
+    background: #1e2330;
+    border-color: #2e3649;
+    color: #94a3b8;
+}
+
+.btn-friend-action--reject:hover {
+    background: #252b3a;
+    color: #ffffff;
+}
+
+.btn-friend-action--cancel {
+    background: #1e2330;
+    border-color: #2e3649;
+    color: #94a3b8;
+}
+
+.btn-friend-action--cancel:hover {
+    background: #252b3a;
+    color: #ffffff;
+}
+
+.friend-card__pending-tag {
+    font-size: 11px;
+    color: #94a3b8;
+    background: #1a1e29;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #282e3d;
+}
+
+.friend-badge-status {
+    font-size: 12px;
+    color: #94a3b8;
+    background: #181d27;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #252c3c;
+}
+
+.friends-empty-placeholder {
+    padding: 36px 20px;
+    text-align: center;
+    background: #10131a;
+    border: 1px dashed #262c3c;
+    border-radius: 8px;
+}
+
+.friends-empty-title {
+    color: #e2e8f0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.friends-empty-desc {
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 6px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+

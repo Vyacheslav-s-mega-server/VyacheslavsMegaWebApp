@@ -8,7 +8,6 @@ namespace VyacheslavsMegaWebApp.Controllers
 {
     public class HomeController : Controller
     {
-        //private readonly ILogger<HomeController> _logger;
         private readonly MainPageRepository _mainPageRepository;
         private readonly PartnersInfoRepository _partnersInfoRepository;
         private readonly ContactsInfoRepository _contactsInfoRepository;
@@ -86,6 +85,13 @@ namespace VyacheslavsMegaWebApp.Controllers
         public async Task<IActionResult> GetTransactions(int lastId)
         {
             return Json(await _fundRepository.GetTransactionsAfterId(lastId, 50));
+        }
+
+        public async Task<IActionResult> Contacts()
+        {
+            ViewBag.PageTitle = "Контакты - Vyacheslav's Mega Server";
+            var contacts = await _contactsInfoRepository.GetAllContacts();
+            return View(contacts);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

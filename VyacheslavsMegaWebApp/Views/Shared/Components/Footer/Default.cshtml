@@ -1,4 +1,20 @@
-﻿@model FooterViewModel
+@model FooterViewModel
+
+@functions {
+    string GetSocialIconClass(ServerMediaLink link)
+    {
+        var target = ((link.Content ?? "") + " " + (link.Url ?? "")).ToLowerInvariant();
+        if (target.Contains("discord")) return "bxl-discord-alt";
+        if (target.Contains("telegram") || target.Contains("t.me")) return "bxl-telegram";
+        if (target.Contains("vk.com") || target.Contains("vkontakte") || target.Contains("вк")) return "bxl-vk";
+        if (target.Contains("instagram") || target.Contains("inst")) return "bxl-instagram";
+        if (target.Contains("youtube") || target.Contains("youtu")) return "bxl-youtube";
+        if (target.Contains("tiktok")) return "bxl-tiktok";
+        if (target.Contains("github")) return "bxl-github";
+        if (target.Contains("twitch")) return "bxl-twitch";
+        return "bx-link-external";
+    }
+}
 
 <div class="footer">
     <div class="container">
@@ -7,53 +23,68 @@
                 <h3 class="footer__header">Создатель сервера</h3>
                 <p>
                     Сервер является некоммерческим проектом компании "Vyacheslav's engineering company" под
-                    руководством Вячеслава
+                    руководством Вячеслава.
                 </p>
             </div>
-            <div class="footer__server--status">
+
+            <div class="footer__navigation">
+                <h3 class="footer__header">Навигация</h3>
+                <nav class="footer__nav-list">
+                    <a class="footer__nav-link" href="/">Главная</a>
+                    <a class="footer__nav-link" asp-area="" asp-controller="Home" asp-action="DonationPage">Пожертвования</a>
+                    <a class="footer__nav-link" asp-area="" asp-controller="UserReports" asp-action="New">Помощь</a>
+                    <a class="footer__nav-link" asp-area="" asp-controller="Home" asp-action="Contacts">Контакты</a>
+                </nav>
+            </div>
+
+            <div class="footer__server-status">
                 <h3 class="footer__header">Состояние сервера</h3>
                 @if (!Model.MCServerStat.Available)
                 {
-                    <p>Состояние сервера сейчас неизвестно</p>
+                    <p class="footer__status-text">Состояние сервера сейчас неизвестно</p>
                 }
                 else
                 {
                     @if (Model.MCServerStat.IsOnline)
                     {
-                        <p>
-                            Сервер онлайн!
-                            <img class="footer__server-status-icon" src="~/img/serverStatusIcons/OnlineIcon.png">
-                        </p>
-                        <p>Игроков на сервере: @Model.MCServerStat.Players.Online/@Model.MCServerStat.Players.Max</p>
+                        <div class="footer__status-badge">
+                            <span>Сервер онлайн!</span>
+                            <img class="footer__server-status-icon" src="~/img/serverStatusIcons/OnlineIcon.png" alt="Онлайн" />
+                        </div>
+                        <p>Игроков на сервере: <span class="footer__players-count">@Model.MCServerStat.Players.Online/@Model.MCServerStat.Players.Max</span></p>
                     }
                     else
                     {
-                        <p>
-                            Сервер оффлайн!
-                            <img class="footer__server-status-icon" src="~/img/serverStatusIcons/OfflineIcon.png">
-                        </p>
-                        <p>Игроков на сервере: 0</p>
+                        <div class="footer__status-badge">
+                            <span>Сервер оффлайн!</span>
+                            <img class="footer__server-status-icon" src="~/img/serverStatusIcons/OfflineIcon.png" alt="Оффлайн" />
+                        </div>
+                        <p>Игроков на сервере: <span class="footer__players-count">0</span></p>
                     }
                 }
-                
             </div>
+
             <div class="footer__project-media">
                 <h3 class="footer__header">Соц. сети проекта</h3>
-                <div class="footer__media-links">
+                <div class="footer__social-links">
                     @foreach (ServerMediaLink link in Model.ServerMediaLinks.Where(l => l.ShowLink))
                     {
-                        <p class="iconed-link">
-                            <img class="iconed-link__icon" src="~/@link.LogoFullPath" />
-                            <a href="@link.Url">@link.Content</a>
-                        </p>
+                        <a class="footer__social-btn" href="@link.Url" target="_blank" rel="noopener" aria-label="@link.Content" title="@link.Content">
+                            <i class='bx @GetSocialIconClass(link)'></i>
+                        </a>
                     }
                 </div>
             </div>
+
             <div class="footer__center-row">
-                <p>У тебя всё ещё какие-то проблемы? Обратись в раздел <a href="/#contacts">контактов</a></p>
+                <p>У тебя всё ещё какие-то проблемы? Обратись в раздел <a asp-area="" asp-controller="Home" asp-action="Contacts">контактов</a></p>
             </div>
+
             <div class="footer__bottom">
-                <p>Vyacheslav's engineering company, г. Костанай</p>
+                <p class="footer__copy">Vyacheslav's engineering company, г. Костанай</p>
+                <p class="footer__mojang-disclaimer">
+                    VEC не связан с Mojang AB. Все средства идут на развитие проекта, деятельность проекта соответствует <a href="https://www.minecraft.net/ru-ru/terms#terms-commercial" target="_blank" rel="noopener">политике коммерческого использования Mojang AB.</a>
+                </p>
             </div>
         </div>
     </div>

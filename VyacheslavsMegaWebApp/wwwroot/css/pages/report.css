@@ -1,10 +1,244 @@
-.block--report {
-    background-image: url(../../img/backgrounds/report-form/report_form.webp);
-    background-repeat: no-repeat;
+.report-page,
+.report-page * {
+    text-shadow: none !important;
 }
 
-.report_form {
+.report-page {
+    min-height: 85vh;
+    padding: 125px 0 90px 0;
+    background-color: #08090d;
+    background-image: 
+        radial-gradient(circle 750px at 50% 10%, rgba(245, 158, 11, 0.08), transparent 70%),
+        radial-gradient(circle 600px at 85% 60%, rgba(59, 130, 246, 0.05), transparent 70%),
+        url('../../img/backgrounds/report-form/report_form.webp');
+    background-size: cover, cover, auto 60%;
+    background-position: center, center, right -80px bottom -40px;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow-x: clip;
+}
+
+.report-container {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 2;
+}
+
+.report-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.report-header .donation-hero__badge {
+    margin-bottom: 10px;
+    display: inline-block;
+    text-shadow: none !important;
+}
+
+.report-header .donation-hero__title {
+    margin: 0 0 14px 0 !important;
+    font-size: 34px !important;
+    text-shadow: none !important;
+}
+
+.report-header .donation-hero__desc {
+    color: #9ca3af !important;
+    font-size: 16px !important;
+    max-width: 620px;
+    margin: 0 auto !important;
+    text-shadow: none !important;
+}
+
+.report-card {
+    background: #0e1118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 36px 32px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+}
+
+.report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    width: 100%;
+}
+
+.report-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.report-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: none !important;
+    margin-left: 2px;
+}
+
+.report-label i {
+    font-size: 18px;
+    color: #fbbf24;
+}
+
+.report-control {
+    width: 100%;
+    position: relative;
+}
+
+.report-control .field__input {
+    text-shadow: none !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.report-control .field__input:focus {
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.35);
+}
+
+.report-control .field__input::placeholder {
+    color: #888888;
+    opacity: 0.85;
+}
+
+.report-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    padding: 0 4px;
+}
+
+.report-counter {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 13px !important;
+    color: #9ca3af;
+    text-shadow: none !important;
+    margin-left: auto;
+}
+
+.report-tips {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.5;
+    margin-top: 6px;
+    text-shadow: none !important;
+}
+
+.report-tips i {
+    font-size: 20px;
+    color: #fbbf24;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.report-footer {
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 16px;
+}
+
+.report-footer .mc-button__title {
+    text-shadow: none !important;
+}
+
+.report-card--success {
+    text-align: center;
+    padding: 48px 36px;
+}
+
+.report-success-icon {
+    font-size: 58px;
+    color: #7dfc1f;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+    filter: drop-shadow(0 0 16px rgba(125, 252, 31, 0.4));
+}
+
+.report-desc {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 16px !important;
+    color: #c9cdd8 !important;
+    margin: 14px auto 28px auto !important;
+    max-width: 520px;
+    line-height: 1.6;
+    text-shadow: none !important;
+}
+
+.report-success-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.report-admin-peeker {
+    position: absolute;
+    left: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 395px;
+    z-index: 5;
+    pointer-events: none;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.report-admin-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.65));
+}
+
+@media (max-width: 1200px) {
+    .report-admin-peeker {
+        left: -70px;
+        width: 325px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+
+@media (max-width: 900px) {
+    .report-admin-peeker {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .report-page {
+        padding: 105px 0 60px 0;
+        background-position: center;
+    }
+
+    .report-header .donation-hero__title {
+        font-size: 26px !important;
+    }
+
+    .report-card {
+        padding: 24px 18px;
+    }
 }

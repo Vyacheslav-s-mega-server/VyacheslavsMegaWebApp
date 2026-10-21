@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Hosting.Internal;
@@ -107,7 +107,7 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
             await _partnersInfoRepository.RemoveLinkById(linkId);
             RouteValueDictionary routeValues = new RouteValueDictionary()
             {
-                { "contactId", partnerId }
+                { "partnerId", partnerId }
             };
             return RedirectToAction(nameof(PartnerLinks), routeValues);
         }

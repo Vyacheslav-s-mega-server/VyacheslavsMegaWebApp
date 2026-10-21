@@ -1,4 +1,4 @@
-﻿@model DownloadButton
+@model DownloadButton
 
 <div class="block block--first">
     <div class="container">
@@ -6,7 +6,7 @@
             <form class="form" asp-area="Admin" asp-controller="DownloadButtons" asp-action="ButtonDetails">
 
                 <div class="form__header">
-                    <h2 class="form__title form__title--main">Содержание главной страницы</h2>
+                    <h2 class="form__title form__title--main">@(Model.Id == 0 ? "Добавление" : "Редактирование") кнопки загрузки</h2>
                 </div>
 
                 <input type="hidden" asp-for="Id" readonly />
@@ -15,7 +15,6 @@
 
                     <div class="form__validation-summary" asp-validation-summary="All"></div>
 
-                    <!-- Title -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="Title"></label>
                         <div class="form-group__control">
@@ -25,7 +24,6 @@
                         </div>
                     </div>
 
-                    <!-- Url -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="Url"></label>
                         <div class="form-group__control">
@@ -35,7 +33,6 @@
                         </div>
                     </div>
 
-                    <!-- IsResourceLocal Show -->
                     <div class="form__row">
                         <div class="form-group form-group--size-50">
                             <div class="form-group__control">
@@ -64,7 +61,7 @@
                         <span class="mc-button__title">Сохранить</span>
                     </button>
 
-                    <p><a asp-area="Admin" asp-controller="Home" asp-action="Index">Назад</a></p>
+                    <p><a asp-area="Admin" asp-controller="DownloadButtons" asp-action="Index">Назад</a></p>
                 </div>
             </form>
         </div>

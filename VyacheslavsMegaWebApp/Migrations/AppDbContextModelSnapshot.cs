@@ -51,12 +51,14 @@ namespace VyacheslavsMegaWebApp.Migrations
                         new
                         {
                             Id = "db158bac-48d4-47c3-a6b0-c6d8b5c9ee55",
+                            ConcurrencyStamp = "e4630e31-70bf-445c-a63a-676107d81fa2",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "03d4ba1e-afef-4e77-849d-295bd86148db",
+                            ConcurrencyStamp = "1ca40dc8-422c-428f-b186-336c8bba3e24",
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
                         });
@@ -171,6 +173,63 @@ namespace VyacheslavsMegaWebApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.ClientBuildFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("BannerUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BuildSlug")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("DownloadUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<long>("FileSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("IconUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ModrinthSlug")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("RelativePath")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SourceType")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ClientBuildFiles");
+                });
+
             modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.Contact", b =>
                 {
                     b.Property<int>("Id")
@@ -195,7 +254,6 @@ namespace VyacheslavsMegaWebApp.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
@@ -324,6 +382,38 @@ namespace VyacheslavsMegaWebApp.Migrations
                     b.ToTable("DownloadButtons");
                 });
 
+            modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.Friendship", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("AddresseeId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("RequesterId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddresseeId");
+
+                    b.HasIndex("RequesterId");
+
+                    b.ToTable("Friendships", (string)null);
+                });
+
             modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.FundSnapshot", b =>
                 {
                     b.Property<int>("Id")
@@ -427,11 +517,23 @@ namespace VyacheslavsMegaWebApp.Migrations
                     b.Property<DateTime?>("EmailConfirmedCodeCreationTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<bool>("HasMinecraftLicense")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("MicrosoftGamertag")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("MicrosoftLicenseLinkedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("MicrosoftUuid")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -440,6 +542,9 @@ namespace VyacheslavsMegaWebApp.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
+
+                    b.Property<string>("OwnedMojangCapesJson")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("longtext");
@@ -476,16 +581,17 @@ namespace VyacheslavsMegaWebApp.Migrations
                         {
                             Id = "d4bc75a9-ca48-45aa-a3f2-2ea5886ce303",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0410d2d9-fb40-45fb-9c70-6626a184e790",
+                            ConcurrencyStamp = "541233d2-f731-4834-a48a-18558f4f30dd",
                             Email = "vya4slav4617@gmail.com",
                             EmailConfirmed = true,
+                            HasMinecraftLicense = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "VYA4SLAV4617@GMAIL.COM",
                             NormalizedUserName = "EVRAY",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPbA2qg+ghHujuDnsow7DE0nmGtPlXjyG9sux5zpKHHu+8GKOWlbnYjsMJmCAsEUlQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPxx6suPp5puiqTy6xQjnKhzHZ0/a190bopLFZGWihTjJYzoY1baa2cliJRgZCdaEA==",
                             PhoneNumber = "+7 (705) 806 3101",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "62eba975-9eb1-45b0-949a-9637a9e205b7",
+                            SecurityStamp = "40278ad1-d87d-41c2-9307-3d528c4fd9fa",
                             TwoFactorEnabled = false,
                             UserName = "Evray"
                         });
@@ -498,18 +604,29 @@ namespace VyacheslavsMegaWebApp.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnOrder(0);
 
+                    b.Property<string>("ClientToken")
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<byte[]>("SessionKeyHash")
+                    b.Property<string>("ServerId")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SessionKey")
                         .IsRequired()
-                        .HasColumnType("longblob");
+                        .HasColumnType("longtext");
+
+                    b.Property<byte[]>("SessionKeyHash")
+                        .HasColumnType("varbinary(3072)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SessionKeyHash");
 
                     b.HasIndex("UserId");
 
@@ -523,15 +640,45 @@ namespace VyacheslavsMegaWebApp.Migrations
                         .HasColumnType("int")
                         .HasColumnOrder(0);
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<string>("ErrorMessage")
-                        .IsRequired()
+                    b.Property<string>("AboutTag")
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<string>("AboutText")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("AboutTitle")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(4000)
+                        .HasColumnType("varchar(4000)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Feature1Desc")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Feature1Title")
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Feature2Desc")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Feature2Title")
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Feature3Desc")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Feature3Title")
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
 
                     b.Property<string>("MetatagDescription")
                         .IsRequired()
@@ -546,25 +693,28 @@ namespace VyacheslavsMegaWebApp.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("ServerAddress")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("ServerVersion")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("ShowErrorMessage")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<string>("Subtitle")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)");
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("TitleAccent")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
 
                     b.Property<string>("YellowHint")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
 
@@ -574,8 +724,13 @@ namespace VyacheslavsMegaWebApp.Migrations
                         new
                         {
                             Id = 1,
+                            AboutTag = "О ПРОЕКТЕ VEC",
+                            AboutTitle = "Сервер, сделанный для людей",
                             Description = "На сервере установлена сборка интересных модов. Этот модпак превращает Minecraft в сложное и увлекательное приключение с множеством новых возможностей.\r\nПогружайтесь в новые приключения с:\r\n\r\nУлучшенным ИИ мобов и механикой боя\r\nОбширными новыми биомами для исследования\r\nРазнообразными и опасными новыми мобами\r\nПродвинутой магией и зачарованиями\r\nИ многим другим",
                             ErrorMessage = "",
+                            Feature1Title = "Собственный лаунчер VEC",
+                            Feature2Title = "Честная игра без донат-мусора",
+                            Feature3Title = "Стабильность и защита",
                             MetatagDescription = "Мега сервер Вячеслава",
                             MetatagKeywords = "Minecraft, server, Вячеслав, мега, сервер",
                             PageTitle = "V-Server",
@@ -583,6 +738,7 @@ namespace VyacheslavsMegaWebApp.Migrations
                             ServerVersion = "1.21.11",
                             ShowErrorMessage = false,
                             Title = "Открой для себя мир Minecraft с\r\nVyacheslav's mega server",
+                            TitleAccent = "ИДЕАЛЬНЫЙ МИР",
                             YellowHint = "Теперь с модами"
                         });
                 });
@@ -797,9 +953,7 @@ namespace VyacheslavsMegaWebApp.Migrations
                 {
                     b.HasOne("VyacheslavsMegaWebApp.Data.Entities.Identity.VmsIdentityUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -813,6 +967,25 @@ namespace VyacheslavsMegaWebApp.Migrations
                         .IsRequired();
 
                     b.Navigation("Contact");
+                });
+
+            modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.Friendship", b =>
+                {
+                    b.HasOne("VyacheslavsMegaWebApp.Data.Entities.Identity.VmsIdentityUser", "Addressee")
+                        .WithMany()
+                        .HasForeignKey("AddresseeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VyacheslavsMegaWebApp.Data.Entities.Identity.VmsIdentityUser", "Requester")
+                        .WithMany()
+                        .HasForeignKey("RequesterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Addressee");
+
+                    b.Navigation("Requester");
                 });
 
             modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.FundTransaction", b =>

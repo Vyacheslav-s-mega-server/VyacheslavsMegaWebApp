@@ -1,4 +1,4 @@
-﻿@model ServerMediaLink
+@model ServerMediaLink
 
 <div class="block block--first">
     <div class="container">
@@ -17,10 +17,8 @@
 
                     <div class="form__validation-summary" asp-validation-summary="All"></div>
 
-                    <!-- Url -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="Url"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="Url">
@@ -28,10 +26,8 @@
                         </div>
                     </div>
 
-                    <!-- Content -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="Content"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="Content">
@@ -39,10 +35,8 @@
                         </div>
                     </div>
 
-                    <!-- Description -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="Description"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="Description">
@@ -50,12 +44,9 @@
                         </div>
                     </div>
 
-                    <!-- Logo -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="LogoFileName"></label>
-
                         <div class="mc-file">
-
                             <div class="mc-file__preview">
                                 @if (Model.HasLogo)
                                 {
@@ -68,7 +59,6 @@
                             </div>
 
                             <div class="mc-file__controls">
-
                                 <input class="mc-file__input"
                                        type="file"
                                        accept="image/*"
@@ -85,12 +75,10 @@
                                 <div class="mc-file__filename" id="fileName">
                                     Файл не выбран
                                 </div>
-
                             </div>
                         </div>
                     </div>
 
-                    <!-- ShowLink -->
                     <div class="form-group">
                         <div class="form-group__control">
                             <label class="mc-checkbox">

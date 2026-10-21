@@ -1,0 +1,40 @@
+@{
+    ViewData["Title"] = "Вход в VEC Launcher";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/pages/account.css" asp-append-version="true" />
+}
+
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            
+            <div class="auth-header">
+                <h1 class="auth-title">ВХОД В ЛАУНЧЕР</h1>
+                <p class="auth-subtitle">Вы уже авторизованы на сайте под этим аккаунтом</p>
+            </div>
+
+            <div style="background: rgba(0, 0, 0, 0.6); border: 2px solid #2d3748; padding: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-family: 'minecraft', sans-serif; font-size: 18px; font-weight: bold; color: #ffffff;">@ViewBag.UserName</div>
+                    <div style="font-family: 'minecraft', sans-serif; font-size: 13px; color: #94a3b8; margin-top: 4px;">@ViewBag.Email</div>
+                </div>
+                <span style="font-family: 'minecraft', sans-serif; font-size: 12px; color: #10b981;">Активен</span>
+            </div>
+
+            <form asp-action="ConfirmLauncherAuth" method="post" class="auth-form">
+                <input type="hidden" name="port" value="@ViewBag.LauncherPort" />
+                <button type="submit" class="btn-download-auth">
+                    <span>Продолжить как @ViewBag.UserName</span>
+                </button>
+            </form>
+
+            <div class="auth-footer" style="margin-top: 24px;">
+                <p><a asp-action="SwitchLauncherAccount" asp-route-port="@ViewBag.LauncherPort">Войти под другим аккаунтом</a></p>
+                <p><a asp-controller="Home" asp-action="Index">Отмена</a></p>
+            </div>
+
+        </div>
+    </div>
+</div>

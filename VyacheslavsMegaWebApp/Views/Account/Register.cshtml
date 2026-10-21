@@ -1,61 +1,98 @@
-﻿@model RegisterViewModel
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Регистрация - Vyacheslav's Mega Server";
+}
 
-<div class="block block--first block--account">
-    <div class="container">
-        <div class="section">
-            <h2 class="section__title section__title--main">Регистрация</h2>
+@section Styles {
+    <link rel="stylesheet" href="~/css/pages/account.css" asp-append-version="true" />
+}
 
-            <form class="form account-form" asp-area="" asp-controller="Account" asp-action="Register" method="post">
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            
+            <div class="auth-header">
+                <h1 class="auth-title">РЕГИСТРАЦИЯ</h1>
+            </div>
+
+            @if (ViewBag.LauncherPort != null)
+            {
+                <div style="background:#11131a;border:1px solid #f59e0b;padding:10px 14px;color:#f59e0b;font-size:12px;margin-bottom:14px;text-align:center;">
+                    Регистрация для VEC Launcher · После подтверждения почты вы вернётесь в лаунчер
+                </div>
+            }
+
+            <form class="auth-form" asp-area="" asp-controller="Account" asp-action="Register" asp-route-launcherPort="@ViewBag.LauncherPort" method="post">
+                
                 <div class="form__validation-summary" asp-validation-summary="All"></div>
 
-                <div class="form__body">
-                    <div class="form-group">
-                        <label class="form-group__label" asp-for="UserName"></label>
-
-                        <div class="form-group__control">
-                            <div class="field">
-                                <input class="field__input" asp-for="UserName">
-                            </div>
-                        </div>
+                <div class="auth-form-group">
+                    <label class="auth-label" asp-for="UserName">Никнейм</label>
+                    <div class="field">
+                        <input class="field__input" asp-for="UserName" placeholder="Steve" autocomplete="username" autofocus required />
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-group__label" asp-for="Email"></label>
-
-                        <div class="form-group__control">
-                            <div class="field">
-                                <input class="field__input" asp-for="Email">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-group__label" asp-for="Password"></label>
-
-                        <div class="form-group__control">
-                            <div class="field">
-                                <input class="field__input" asp-for="Password">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-group__label" asp-for="PasswordConfirm"></label>
-
-                        <div class="form-group__control">
-                            <div class="field">
-                                <input class="field__input" asp-for="PasswordConfirm">
-                            </div>
-                        </div>
-                    </div>
+                    <span class="form-error-msg" asp-validation-for="UserName"></span>
                 </div>
 
-                <div class="form__footer">
-                    <button class="mc-button mc-button--wide" type="submit">
-                        <span class="mc-button__title">Регистрация</span>
+                <div class="auth-form-group">
+                    <label class="auth-label" asp-for="Email">Email</label>
+                    <div class="field">
+                        <input class="field__input" asp-for="Email" type="email" placeholder="steve@minecraft.net" autocomplete="email" required />
+                    </div>
+                    <span class="form-error-msg" asp-validation-for="Email"></span>
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-label" asp-for="Password">Пароль</label>
+                    <div class="field">
+                        <input class="field__input" asp-for="Password" type="password" placeholder="••••••••" autocomplete="new-password" required />
+                    </div>
+                    <span class="form-error-msg" asp-validation-for="Password"></span>
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-label" asp-for="PasswordConfirm">Подтверждение пароля</label>
+                    <div class="field">
+                        <input class="field__input" asp-for="PasswordConfirm" type="password" placeholder="••••••••" autocomplete="new-password" required />
+                    </div>
+                    <span class="form-error-msg" asp-validation-for="PasswordConfirm"></span>
+                </div>
+
+                <button type="submit" class="btn-download-auth">
+                    <span>Зарегистрироваться</span>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Уже есть аккаунт? <a asp-action="Login" asp-route-launcherPort="@ViewBag.LauncherPort">Войти</a></p>
+            </div>
+
+            <div class="auth-socials-box">
+                <span class="auth-socials-title">Войти через</span>
+                <div class="auth-socials-grid">
+                    <button type="button" class="btn-social" onclick="handleSocialAuth('Google')">
+                        <i class='bx bxl-google'></i>
+                        <span>Google</span>
+                    </button>
+                    <button type="button" class="btn-social" onclick="handleSocialAuth('Discord')">
+                        <i class='bx bxl-discord-alt'></i>
+                        <span>Discord</span>
+                    </button>
+                    <button type="button" class="btn-social" onclick="handleSocialAuth('GitHub')">
+                        <i class='bx bxl-github'></i>
+                        <span>GitHub</span>
                     </button>
                 </div>
-            </form>
+            </div>
+
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function handleSocialAuth(provider) {
+            alert('Авторизация через ' + provider + ' находится в разработке.');
+        }
+    </script>
+}

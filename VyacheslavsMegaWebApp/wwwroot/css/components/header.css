@@ -1,197 +1,600 @@
-﻿/*Header*/
-.header {
+.header-capsule-wrapper {
     position: fixed;
-    top: 0;
+    top: 14px;
     left: 0;
     right: 0;
     z-index: 10000;
-
     display: flex;
-    flex-direction:row;
-    gap: 20px;
-    height: fit-content;
-    padding: 5px 0;
-
-    font-size: var(--header-font-size);
-
-    background-color: var(--header-background);
+    justify-content: center;
+    padding: 0 20px;
+    pointer-events: none;
 }
 
-.header__inner {
-    display: grid;
+.header-capsule {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 1400px;
+    height: 72px;
+    background: rgba(14, 15, 18, 0.65);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+    display: flex;
     align-items: center;
-    grid-template-columns: repeat(4, auto);
-    gap: 15px;
-        
-    overflow: visible;
+    justify-content: space-between;
+    padding: 0 28px 0 20px;
 }
 
-.header__logo-link {
-    grid-column: 1;
-    display:block;
+.header-capsule .header__logo-link {
+    display: flex;
+    align-items: center;
     text-decoration: none;
 }
 
-.header__user {
-    grid-column: 3;
+.header-capsule .logo {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: flex-end;
-    max-width: 200px;
-
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    gap: 12px;
+    text-shadow: none;
 }
 
-/*Menu*/
-
-.header__menu {
-    grid-column: 2;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content:flex-start;
-    align-items: center;
-    align-content: center;
-    gap: 5px 20px;
+.header-capsule .logo__image {
+    height: 52px !important;
+    width: 52px !important;
+    object-fit: contain;
 }
 
-.header__menu-link {
-    text-decoration: none;
-    text-wrap-mode: nowrap;
+.header-capsule .logo__text {
+    font-family: 'Noto Sans', sans-serif !important;
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    color: #ffffff !important;
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    text-shadow: none !important;
 }
 
-.header__menu-link--account {
+.header-capsule .header__menu {
+    display: flex !important;
+    align-items: center !important;
+    gap: 36px !important;
     margin: 0 !important;
-    min-width: 0;
-
-    text-decoration: underline;
+    padding: 0 !important;
 }
 
-.header__menu-link:hover {
-    text-shadow: var(--text-shadow-hover);
-    color: var(--text-color-hover);
+.header-capsule .header__menu-link {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.5px !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    text-decoration: none !important;
+    text-shadow: none !important;
+    transition: color 0.15s ease;
 }
 
-.header__table-menu tr td:first-child {
-    padding: 10px 0 10px 16px;
-    font-size: medium;
-    vertical-align: top;
+.header-capsule .header__menu-link:hover {
+    color: #f59e0b !important;
+    text-shadow: none !important;
 }
 
-.header__table-menu tr td:last-child {
-    padding: 10px 16px 10px 0;
+.header-capsule .header__user {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
 }
 
-/*Burger*/
-.header__burger {
+/* ========================================================
+   Navbar Auth Button (Exact Hero btn-download Style, slightly more compact)
+   ======================================================== */
+.header-capsule .header__auth-btn,
+.header-capsule .header__auth-btn * {
+    text-shadow: none !important;
+}
+
+.header-capsule .header__auth-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: #f59e0b;
+    color: #08090d !important;
+    border: 1px solid #fbbf24;
+    border-radius: 6px;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 16px !important;
+    font-weight: normal !important;
+    letter-spacing: 0.6px !important;
+    text-decoration: none !important;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: none !important;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.header-capsule .header__auth-btn:hover {
+    background: #fbbf24;
+    color: #08090d !important;
+    transform: translateY(-1px);
+}
+
+.header-capsule .header__auth-btn:active {
+    transform: translateY(1px);
+}
+
+/* ========================================================
+   User Dropdown (Official Minecraft.net Square Aesthetic)
+   ======================================================== */
+.header-capsule .dropdown {
     position: relative;
-    grid-column: 4;
-    z-index: 20;
+    display: inline-block;
+}
 
+.header-capsule .dropdown__content {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: #14171f;
+    border: 2px solid #3b3f48;
+    border-radius: 0 !important;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 15px !important;
+    font-weight: normal !important;
+    color: #ffffff;
+    cursor: pointer;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    user-select: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* 2D Minecraft Head Avatar in Header Button */
+.header-capsule .dropdown__avatar-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #3b3f48;
+    background: #0d0f14;
+    flex-shrink: 0;
+    overflow: hidden;
+    line-height: 0;
+    margin-right: 2px;
+    transition: border-color 0.15s ease;
+}
+
+.header-capsule .dropdown__avatar-box .mc-head-canvas {
+    width: 22px;
+    height: 22px;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    display: block;
+}
+
+.header-capsule .dropdown__content:hover .dropdown__avatar-box,
+.header-capsule .dropdown.is-active .dropdown__avatar-box {
+    border-color: #4b5563;
+}
+
+/* Explicitly disable legacy ::after arrow */
+.header-capsule .dropdown__content::after {
+    display: none !important;
+    content: none !important;
+}
+
+.header-capsule .dropdown__content:hover,
+.header-capsule .dropdown.is-active .dropdown__content,
+.header-capsule .dropdown:hover .dropdown__content {
+    background: #1a1e28;
+    border-color: #f59e0b;
+}
+
+.header-capsule .dropdown__username {
+    letter-spacing: 0.5px;
+}
+
+/* Custom Large Pixelated Minecraft Arrow */
+.header-capsule .mc-pixel-arrow {
+    width: 14px;
+    height: 8px;
+    image-rendering: pixelated;
+    margin-left: 6px;
+    color: #d1d5db;
+    fill: currentColor;
+    transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.header-capsule .dropdown:hover .mc-pixel-arrow,
+.header-capsule .dropdown.is-active .mc-pixel-arrow {
+    transform: rotate(180deg);
+    color: #f59e0b;
+}
+
+.header-capsule .user-warn-dot {
+    font-size: 12px;
+}
+
+/* Dropdown Menu Container (Flush right below the button, no distance gap) */
+.header-capsule .dropdown__menu {
+    position: absolute !important;
+    right: 0 !important;
+    top: 100% !important;
+    margin-top: 2px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    z-index: 1000;
+    min-width: 200px;
     display: none;
-    width: 40px;
-    height: 30px;
+}
+
+/* Invisible bridge so mouse never loses hover */
+.header-capsule .dropdown__menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: transparent;
+}
+
+.header-capsule .dropdown:hover .dropdown__menu,
+.header-capsule .dropdown.is-active .dropdown__menu {
+    display: block;
+}
+
+.header-capsule .dropdown__menu-inner {
+    background: #111319;
+    border: 2px solid #3b3f48;
+    border-radius: 0 !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+}
+
+.header-capsule .dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 14px !important;
+    color: #e5e7eb;
+    text-decoration: none;
+    text-shadow: none !important;
+    border-left: 3px solid transparent;
+    border-radius: 0 !important;
+    transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.header-capsule .dropdown__item i {
+    font-size: 16px;
+    color: #9ca3af;
+    transition: color 0.12s ease;
+}
+
+.header-capsule .dropdown__item:hover {
+    background: #1a1e28;
+    color: #f59e0b;
+    border-left-color: #f59e0b;
+}
+
+.header-capsule .dropdown__item:hover i {
+    color: #f59e0b;
+}
+
+.header-capsule .dropdown__item--warn {
+    color: #f59e0b;
+}
+
+.header-capsule .dropdown__item--warn i {
+    color: #f59e0b;
+}
+
+.header-capsule .dropdown__item--logout:hover {
+    background: #241417;
+    color: #ef4444;
+    border-left-color: #ef4444;
+}
+
+.header-capsule .dropdown__item--logout:hover i {
+    color: #ef4444;
+}
+
+.header-capsule .dropdown__divider {
+    height: 1px;
+    background: #262932;
+    margin: 0;
+}
+
+/* ========================================================
+   Mobile Burger
+   ======================================================== */
+.header-capsule .header__burger {
+    display: none;
     flex-direction: column;
     justify-content: space-between;
-    
+    width: 26px;
+    height: 20px;
     cursor: pointer;
 }
 
-.header__burger span {
-    position: absolute;
-    left: 0;
-
+.header-capsule .header__burger span {
+    display: block;
     width: 100%;
-    height: 6px;
-    background-color: #fff;
-
-    border-radius: 3px;
-
-    transition: all 0.3s ease;
-}
-
-/*Burger stripes*/
-.header__burger span:nth-child(1) {
-    top: 0;
-}
-
-.header__burger span:nth-child(2) {
-    top: 50%;
-    transform: translate(0, -50%);
-}
-
-.header__burger span:nth-child(3) {
-    bottom: 0;
-}
-
-.header__burger.active span:nth-child(2) {
-    opacity: 0;
-}
-
-.header__burger.active span:nth-child(1),
-.header__burger.active span:nth-child(3) {
-    top: 50%;
-    transform: translate(0, -50%);
-}
-
-.header__burger.active span:nth-child(1) {
-    transform: rotate(-45deg);
-}
-
-.header__burger.active span:nth-child(3) {
-    transform: rotate(45deg);
+    height: 2px;
+    background: #ffffff;
+    border-radius: 1px;
 }
 
 @media (max-width: 768px) {
-    .header__burger {
+    .header-capsule {
+        padding: 0 16px;
+        height: 64px;
+    }
+    
+    .header-capsule .logo__image {
+        height: 42px !important;
+        width: 42px !important;
+    }
+    
+    .header-capsule .header__menu {
+        display: none !important;
+    }
+    
+    .header-capsule .header__burger {
         display: flex;
-    }
-
-    .header__menu {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        z-index: 10;
-
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        flex-wrap: nowrap;
-        text-align: left;
-        padding-top: 100px;
-        width: 60%;
-        height: 100%;
-
-        background-color: #000000BB;
-        
-        transition: right 0.2s linear;
-    }
-
-    .header__menu.active {
-        right: 0;
-    }
-
-    .header__menu .header__menu-link {
-        text-wrap-mode: wrap;
-        margin: 0 20px 20px 20px;
-    }
-
-    .header__dropdown-title {
-        margin-right: 10px;
-    }
-
-    .header__dropdown:hover .header__dropdown-title {
-        margin-bottom: 20px;
-    }
-
-    .header__dropdown-content-link {
-        margin: 0 30px 30px 40px;
-        padding: 0;
     }
 }
 
-@media (max-width: 426px) {
-    .header__menu {
-        width: 90%
-    }
+/* ========================================================
+   Header Notification Bell
+   ======================================================== */
+.header-notif-dropdown {
+    position: relative;
+}
+
+.header-notif-btn {
+    width: 38px;
+    height: 38px;
+    background: #161922;
+    border: 1px solid #2b303c;
+    color: #d1d5db;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    position: relative;
+    transition: all 0.15s ease;
+}
+
+.header-notif-btn:hover {
+    background: #1f232d;
+    border-color: #4b5263;
+    color: #ffffff;
+}
+
+.header-notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #22c55e;
+    color: #000000;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 8px;
+    line-height: 1.2;
+}
+
+.header-notif-dropdown,
+.header-notif-dropdown *,
+.header-notif-menu,
+.header-notif-menu * {
+    text-shadow: none !important;
+}
+
+.header-notif-dropdown.open .header-notif-menu {
+    display: block !important;
+}
+
+.header-notif-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 320px;
+    background: #11141c;
+    border: 1px solid #282e3d;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
+    border-radius: 6px;
+}
+
+.header-notif-menu__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #232836;
+    font-size: 13px;
+    font-weight: 600;
+    color: #f1f5f9;
+}
+
+.header-notif-count-label {
+    color: #60a5fa;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.header-notif-empty {
+    padding: 20px 10px;
+    text-align: center;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.header-notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.header-notif-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #161922;
+    border: 1px solid #252b3a;
+    border-radius: 4px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.header-notif-item:hover {
+    background: #1a1e2a;
+    border-color: #333a4d;
+}
+
+.header-notif-avatar {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    background: #0d0f14;
+    border: 1px solid #2e3547;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.header-notif-avatar canvas {
+    display: block;
+    image-rendering: pixelated;
+}
+
+.header-notif-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    background: #1e2638;
+    border: 1px solid #2f3b54;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #60a5fa;
+    font-size: 16px;
+}
+
+.header-notif-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.header-notif-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.header-notif-tag--sys {
+    color: #60a5fa;
+}
+
+.header-notif-user {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f8fafc;
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.15s ease;
+}
+
+.header-notif-user:hover {
+    color: #60a5fa;
+}
+
+.header-notif-mc {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 1px;
+}
+
+.header-notif-desc {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.header-notif-date {
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 3px;
+}
+
+.header-notif-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.notif-btn {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.12s ease;
+}
+
+.notif-btn--accept {
+    background: #15803d;
+    border-color: #22c55e;
+    color: #ffffff;
+}
+
+.notif-btn--accept:hover {
+    background: #16a34a;
+}
+
+.notif-btn--reject {
+    background: #1e2330;
+    border-color: #2e3649;
+    color: #94a3b8;
+}
+
+.notif-btn--reject:hover {
+    background: #252b3a;
+    color: #ffffff;
+    border-color: #3e4860;
 }

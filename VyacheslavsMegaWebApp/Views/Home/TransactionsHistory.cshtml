@@ -1,115 +1,156 @@
-﻿@model TransactionsHistoryViewModel
+@model TransactionsHistoryViewModel
 
-<div class="block block--first">
-    <div class="container">
-        <div class="section">
-            <h1 class="section__title section__title--main">История транзакций</h1>
-            
-            <p>Всего транзакций: @Model.TotalCount</p>
+@{
+    ViewData["Title"] = "История транзакций - Vyacheslav's Mega Server";
+}
+
+<div class="transactions-page">
+    <div class="transactions-container">
+        
+        <div class="transactions-nav-back">
+            <a asp-controller="Home" asp-action="DonationPage" class="btn-back">
+                <i class='bx bx-left-arrow-alt'></i>
+                <span>К странице пожертвований</span>
+            </a>
+        </div>
+
+        <div class="transactions-header-block">
+            <h1 class="donation-hero__title">
+                История <span class="hero-title__accent">транзакций</span>
+            </h1>
+        </div>
+
+        <div class="transactions-info-block">
+            <p class="transactions-info-line">
+                Всего транзакций: <span class="transactions-info-val">@Model.TotalCount</span>
+            </p>
             @if (Model.MaxIncome != null) 
             {
-                <p>
-                    Максимальный доход: @Model.MaxIncome.Amount - @Model.MaxIncome.Note<br />
-                    Категория дохода - @Model.MaxIncome.Purpose.Name
+                <p class="transactions-info-line">
+                    Максимальный доход: <span class="transactions-info-val">@Model.MaxIncome.Amount.ToString("N0") ₸</span>@(string.IsNullOrWhiteSpace(Model.MaxIncome.Note) ? "" : $" - {Model.MaxIncome.Note}")<br />
+                    <span class="transactions-info-sub">Категория дохода - @Model.MaxIncome.Purpose?.Name</span>
                 </p>
             }
             @if (Model.MaxExpence != null)
             {
-                <p>
-                    Максимальный расход: @Model.MaxExpence.Amount - @Model.MaxExpence.Note<br />
-                    Категория расхода - @Model.MaxExpence.Purpose.Name
+                <p class="transactions-info-line">
+                    Максимальный расход: <span class="transactions-info-val">@Model.MaxExpence.Amount.ToString("N0") ₸</span>@(string.IsNullOrWhiteSpace(Model.MaxExpence.Note) ? "" : $" - {Model.MaxExpence.Note}")<br />
+                    <span class="transactions-info-sub">Категория расхода - @Model.MaxExpence.Purpose?.Name</span>
                 </p>
             }
+        </div>
 
+        <div class="fund-table-card">
             <div class="mc-table-container">
                 <table class="mc-table mc-table--wide">
-                    <tr class="mc-table--center-aligment">
-                        <td>ID</td>
-                        <td>Сумма</td>
-                        <td>Назначение</td>
-                        <td>Доп. информация</td>
-                    </tr>
+                    <thead>
+                        <tr class="mc-table--center-aligment">
+                            <td style="width: 80px;">ID</td>
+                            <td style="width: 170px;">Сумма</td>
+                            <td style="width: 240px;">Назначение</td>
+                            <td>Доп. информация</td>
+                        </tr>
+                    </thead>
 
                     <tbody id="transactionsBody">
-
-
-                    @if (Model.TransactionsList.Count == 0)
-                    {
-                        <tr class="mc-table--center-aligment">
-                            <td colspan="3">Транзакций пока не было</td>
-                        </tr>
-                    }
-                    else
-                    {
-                        foreach (FundTransaction transaction in Model.TransactionsList)
+                        @if (Model.TransactionsList.Count == 0)
                         {
-                            <tr>
-                                <td>@transaction.Id</td>
-                                <td>@transaction.Amount</td>
-                                <td>@transaction.Purpose.Name</td>
-                                <td>@transaction.Note</td>
+                            <tr class="mc-table--center-aligment">
+                                <td colspan="4">Транзакций пока не было</td>
                             </tr>
-                        }  
-                    }
-
+                        }
+                        else
+                        {
+                            foreach (FundTransaction transaction in Model.TransactionsList)
+                            {
+                                <tr>
+                                    <td class="mc-table--center-aligment">@transaction.Id</td>
+                                    <td class="mc-table--center-aligment">@transaction.Amount.ToString("N0") ₸</td>
+                                    <td>@transaction.Purpose?.Name</td>
+                                    <td>@(string.IsNullOrWhiteSpace(transaction.Note) ? "—" : transaction.Note)</td>
+                                </tr>
+                            }
+                        }
                     </tbody>
 
-                    <tr class="mc-table--center-aligment" id="loadMoreRow">
-                        <td colspan="4">
-                            <a href="#" id="loadMoreBtn">Ещё</a>
-                        </td>
-                    </tr>
+                    @if (Model.TransactionsList.Count > 0)
+                    {
+                        <tr class="mc-table--center-aligment" id="loadMoreRow">
+                            <td colspan="4" class="mc-table-load-more-cell">
+                                <button type="button" id="loadMoreBtn" class="mc-load-btn">
+                                    <span>Ещё</span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
                 </table>
             </div>
         </div>
+
     </div>
 </div>
 
-
 <script>
-
     let lastId = @(
         Model.TransactionsList.Count > 0
         ? Model.TransactionsList.Last().Id
         : 0
-        );
+    );
 
     async function loadMoreTransactions(e) {
+        if (e) e.preventDefault();
+        const btn = document.getElementById("loadMoreBtn");
+        if (!btn || btn.disabled) return;
 
-        e.preventDefault();
+        btn.disabled = true;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "<span>Загрузка...</span>";
 
-        const response = await fetch(`/Home/GetTransactions?lastId=${lastId}`);
+        try {
+            const response = await fetch(`/Home/GetTransactions?lastId=${lastId}`);
+            if (!response.ok) throw new Error("HTTP error " + response.status);
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (data.length === 0) {
+            if (!data || data.length === 0) {
+                const loadRow = document.getElementById("loadMoreRow");
+                if (loadRow) {
+                    loadRow.remove();
+                }
+                return;
+            }
 
-            document.getElementById("loadMoreRow").remove();
+            const tbody = document.getElementById("transactionsBody");
 
-            return;
+            data.forEach(t => {
+                const row = document.createElement("tr");
+
+                const amountVal = Number(t.amount || 0).toLocaleString('ru-RU');
+                const purposeName = t.purpose && t.purpose.name ? t.purpose.name : '—';
+                const noteText = t.note && t.note.trim() ? t.note : '—';
+
+                row.innerHTML = `
+                    <td class="mc-table--center-aligment">${t.id}</td>
+                    <td class="mc-table--center-aligment">${amountVal} ₸</td>
+                    <td>${purposeName}</td>
+                    <td>${noteText}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            lastId = data[data.length - 1].id;
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        } catch (err) {
+            console.error("Ошибка загрузки транзакций:", err);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         }
-
-        const tbody = document.getElementById("transactionsBody");
-
-        data.forEach(t => {
-
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${t.id}</td>
-                <td>${t.amount}</td>
-                <td>${t.purpose.name}</td>
-                <td>${t.note ?? ''}</td>
-            `;
-
-            tbody.appendChild(row);
-        });
-
-        lastId = data[data.length - 1].id;
     }
 
-    document
-        .getElementById("loadMoreBtn")
-        .addEventListener("click", loadMoreTransactions);
-
+    const loadBtn = document.getElementById("loadMoreBtn");
+    if (loadBtn) {
+        loadBtn.addEventListener("click", loadMoreTransactions);
+    }
 </script>

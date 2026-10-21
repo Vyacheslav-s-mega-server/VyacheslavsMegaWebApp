@@ -1,0 +1,138 @@
+@model List<Contact>
+
+@{
+    ViewData["Title"] = "Контакты — VEC";
+}
+
+<div class="contacts-page">
+    <div class="contacts-container">
+        
+        <div class="contacts-header">
+            <span class="donation-hero__badge">СВЯЗЬ С КОМАНДОЙ</span>
+            <h1 class="donation-hero__title">
+                КОМАНДА & <span class="hero-title__accent">КОНТАКТЫ</span>
+            </h1>
+            <p class="donation-hero__desc">
+                Vyacheslav's Mega Server создаётся энтузиастами для игроков. По любым вопросам сотрудничества, предложениям или багам — свяжитесь с нами напрямую:
+            </p>
+        </div>
+
+        <div class="contacts-grid">
+            @if (Model != null)
+            {
+                @foreach (var contact in Model.Where(c => c.ShowContact))
+                {
+                    var isFounder = contact.Id == 1 || (contact.DisplayName ?? "").Contains("Вячеслав");
+                    var isDev = (contact.DisplayName ?? "").Contains("ALWLEX") || (contact.Description ?? "").Contains("Разработчик");
+                    var photoUrl = isFounder ? Url.Content("~/img/team/vyacheslav.jpg") : (isDev ? Url.Content("~/img/team/alwlex.jpg") : Url.Content("~/img/logo.png"));
+
+                    <div class="contact-card">
+                        <div>
+                            <div class="contact-card__head">
+                                <div class="contact-avatar-box">
+                                    <img src="@photoUrl" alt="@contact.DisplayName" class="contact-avatar-img" />
+                                    <div class="contact-identity">
+                                        <span class="contact-role-badge">@(contact.Description ?? "Команда VEC")</span>
+                                        <h2 class="contact-name">@contact.DisplayName</h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(contact.DescriptionLarge))
+                            {
+                                <p class="contact-bio">
+                                    @contact.DescriptionLarge
+                                </p>
+                            }
+                        </div>
+
+                        <div class="contact-links-list">
+                            @if (contact.Links != null)
+                            {
+                                @foreach (var link in contact.Links)
+                                {
+                                    var text = ((link.Description ?? "") + " " + (link.Content ?? "") + " " + (link.Url ?? "")).ToLower();
+                                    var pillClass = "contact-pill--tg";
+                                    var iconClass = "bxl-telegram";
+                                    var isCopyDs = false;
+
+                                    if (text.Contains("discord") || text.Contains("дискорд") || text.Contains("дс"))
+                                    {
+                                        pillClass = "contact-pill--ds";
+                                        iconClass = "bxl-discord-alt";
+                                        if (!link.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            isCopyDs = true;
+                                        }
+                                    }
+                                    else if (text.Contains("vk") || text.Contains("вк"))
+                                    {
+                                        pillClass = "contact-pill--vk";
+                                        iconClass = "bxl-vk";
+                                    }
+                                    else if (text.Contains("github"))
+                                    {
+                                        pillClass = "contact-pill--gh";
+                                        iconClass = "bxl-github";
+                                    }
+
+                                    if (isCopyDs)
+                                    {
+                                        <div class="contact-pill @pillClass" onclick="copyDiscord(event, '@link.Content')" title="Скопировать Discord тег">
+                                            <i class='bx @iconClass contact-pill__icon'></i>
+                                            <div class="contact-pill__text">
+                                                <span class="contact-pill__label">@(string.IsNullOrEmpty(link.Description) ? "Discord" : link.Description)</span>
+                                                <span class="contact-pill__value">@link.Content</span>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <a class="contact-pill @pillClass" href="@link.Url" target="_blank" rel="noopener">
+                                            <i class='bx @iconClass contact-pill__icon'></i>
+                                            <div class="contact-pill__text">
+                                                <span class="contact-pill__label">@(string.IsNullOrEmpty(link.Description) ? "Ссылка" : link.Description)</span>
+                                                <span class="contact-pill__value">@link.Content</span>
+                                            </div>
+                                        </a>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="contacts-extra-banner">
+            <div class="contacts-extra-content">
+                <h3 class="contacts-extra-title">Discord сообщество сервера</h3>
+                <p class="contacts-extra-desc">
+                    Общайтесь с игроками, участвуйте в голосованиях и следите за оперативными анонсами обновлений в нашем Discord.
+                </p>
+            </div>
+
+            <div class="contacts-extra-actions">
+                <a href="https://discord.gg/ATES48pgJj" target="_blank" rel="noopener" class="btn-download">
+                    <i class='bx bxl-discord-alt'></i>
+                    <span>Войти в Discord</span>
+                </a>
+                <a asp-controller="UserReports" asp-action="New" class="btn-secondary">
+                    <span>Техподдержка</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function copyDiscord(event, tag) {
+        event.preventDefault();
+        navigator.clipboard.writeText(tag).then(function() {
+            alert('Discord тег скопирован: ' + tag);
+        }).catch(function() {
+            prompt('Скопируйте Discord тег:', tag);
+        });
+    }
+</script>

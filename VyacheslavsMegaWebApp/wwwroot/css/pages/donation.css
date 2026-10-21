@@ -1,23 +1,742 @@
-.block--donation-intro {
-    background: url(../../img/backgrounds/donation/intro.webp);
-    background-repeat: no-repeat;
-}
-
-.donation-intro__cards-container {
-    margin: 0 auto;
-}
-
-.block--donation-fund {
-    background: url(../../img/backgrounds/donation/fund.webp);
-    background-repeat: no-repeat;
+.donation-hero {
+    min-height: 84vh;
+    padding: 130px 0 70px 0;
+    display: flex;
+    align-items: center;
+    background-color: #08090d;
+    background-image: 
+        radial-gradient(circle 600px at 70% 40%, rgba(245, 158, 11, 0.16), transparent 70%),
+        linear-gradient(90deg, #08090d 0%, #08090d 38%, rgba(8, 9, 13, 0.85) 65%, rgba(8, 9, 13, 0.25) 100%),
+        url('../../img/donation-bg.jpg');
     background-size: cover;
+    background-position: center right;
+    background-repeat: no-repeat;
+    position: relative;
 }
 
-.donation-fund__bar {
+.donation-hero__container {
+    width: 100%;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.donation-hero__grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.donation-hero__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    max-width: 680px;
+}
+
+.donation-hero__badge {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #f59e0b;
+    text-transform: uppercase;
+    text-shadow: none !important;
+}
+
+.donation-hero__title {
+    font-family: 'minecraft-title', 'minecraft', sans-serif !important;
+    font-size: 42px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    letter-spacing: 1px !important;
+    color: #ffffff !important;
+    margin: 0 !important;
+    text-transform: uppercase;
+    text-shadow: none !important;
+}
+
+.donation-hero__desc {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 17px !important;
+    line-height: 1.65 !important;
+    letter-spacing: 0.5px !important;
+    color: #c9cdd8 !important;
+    margin: 0 !important;
+    text-shadow: none !important;
+}
+
+.donation-hero__features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 4px 0 8px 0;
+    width: 100%;
+}
+
+.donation-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 15px;
+    color: #e5e7eb;
+    text-shadow: none !important;
+}
+
+.donation-feature-item i {
+    font-size: 20px;
+    color: #fbbf24;
+    flex-shrink: 0;
+}
+
+.donation-hero__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 13px 24px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+    color: #ffffff !important;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 17px !important;
+    letter-spacing: 0.6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    text-shadow: none !important;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.32);
+    color: #fbbf24 !important;
+    transform: translateY(-1px);
+}
+
+.donation-hero__visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.donation-char-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.donation-char-aura {
+    position: absolute;
+    width: 440px;
+    height: 440px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.28) 0%, rgba(217, 119, 6, 0.1) 45%, transparent 72%);
+    filter: blur(35px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.donation-char-img {
+    position: relative;
+    z-index: 2;
+    max-width: 100%;
+    max-height: 480px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.8));
+    transition: transform 0.3s ease;
+}
+
+.donation-char-wrapper:hover .donation-char-img {
+    transform: scale(1.02);
+}
+
+.donation-char-chip {
+    position: absolute;
+    bottom: 12px;
+    left: 20px;
+    z-index: 3;
+    background: rgba(14, 17, 24, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    border-radius: 12px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+}
+
+.donation-chip-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(251, 191, 36, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fbbf24;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.donation-chip-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.donation-chip-label {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 11px !important;
+    letter-spacing: 0.8px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    text-shadow: none !important;
+}
+
+.donation-chip-value {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: none !important;
+}
+
+/* Bank Cards Section */
+.donation-cards-section {
+    padding: 85px 0 95px 0;
+    background: #06070a;
+    position: relative;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.donation-section-head {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 40px auto;
+}
+
+.donation-section-tag {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #f59e0b;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+    text-shadow: none !important;
+}
+
+.donation-section-title {
+    font-family: 'minecraft-title', 'minecraft', sans-serif !important;
+    font-size: 32px !important;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 12px 0;
+    text-shadow: none !important;
+}
+
+.donation-section-desc {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 16px;
+    color: #9ca3af;
+    line-height: 1.6;
+    margin: 0;
+    text-shadow: none !important;
+}
+
+.donation-cards-grid {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 36px;
+}
+
+.donation-bank-card {
+    width: 420px;
+    min-width: 380px;
+    max-width: 100%;
+    height: 240px;
+    border-radius: 18px;
+    padding: 24px 22px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #ffffff;
+    text-shadow: none !important;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+    user-select: none;
+}
+
+.donation-bank-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.7);
+}
+
+.donation-bank-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.35) 100%);
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.donation-bank-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+}
+
+.card-top-row {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-chip-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.card-emv-chip {
+    width: 44px;
+    height: 32px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #f5d061 0%, #e5a93c 50%, #c48b26 100%);
+    position: relative;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(138, 92, 10, 0.5);
+    overflow: hidden;
+}
+
+.card-emv-chip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.card-emv-chip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 45%;
+    width: 1px;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.card-nfc-icon {
+    font-size: 24px;
+    transform: rotate(90deg);
+    opacity: 0.85;
+    color: #ffffff;
+}
+
+.card-bank-name {
+    font-family: 'Noto Sans', sans-serif !important;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.card-mid-row {
+    position: relative;
+    z-index: 2;
+    margin: 8px 0;
+}
+
+.card-number-text {
+    font-family: 'card', monospace !important;
+    font-size: 19px !important;
+    letter-spacing: 2px !important;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.65) !important;
+    margin: 0 0 12px 0 !important;
+    white-space: nowrap !important;
+    word-spacing: 4px;
+}
+
+.card-copy-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 13px !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: none !important;
+}
+
+.card-copy-pill:hover,
+.card-copy-pill.is-copied {
+    background: rgba(251, 191, 36, 0.25);
+    border-color: rgba(251, 191, 36, 0.6);
+    color: #fbbf24;
+}
+
+.card-bottom-row {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.card-holder-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.card-holder-label {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 10px !important;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    text-shadow: none !important;
+}
+
+.card-holder-name {
+    font-family: 'card', monospace !important;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+.card-system-brand {
+    font-family: 'Noto Sans', sans-serif !important;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.25);
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+/* Fund Section */
+.donation-fund-section {
+    padding: 85px 0 95px 0;
+    background: #08090d;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.fund-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.fund-stat-card {
+    background: #0e1118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.fund-stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fbbf24;
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.fund-stat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fund-stat-label {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 13px !important;
+    letter-spacing: 0.5px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    text-shadow: none !important;
+}
+
+.fund-stat-val {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: none !important;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.fund-progress-card {
+    background: #0b0d13;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 36px 32px;
+    text-align: center;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    margin-bottom: 40px;
+}
+
+.fund-progress-title {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 20px 0;
+    text-shadow: none !important;
+}
+
+/* Minecraft XP Bar */
+.mc-bar {
+    padding-top: 36px;
+    width: fit-content;
+    position: relative;
+    text-align: center;
     margin: 0 auto;
 }
 
-.block--donation-attention {
-    background: url(../../img/backgrounds/donation/attention.webp);
-    background-repeat: no-repeat;
+.mc-bar__text {
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    width: 100%;
+    color: #7dfc1f !important;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    text-align: center;
+    letter-spacing: 1px;
+    text-shadow:
+        -2px 0 #000,
+        2px 0 #000,
+        0 -2px #000,
+        0 2px #000,
+        -2px -2px #000,
+        2px -2px #000,
+        -2px 2px #000,
+        2px 2px #000 !important;
+}
+
+.mc-bar__progress {
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    gap: 1px;
+    width: fit-content;
+    padding: 2px;
+    background: #000000;
+    border: 2px solid #000000;
+    box-shadow: 0 0 0 1px #2a2a2a;
+    border-radius: 4px;
+}
+
+.mc-bar__cell {
+    height: 16px;
+    width: 28px;
+    background: #142214;
+    border-top: 2px solid #0a120a;
+    border-bottom: 2px solid #1c301c;
+    box-sizing: border-box;
+}
+
+.mc-bar__cell--filled {
+    background: #7cfc00;
+    background: linear-gradient(180deg, #b8ff40 0%, #7cfc00 50%, #46aa00 100%);
+    border-top: 2px solid #e0ff90;
+    border-bottom: 2px solid #286000;
+    box-shadow: 0 0 6px rgba(124, 252, 0, 0.4);
+}
+
+/* Minecraft GUI Table Section */
+.fund-table-card {
+    background: #0e1118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+.fund-table-title {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 20px 0;
+    text-shadow: none !important;
+}
+
+.mc-table-container {
+    padding-bottom: 10px;
+    overflow-x: auto;
+    width: 100%;
+}
+
+.mc-table {
+    padding: 15px;
+    text-align: left;
+    border-spacing: 0;
+    border: 3px solid #000000;
+    border-radius: 5px;
+    background: #c6c6c6;
+    box-shadow: inset 5px 5px #ffffff, inset -5px -5px #565656;
+    width: 100%;
+    font-family: 'minecraft', sans-serif !important;
+    color: #ffffff;
+    text-shadow: 2px 2px #3f3f3f;
+}
+
+.mc-table--wide {
+    width: 100%;
+}
+
+.mc-table--center-aligment {
+    text-align: center;
+}
+
+.mc-table td {
+    padding: 10px 14px;
+    background: #8b8b8b;
+    border: 4px solid;
+    border-color: #353535 #ffffff #ffffff #353535;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 16px;
+    color: #ffffff;
+    text-shadow: 2px 2px #3f3f3f;
+}
+
+.mc-table a {
+    color: #ffffa0;
+    text-decoration: underline;
+    text-shadow: 2px 2px #202013cc;
+    transition: color 0.15s ease;
+}
+
+.mc-table a:hover {
+    color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .donation-hero__grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
+    }
+
+    .donation-hero__content {
+        max-width: 100%;
+    }
+
+    .fund-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .donation-hero {
+        padding: 110px 0 50px 0;
+    }
+
+    .donation-hero__title {
+        font-size: 32px !important;
+    }
+
+    .donation-char-img {
+        max-height: 380px;
+    }
+
+    .donation-char-aura {
+        width: 320px;
+        height: 320px;
+    }
+
+    .donation-char-chip {
+        left: 0;
+        bottom: 0;
+        padding: 10px 14px;
+    }
+
+    .donation-bank-card {
+        width: 100%;
+        min-width: unset;
+        height: auto;
+        min-height: 220px;
+    }
+
+    .card-number-text {
+        font-size: 17px !important;
+        letter-spacing: 1.5px !important;
+    }
+
+    .mc-bar__cell {
+        height: 12px;
+        width: 16px;
+    }
+
+    .mc-bar__text {
+        font-size: 18px !important;
+    }
 }

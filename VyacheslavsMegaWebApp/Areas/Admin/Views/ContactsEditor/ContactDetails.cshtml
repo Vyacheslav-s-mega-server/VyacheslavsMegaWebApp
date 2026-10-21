@@ -1,4 +1,4 @@
-﻿@model Contact
+@model Contact
 
 <div class="block block--first">
     <div class="container">
@@ -16,10 +16,8 @@
 
                     <div class="form__validation-summary" asp-validation-summary="All"></div>
 
-                    <!-- DisplayName -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="DisplayName"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="DisplayName">
@@ -27,10 +25,8 @@
                         </div>
                     </div>
 
-                    <!-- Description -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="Description"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="Description">
@@ -38,10 +34,8 @@
                         </div>
                     </div>
 
-                    <!-- DescriptionLarge -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="DescriptionLarge"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <textarea class="field__input" rows="4" asp-for="DescriptionLarge"></textarea>
@@ -49,7 +43,6 @@
                         </div>
                     </div>
 
-                    <!-- UserId -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="UserId"></label>
                         <select class="mc-listbox"
@@ -59,7 +52,6 @@
                         </select>
                     </div>
 
-                    <!-- ShowContact -->
                     <div class="form-group">
                         <div class="form-group__control">
                             <label class="mc-checkbox">

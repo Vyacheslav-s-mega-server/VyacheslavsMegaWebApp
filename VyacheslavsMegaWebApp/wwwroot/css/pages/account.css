@@ -1,15 +1,301 @@
-﻿.block--account {
-    background-image: url(../../img/backgrounds/account.webp);
-    background-repeat: no-repeat;
+.auth-page,
+.auth-page *,
+.auth-card,
+.auth-card * {
+    text-shadow: none !important;
 }
 
-.account-form {
-    width: 50%;
+.auth-page {
+    min-height: calc(100vh - 90px);
+    padding: 120px 20px 70px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #08090d;
+    position: relative;
+    font-family: 'minecraft', sans-serif;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 460px;
     margin: 0 auto;
 }
 
-@media (max-width: 768px) {
-    .account-form {
-        width: 100%;
+.auth-card {
+    background: #0e1118;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 36px 30px;
+    box-sizing: border-box;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.auth-title {
+    font-family: 'minecraft-title', 'minecraft', sans-serif !important;
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
+    color: #ffffff !important;
+    margin: 0 0 8px 0 !important;
+    text-transform: uppercase;
+    text-shadow: none !important;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: #9ca3af;
+    margin: 0;
+    line-height: 1.4;
+    text-shadow: none !important;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+}
+
+.auth-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.auth-label {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-shadow: none !important;
+}
+
+.field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.field__input {
+    width: 100%;
+    padding: 14px 12px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 3px solid #d1d5db;
+    border-radius: 0 !important;
+    color: #ffffff;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
+    text-shadow: none !important;
+}
+
+.field__input::placeholder {
+    color: #6b7280;
+    font-family: 'minecraft', sans-serif !important;
+    opacity: 0.85;
+}
+
+.field__input:focus {
+    border-color: #f59e0b;
+}
+
+.auth-row-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 2px;
+}
+
+.auth-forgot-link {
+    font-size: 14px;
+    color: #f59e0b;
+    text-decoration: none;
+    transition: color 0.15s ease;
+    text-shadow: none !important;
+}
+
+.auth-forgot-link:hover {
+    color: #fbbf24;
+    text-decoration: underline;
+}
+
+.btn-download,
+.btn-download *,
+.btn-download-auth,
+.btn-download-auth * {
+    text-shadow: none !important;
+}
+
+.btn-download,
+.btn-download-auth {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 13px 26px;
+    background: #f59e0b;
+    color: #08090d !important;
+    border: 1px solid #fbbf24;
+    border-radius: 8px;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 18px !important;
+    letter-spacing: 0.8px !important;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+    user-select: none;
+    box-shadow: none !important;
+    box-sizing: border-box;
+}
+
+.btn-download-auth,
+.btn-download--full {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.btn-download:hover,
+.btn-download-auth:hover {
+    background: #fbbf24;
+    color: #08090d !important;
+    transform: translateY(-1px);
+}
+
+.btn-download:active,
+.btn-download-auth:active {
+    transform: translateY(1px);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-footer p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #9ca3af;
+    text-shadow: none !important;
+}
+
+.auth-footer a {
+    color: #f59e0b;
+    text-decoration: none;
+    font-weight: 700;
+    text-shadow: none !important;
+}
+
+.auth-footer a:hover {
+    color: #fbbf24;
+    text-decoration: underline;
+}
+
+.auth-socials-box {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-socials-title {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 12px;
+    text-shadow: none !important;
+}
+
+.auth-socials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.btn-social,
+.btn-social * {
+    text-shadow: none !important;
+}
+
+.btn-social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 14px !important;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+    user-select: none;
+    box-shadow: none !important;
+}
+
+.btn-social:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.btn-social i {
+    font-size: 16px;
+}
+
+.form-error-msg {
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 2px;
+    text-shadow: none !important;
+}
+
+.form__validation-summary {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: #fca5a5;
+    font-size: 13px;
+    margin-bottom: 14px;
+    text-shadow: none !important;
+}
+
+.form__validation-summary.validation-summary-valid {
+    display: none;
+}
+
+.form__validation-summary ul {
+    margin: 0;
+    padding-left: 16px;
+}
+
+@media (max-width: 500px) {
+    .auth-page {
+        padding: 100px 14px 40px 14px;
+    }
+
+    .auth-card {
+        padding: 26px 18px;
+    }
+
+    .auth-socials-grid {
+        grid-template-columns: 1fr;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using VyacheslavsMegaWebApp.Areas.Admin.Models;
 using VyacheslavsMegaWebApp.Data.Entities;
 using VyacheslavsMegaWebApp.Data.Repositories;
@@ -42,7 +42,7 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
                 string newImageName = await _imageManager.SaveUniqueFileName(Goal.LOGOS_DIR, goalLogoImage);
                 if (!string.IsNullOrEmpty(model.LogoFileName))
                 {
-                    _imageManager.RemoveImage(Partner.LOGOS_DIR, model.LogoFileName);
+                    _imageManager.RemoveImage(Goal.LOGOS_DIR, model.LogoFileName);
                 }
                 model.LogoFileName = newImageName;
             }

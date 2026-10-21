@@ -1,9 +1,33 @@
-﻿<div class="block block--first block--account">
-    <div class="container">
-        <div class="section section--centered">
-            <h2 class="section__title section__title--main">E-mail отправлен</h2>
-            <p>Проверьте ваш почтовый ящик - @TempData["email"]</p>
-            <p>Письмо по ошибке может попасть в папку спам. Отметьте его не спамом, чтобы удобно получать дальшейшие уведомления.</p>
+@{
+    ViewData["Title"] = "Письмо отправлено - Vyacheslav's Mega Server";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/pages/account.css" asp-append-version="true" />
+}
+
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card" style="text-align: center;">
+            
+            <div class="auth-header">
+                <h1 class="auth-title">ПИСЬМО ОТПРАВЛЕНО</h1>
+                <p class="auth-subtitle">Инструкции высланы на ваш адрес электронной почты:</p>
+                <p style="margin: 12px 0; color: #fbbf24; font-size: 15px; font-weight: bold; word-break: break-all;">
+                    @TempData["email"]
+                </p>
+                <p style="font-size: 13px; color: #94a3b8; line-height: 1.5;">
+                    Проверьте папку «Спам», если письмо не пришло во «Входящие».
+                </p>
+            </div>
+
+
+
+            <div class="auth-footer">
+                <p><a asp-action="Login">Вернуться ко входу</a></p>
+                <p><a asp-controller="Home" asp-action="Index">На главную</a></p>
+            </div>
+
         </div>
     </div>
 </div>

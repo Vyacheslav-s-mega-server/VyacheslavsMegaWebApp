@@ -1,51 +1,429 @@
-﻿@model ChangePasswordViewModel
+@model VyacheslavsMegaWebApp.Models.AccountSettingsViewModel
+@{
+    ViewData["Title"] = "Настройки аккаунта — VEC";
+}
 
-<div class="block block--first block--account">
-    <div class="container">
-        <div class="section">
-            <h2 class="section__title section__title--main">Настройки аккаунта</h2>
+@section Styles {
+    <link rel="stylesheet" href="~/css/pages/account.css" asp-append-version="true" />
+    <style>
+        .settings-page {
+            padding: 120px 0 80px;
+            background: #08090d;
+            min-height: 100vh;
+            color: #d1d5db;
+            font-family: 'minecraft', sans-serif;
+        }
 
-            <form class="form account-form" asp-area="" asp-controller="Account" asp-action="ChangePassword" method="post">
-                <div class="form__validation-summary" asp-validation-summary="All"></div>
+        .settings-page * {
+            text-shadow: none !important;
+            box-shadow: none !important;
+        }
 
-                <div class="form__body">
-                    <div class="form-group">
-                        <label class="form-group__label" asp-for="OldPassword"></label>
+        .settings-container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-                        <div class="form-group__control">
-                            <div class="field">
-                                <input class="field__input" asp-for="OldPassword">
-                            </div>
-                        </div>
-                    </div>
+        .settings-header {
+            margin-bottom: 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
 
-                    <div class="form-group">
-                        <label class="form-group__label" asp-for="NewPassword"></label>
+        .settings-header__title {
+            font-family: 'minecraft-title', 'minecraft', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-                        <div class="form-group__control">
-                            <div class="field">
-                                <input class="field__input" asp-for="NewPassword">
-                            </div>
-                        </div>
-                    </div>
+        .settings-header__desc {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-top: 6px;
+            font-family: 'minecraft', sans-serif;
+        }
 
-                    <div class="form-group">
-                        <label class="form-group__label" asp-for="ConfirmPassword"></label>
+        .settings-back-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            font-family: 'minecraft', sans-serif;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
 
-                        <div class="form-group__control">
-                            <div class="field">
-                                <input class="field__input" asp-for="ConfirmPassword">
-                            </div>
-                        </div>
+        .settings-back-link:hover {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+        }
+
+        .settings-card {
+            background: #0e1118;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 24px;
+            padding: 26px 30px;
+            box-sizing: border-box;
+        }
+
+        .settings-card__head {
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .settings-card__title {
+            font-family: 'minecraft-title', 'minecraft', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .settings-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .settings-info-row {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .settings-info-row__label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #838a9a;
+            font-family: 'minecraft', sans-serif;
+        }
+
+        .settings-info-row__value {
+            font-size: 15px;
+            color: #ffffff;
+            word-break: break-all;
+            font-family: 'minecraft', sans-serif;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-family: 'minecraft', sans-serif;
+        }
+
+        .status-badge--success {
+            background: #064e3b;
+            color: #34d399;
+            border: 1px solid #059669;
+        }
+
+        .status-badge--warn {
+            background: #451a03;
+            color: #fbbf24;
+            border: 1px solid #d97706;
+            text-decoration: none;
+        }
+
+        .status-badge--warn:hover {
+            color: #fff;
+            background: #78350f;
+        }
+
+        .mc-status-bar {
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'minecraft', sans-serif;
+        }
+
+        .mc-status-bar--success {
+            background: #064e3b;
+            border: 1px solid #059669;
+            color: #a7f3d0;
+        }
+
+        .mc-status-bar--danger {
+            background: #450a0a;
+            border: 1px solid #dc2626;
+            color: #fecaca;
+        }
+
+        .settings-field-label {
+            display: block;
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            font-family: 'minecraft', sans-serif;
+        }
+
+        .settings-page .field__input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #d1d5db;
+            border-radius: 0 !important;
+            color: #ffffff;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.15s ease;
+            font-family: 'minecraft', sans-serif !important;
+        }
+
+        .settings-page .field__input:focus {
+            border-color: #f59e0b;
+        }
+
+        .settings-page .field__input::placeholder {
+            color: #6b7280;
+            font-family: 'minecraft', sans-serif !important;
+        }
+    </style>
+}
+
+<div class="settings-page">
+    <div class="settings-container">
+        
+        <div class="settings-header">
+            <div>
+                <h1 class="settings-header__title">Настройки аккаунта</h1>
+                <div class="settings-header__desc">Управление параметрами учетной записи и безопасностью</div>
+            </div>
+            <a asp-action="Profile" class="settings-back-link">
+                <span>В личный профиль</span>
+            </a>
+        </div>
+
+        @if (TempData["PasswordSuccess"] != null)
+        {
+            <div class="mc-status-bar mc-status-bar--success">
+                <span>@TempData["PasswordSuccess"]</span>
+            </div>
+        }
+        @if (TempData["PasswordError"] != null)
+        {
+            <div class="mc-status-bar mc-status-bar--danger">
+                <span>@TempData["PasswordError"]</span>
+            </div>
+        }
+
+        <div class="settings-card">
+            <div class="settings-card__head">
+                <h2 class="settings-card__title">Данные учетной записи</h2>
+                <span class="status-badge status-badge--success">@Model.RoleBadge</span>
+            </div>
+
+            <div class="settings-info-list">
+                <div class="settings-info-row">
+                    <span class="settings-info-row__label">Имя пользователя (Никнейм)</span>
+                    <span class="settings-info-row__value">@Model.Username</span>
+                </div>
+
+                <div class="settings-info-row">
+                    <span class="settings-info-row__label">Электронная почта</span>
+                    <div class="settings-info-row__value" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <span>@Model.Email</span>
+                        @if (Model.EmailConfirmed)
+                        {
+                            <span class="status-badge status-badge--success">Подтвержден</span>
+                        }
+                        else
+                        {
+                            <a asp-action="SendEmailConfirmationToken" class="status-badge status-badge--warn" title="Отправить письмо повторно">
+                                Не подтвержден
+                            </a>
+                        }
                     </div>
                 </div>
 
-                <div class="form__footer">
-                    <button class="mc-button mc-button--wide" type="submit">
-                        <span class="mc-button__title">Сменить пароль</span>
+                <div class="settings-info-row">
+                    <span class="settings-info-row__label">Идентификатор VMS ID</span>
+                    <div class="settings-info-row__value">
+                        <code style="color: #f59e0b; background: transparent; padding: 0; font-size: 14px;">@Model.UserId</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <div class="settings-card__head">
+                <h2 class="settings-card__title">Смена пароля</h2>
+            </div>
+
+            <form class="form account-form" asp-action="ChangePassword" method="post" style="max-width: 520px;">
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label class="settings-field-label">Текущий пароль</label>
+                    <input class="field__input" asp-for="ChangePassword.OldPassword" type="password" required autocomplete="current-password" placeholder="Введите старый пароль" />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label class="settings-field-label">Новый пароль</label>
+                    <input class="field__input" asp-for="ChangePassword.NewPassword" type="password" required autocomplete="new-password" placeholder="Минимум 6 символов" />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 22px;">
+                    <label class="settings-field-label">Подтверждение нового пароля</label>
+                    <input class="field__input" asp-for="ChangePassword.ConfirmPassword" type="password" required autocomplete="new-password" placeholder="Повторите новый пароль" />
+                </div>
+
+                <div>
+                    <button class="btn-download-auth" type="submit" style="width: auto; padding: 12px 28px;">
+                        <span>Обновить пароль</span>
                     </button>
                 </div>
             </form>
         </div>
+
+        <div class="settings-card">
+            <div class="settings-card__head">
+                <h2 class="settings-card__title">Смена электронной почты</h2>
+            </div>
+
+            <div style="font-size: 14px; color: #9ca3af; margin-bottom: 18px; font-family: 'minecraft', sans-serif;">
+                Для смены почты укажите новый адрес и запросите код подтверждения.
+            </div>
+
+            @if (TempData["EmailSuccess"] != null)
+            {
+                <div class="mc-status-bar mc-status-bar--success">
+                    <span>@TempData["EmailSuccess"]</span>
+                </div>
+            }
+            @if (TempData["EmailError"] != null)
+            {
+                <div class="mc-status-bar mc-status-bar--danger">
+                    <span>@TempData["EmailError"]</span>
+                </div>
+            }
+
+            <form class="form account-form" asp-action="ConfirmEmailChange" method="post" style="max-width: 520px;">
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label class="settings-field-label">Новая электронная почта</label>
+                    <input class="field__input" id="newEmailInput" name="newEmail" type="email" required placeholder="name@example.com" />
+                    <div style="margin-top: 12px;">
+                        <button type="button" id="sendEmailCodeBtn" class="btn-download-auth" style="width: auto; padding: 10px 22px; font-size: 15px;" onclick="requestEmailChangeCode()">
+                            Получить код
+                        </button>
+                    </div>
+                    <div id="emailCodeFeedback" style="font-size: 14px; margin-top: 10px; display: none; font-family: 'minecraft', sans-serif;"></div>
+                </div>
+
+                <div id="emailCodeStep2" style="display: @(TempData["EmailError"] != null ? "block" : "none"); margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                    <div class="form-group" style="margin-bottom: 18px;">
+                        <label class="settings-field-label">Код подтверждения из письма</label>
+                        <input class="field__input" name="code" type="text" maxlength="6" placeholder="6-значный код" style="max-width: 240px; letter-spacing: 2px;" />
+                    </div>
+
+                    <div>
+                        <button class="btn-download-auth" type="submit" style="width: auto; padding: 12px 28px;">
+                            <span>Подтвердить смену почты</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        async function requestEmailChangeCode() {
+            const emailInput = document.getElementById('newEmailInput');
+            const feedback = document.getElementById('emailCodeFeedback');
+            const btn = document.getElementById('sendEmailCodeBtn');
+            const step2 = document.getElementById('emailCodeStep2');
+            const newEmail = emailInput ? emailInput.value.trim() : '';
+
+            if (!newEmail || !newEmail.includes('@@')) {
+                feedback.style.display = 'block';
+                feedback.style.color = '#ef4444';
+                feedback.textContent = 'Пожалуйста, введите корректный адрес электронной почты.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Отправка...';
+            feedback.style.display = 'none';
+
+            try {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+                const form = new FormData();
+                form.append('newEmail', newEmail);
+                if (token) form.append('__RequestVerificationToken', token);
+
+                const response = await fetch('/Account/RequestEmailChangeCode', {
+                    method: 'POST',
+                    body: form
+                });
+                const data = await response.json();
+
+                feedback.style.display = 'block';
+                if (data.success) {
+                    feedback.style.color = '#10b981';
+                    feedback.textContent = data.message || 'Код подтверждения отправлен на указанную почту.';
+                    if (step2) step2.style.display = 'block';
+                    let countdown = 60;
+                    btn.textContent = 'Повтор через ' + countdown + 'с';
+                    const timer = setInterval(() => {
+                        countdown--;
+                        if (countdown <= 0) {
+                            clearInterval(timer);
+                            btn.disabled = false;
+                            btn.textContent = 'Получить код';
+                        } else {
+                            btn.textContent = 'Повтор через ' + countdown + 'с';
+                        }
+                    }, 1000);
+                } else {
+                    feedback.style.color = '#ef4444';
+                    feedback.textContent = data.error || 'Не удалось отправить код.';
+                    btn.disabled = false;
+                    btn.textContent = 'Получить код';
+                }
+            } catch (err) {
+                feedback.style.display = 'block';
+                feedback.style.color = '#ef4444';
+                feedback.textContent = 'Произошла ошибка при отправке запроса.';
+                btn.disabled = false;
+                btn.textContent = 'Получить код';
+            }
+        }
+    </script>
+}

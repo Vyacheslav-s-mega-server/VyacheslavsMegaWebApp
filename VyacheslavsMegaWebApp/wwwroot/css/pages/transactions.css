@@ -1,0 +1,166 @@
+/* Transactions History Page Styles */
+
+.transactions-page {
+    min-height: 85vh;
+    padding: 125px 0 90px 0;
+    background-color: #08090d;
+    background-image: 
+        radial-gradient(circle 750px at 50% 0%, rgba(245, 158, 11, 0.08), transparent 70%),
+        radial-gradient(circle 600px at 85% 50%, rgba(255, 255, 255, 0.03), transparent 70%);
+    position: relative;
+}
+
+.transactions-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.transactions-nav-back {
+    margin-bottom: 24px;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    color: #c9cdd8;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.btn-back i {
+    font-size: 18px;
+    transition: transform 0.2s ease;
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.45);
+    transform: translateY(-1px);
+}
+
+.btn-back:hover i {
+    transform: translateX(-3px);
+}
+
+.transactions-header-block {
+    margin-bottom: 28px;
+}
+
+.transactions-header-block .donation-hero__title {
+    margin: 0 0 10px 0 !important;
+    font-size: 36px !important;
+}
+
+/* Original-style Clean Info Block */
+.transactions-info-block {
+    background: #0e1118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin-bottom: 28px;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #e5e7eb;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.transactions-info-line {
+    margin: 0 0 14px 0;
+}
+
+.transactions-info-line:last-child {
+    margin-bottom: 0;
+}
+
+.transactions-info-val {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.transactions-info-sub {
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+/* Table Card Container */
+.fund-table-card {
+    background: #0e1118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+.mc-table-load-more-cell {
+    padding: 12px 14px !important;
+    background: #8b8b8b !important;
+    text-align: center;
+}
+
+.mc-load-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 32px;
+    background: #555555;
+    border: 3px solid;
+    border-color: #ffffff #1a1a1a #1a1a1a #ffffff;
+    border-radius: 4px;
+    color: #ffffff;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 15px;
+    cursor: pointer;
+    text-shadow: 2px 2px #000000;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.mc-load-btn:hover {
+    background: #666666;
+    color: #ffffa0;
+}
+
+.mc-load-btn:active {
+    border-color: #1a1a1a #ffffff #ffffff #1a1a1a;
+    transform: translateY(1px);
+}
+
+.mc-load-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .transactions-page {
+        padding: 105px 0 60px 0;
+    }
+
+    .transactions-header-block .donation-hero__title {
+        font-size: 28px !important;
+    }
+
+    .fund-table-card {
+        padding: 18px 14px;
+    }
+
+    .mc-table td,
+    .mc-table th {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+}

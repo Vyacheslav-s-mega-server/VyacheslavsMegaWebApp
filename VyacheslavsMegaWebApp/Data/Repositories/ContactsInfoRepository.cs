@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using VyacheslavsMegaWebApp.Data.Entities;
@@ -10,7 +10,7 @@ namespace VyacheslavsMegaWebApp.Data.Repositories
     {
         public async Task<List<Contact>> GetAllContacts()
         {
-            return await DB.Contacts.ToListAsync() ?? new List<Contact>();
+            return await DB.Contacts.Include(c => c.User).Include(c => c.Links).ToListAsync() ?? new List<Contact>();
         }
 
         public async Task<Contact> GetContactById(int id)

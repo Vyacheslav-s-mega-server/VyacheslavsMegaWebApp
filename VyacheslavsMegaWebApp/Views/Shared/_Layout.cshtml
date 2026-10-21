@@ -1,9 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 
 <head>    
     @await Html.PartialAsync("_MetatagsPartial")
     @await Html.PartialAsync("_LinksPartial")
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body>
@@ -22,6 +23,7 @@
 
     <script src="~/js/burger-menu.js"></script>
     <script src="~/js/dropdown-position.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>

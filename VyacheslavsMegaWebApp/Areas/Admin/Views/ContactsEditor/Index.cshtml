@@ -1,4 +1,4 @@
-﻿@model ContactsEditorViewModel
+@model ContactsEditorViewModel
 
 <div class="block block--first">
     <div class="container">
@@ -16,7 +16,7 @@
                     @foreach (Contact contact in Model.Contacts)
                     {
                         <tr>
-                            <td>@contact.User.UserName</td>
+                            <td>@(contact.User != null ? contact.User.UserName : contact.DisplayName)</td>
                             <td>@contact.DisplayName</td>
                             <td>@contact.Description</td>
                             <td><a asp-action="ContactDetails" asp-route-contactId="@contact.Id">Редактировать</a></td>

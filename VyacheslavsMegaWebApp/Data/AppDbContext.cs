@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using VyacheslavsMegaWebApp.Data.Entities;
@@ -31,6 +31,11 @@ namespace VyacheslavsMegaWebApp.Data
         public DbSet<DownloadButton> DownloadButtons { get; set; }
         public DbSet<TransactionPurpose> TransactionPurposes { get; set; }
         public DbSet<LauncherSession> LauncherSessions { get; set; }
+        public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<ClientBuildFile> ClientBuildFiles { get; set; }
+        public DbSet<CustomCape> CustomCapes { get; set; }
+        public DbSet<CapeRedeemCode> CapeRedeemCodes { get; set; }
+        public DbSet<UserCapeOwnership> UserCapeOwnerships { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -134,6 +139,37 @@ namespace VyacheslavsMegaWebApp.Data
                 Name = "Покупка комплектующих сервера",
                 Type = TransactionPurpose.TransactionType.Expense
             });
+
+            modelBuilder.Entity<Friendship>().ToTable("Friendships");
+            modelBuilder.Entity<Friendship>()
+                .HasOne(f => f.Requester)
+                .WithMany()
+                .HasForeignKey(f => f.RequesterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Friendship>()
+                .HasOne(f => f.Addressee)
+                .WithMany()
+                .HasForeignKey(f => f.AddresseeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LauncherSession>(b =>
+            {
+                b.HasKey(s => s.SessionKey);
+                b.Ignore(s => s.SessionKeyHash);
+            });
+
+            modelBuilder.Entity<CustomCape>()
+                .HasIndex(c => c.Slug)
+                .IsUnique();
+
+            modelBuilder.Entity<CapeRedeemCode>()
+                .HasIndex(r => r.Code)
+                .IsUnique();
+
+            modelBuilder.Entity<UserCapeOwnership>()
+                .HasIndex(o => new { o.UserId, o.CapeId })
+                .IsUnique();
         }
     }
 }

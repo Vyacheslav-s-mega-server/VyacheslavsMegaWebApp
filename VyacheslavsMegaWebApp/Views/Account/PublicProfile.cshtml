@@ -1,0 +1,284 @@
+@model VyacheslavsMegaWebApp.Models.PublicProfileViewModel
+@{
+    ViewData["Title"] = "Профиль игрока — " + Model.Username;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/pages/profile.css" asp-append-version="true" />
+    <style>
+        .public-profile-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .btn-relation {
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        .btn-relation--add {
+            background: #15803d;
+            border-color: #22c55e;
+            color: #ffffff;
+        }
+        .btn-relation--add:hover {
+            background: #16a34a;
+            border-color: #4ade80;
+        }
+        .btn-relation--pending {
+            background: #1c1f28;
+            border-color: #4b5263;
+            color: #d1d5db;
+        }
+        .btn-relation--pending:hover {
+            background: #252a37;
+            border-color: #9ca3af;
+        }
+        .btn-relation--friends {
+            background: #14281c;
+            border-color: #22c55e;
+            color: #4ade80;
+        }
+        .btn-relation--remove {
+            background: #1c1f28;
+            border-color: #4b5263;
+            color: #9ca3af;
+        }
+        .btn-relation--remove:hover {
+            background: #252a37;
+            color: #ffffff;
+            border-color: #d1d5db;
+        }
+    </style>
+}
+
+<div class="profile-page">
+    <div class="profile-container">
+
+        <div class="profile-header-card">
+            <div class="profile-banner" style="background-image: url('@Model.BannerUrl');">
+                <div class="profile-banner__overlay"></div>
+            </div>
+
+            <div class="profile-identity-bar">
+                <div class="profile-avatar-container">
+                    <div class="profile-avatar-frame" style="cursor: default;">
+                        <img src="@Model.AvatarUrl" alt="@Model.Username" />
+                    </div>
+                </div>
+
+                <div class="profile-identity-info">
+                    <div class="profile-name-row">
+                        <h1 class="profile-username">@Model.Username</h1>
+                    </div>
+
+                    <div class="profile-meta-line">
+                        <span class="meta-item">Minecraft: @Model.MinecraftUsername</span>
+                        <span class="meta-sep">•</span>
+                        @if (!string.IsNullOrEmpty(Model.CreatedAt))
+                        {
+                            <span class="meta-item">Участник с @Model.CreatedAt</span>
+                            <span class="meta-sep">•</span>
+                        }
+                        <span class="meta-item">Друзей: @Model.FriendsCount</span>
+                    </div>
+
+                    <div class="public-profile-actions" id="relationActionsContainer">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            @if (Model.FriendshipStatus == "Friends")
+                            {
+                                <button type="button" class="btn-relation btn-relation--friends" disabled>
+                                    <i class='bx bx-check-double'></i>
+                                    <span>В друзьях</span>
+                                </button>
+                                <button type="button" class="btn-relation btn-relation--remove" onclick="removeFriendFromProfile(@(Model.FriendshipId ?? 0))">
+                                    <span>Удалить</span>
+                                </button>
+                            }
+                            else if (Model.FriendshipStatus == "PendingOutgoing")
+                            {
+                                <button type="button" class="btn-relation btn-relation--pending" onclick="cancelRequestFromProfile(@(Model.FriendshipId ?? 0))" title="Нажмите, чтобы отменить заявку">
+                                    <i class='bx bx-time'></i>
+                                    <span>Заявка отправлена (Отменить)</span>
+                                </button>
+                            }
+                            else if (Model.FriendshipStatus == "PendingIncoming")
+                            {
+                                <button type="button" class="btn-relation btn-relation--add" onclick="acceptRequestFromProfile(@(Model.FriendshipId ?? 0))">
+                                    <i class='bx bx-user-check'></i>
+                                    <span>Принять заявку</span>
+                                </button>
+                                <button type="button" class="btn-relation btn-relation--remove" onclick="rejectRequestFromProfile(@(Model.FriendshipId ?? 0))">
+                                    <span>Отклонить</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn-relation btn-relation--add" onclick="sendFriendRequestFromProfile('@Model.UserId')">
+                                    <i class='bx bx-user-plus'></i>
+                                    <span>Добавить в друзья</span>
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            <a href="/Account/Login" class="btn-relation btn-relation--add">
+                                <i class='bx bx-log-in'></i>
+                                <span>Войдите, чтобы добавить в друзья</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="public-profile-model-wrap" style="margin-top: 24px; max-width: 320px;">
+            <div class="viewer-viewport-box" style="margin-top: 0;">
+                <div class="viewer-canvas-frame" style="width: 100%; height: 420px;">
+                    <canvas id="publicSkinCanvas" width="280" height="420"></canvas>
+                    <div class="viewer-loading" id="publicSkinLoading">
+                        <div class="viewer-spinner"></div>
+                        <span>Загрузка 3D модели...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/bundles/skinview3d.bundle.js"></script>
+    <script>
+        const skinUrl = "@Model.SkinUrl";
+        const capeUrl = "@(string.IsNullOrEmpty(Model.CapeUrl) ? "" : Model.CapeUrl)";
+        const skinModel = "@Model.SkinModel";
+
+        let skinViewer = null;
+
+        function initPublicSkinViewer() {
+            const canvas = document.getElementById('publicSkinCanvas');
+            const loading = document.getElementById('publicSkinLoading');
+            if (!canvas || !window.skinview3d) return;
+
+            try {
+                skinViewer = new skinview3d.SkinViewer({
+                    canvas: canvas,
+                    width: 280,
+                    height: 420,
+                    skin: skinUrl,
+                    model: skinModel
+                });
+
+                skinViewer.camera.position.set(0, 0, 70);
+                skinViewer.fov = 70;
+                skinViewer.zoom = 0.95;
+
+                if (skinViewer.controls) {
+                    skinViewer.controls.enableRotate = true;
+                    skinViewer.controls.enableZoom = true;
+                    skinViewer.controls.enablePan = false;
+                }
+
+                try {
+                    skinViewer.animation = new skinview3d.WalkingAnimation();
+                    skinViewer.animation.speed = 0.6;
+                } catch (err) {}
+
+                if (capeUrl && capeUrl.length > 0) {
+                    skinViewer.loadCape(capeUrl);
+                }
+
+                if (loading) loading.style.display = 'none';
+            } catch (e) {
+                if (loading) loading.innerHTML = '<span>Ошибка 3D: ' + e.message + '</span>';
+            }
+        }
+
+        async function sendFriendRequestFromProfile(userId) {
+            try {
+                const res = await fetch('/Account/SendFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `targetUserId=${encodeURIComponent(userId)}`
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                }
+            } catch (e) {}
+        }
+
+        async function cancelRequestFromProfile(fId) {
+            try {
+                const res = await fetch('/Account/CancelFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `friendshipId=${encodeURIComponent(fId)}`
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                }
+            } catch (e) {}
+        }
+
+        async function acceptRequestFromProfile(fId) {
+            try {
+                const res = await fetch('/Account/AcceptFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `friendshipId=${encodeURIComponent(fId)}`
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                }
+            } catch (e) {}
+        }
+
+        async function rejectRequestFromProfile(fId) {
+            try {
+                const res = await fetch('/Account/RejectFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `friendshipId=${encodeURIComponent(fId)}`
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                }
+            } catch (e) {}
+        }
+
+        async function removeFriendFromProfile(fId) {
+            if (!confirm('Удалить из друзей?')) return;
+            try {
+                const res = await fetch('/Account/RemoveFriend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `friendshipId=${encodeURIComponent(fId)}`
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                }
+            } catch (e) {}
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initPublicSkinViewer();
+        });
+    </script>
+}

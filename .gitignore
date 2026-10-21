@@ -365,3 +365,6 @@ FodyWeavers.xsd
 /VyacheslavsMegaServer/wwwroot/uploaded-resources
 /VyacheslavsMegaWebApp/appsettings.Production.json
 /VyacheslavsMegaWebApp/appsettings.Staging.json
+App_Data/
+*.pem
+/VyacheslavsMegaWebApp/wwwroot/uploads/

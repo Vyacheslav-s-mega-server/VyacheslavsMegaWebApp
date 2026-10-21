@@ -1,0 +1,1443 @@
+@model VyacheslavsMegaWebApp.Models.ProfileViewModel
+@{
+    var displaySiteName = string.IsNullOrWhiteSpace(Model.SiteName) ? Model.Username : Model.SiteName;
+    ViewData["Title"] = "Личный профиль — " + displaySiteName;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+    <link rel="stylesheet" href="~/css/pages/profile.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+    <div class="profile-container">
+        @if (TempData["ProfileSuccess"] != null)
+        {
+            <div class="mc-status-bar mc-status-bar--success">
+                <i class='bx bx-check-circle'></i>
+                <span>@TempData["ProfileSuccess"]</span>
+            </div>
+        }
+        @if (TempData["ProfileError"] != null)
+        {
+            <div class="mc-status-bar mc-status-bar--danger">
+                <i class='bx bx-error-circle'></i>
+                <span>@TempData["ProfileError"]</span>
+            </div>
+        }
+
+        <div class="profile-header-card">
+            <div class="profile-banner" id="profileBannerBox" style="background-image: url('@Model.BannerUrl');">
+                <div class="profile-banner__overlay"></div>
+                
+                <div class="profile-banner__actions">
+                    <label class="banner-btn" title="Загрузить и настроить баннер">
+                        <i class='bx bx-camera'></i>
+                        <span>Сменить баннер</span>
+                        <input type="file" id="bannerFileInput" accept="image/*" style="display: none;" onclick="event.stopPropagation()" onchange="handleBannerSelect(this)" />
+                    </label>
+                </div>
+            </div>
+
+            <div class="profile-identity-bar">
+                <div class="profile-avatar-container">
+                    <div class="profile-avatar-frame" onclick="document.getElementById('avatarFileInput').click()" title="Нажмите, чтобы сменить аватар">
+                        <img id="profileAvatarImg" src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? $"https://minotar.net/helm/{Model.Username}/112.png" : Model.AvatarUrl)" 
+                             onerror="this.src='/img/skins/steve_classic.png'" alt="@Model.Username" />
+                        <div class="profile-avatar-overlay">
+                            <i class='bx bx-camera'></i>
+                            <span>Сменить</span>
+                        </div>
+                        <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onclick="event.stopPropagation()" onchange="handleAvatarSelect(this)" />
+                    </div>
+                </div>
+
+                <div class="profile-identity-info">
+                    <div class="profile-name-row">
+                        <h1 class="profile-username">@displaySiteName</h1>
+                    </div>
+
+                    <div class="profile-meta-line">
+                        @if (!string.IsNullOrWhiteSpace(Model.SiteName) && !string.Equals(Model.SiteName, Model.Username, StringComparison.OrdinalIgnoreCase))
+                        {
+                            <span class="meta-item">Логин: @Model.Username</span>
+                            <span class="meta-sep">•</span>
+                        }
+                        <span class="meta-item">Minecraft: @Model.MinecraftUsername</span>
+                        <span class="meta-sep">•</span>
+                        <span class="meta-item">Участник с @Model.CreatedAt</span>
+                        <span class="meta-sep">•</span>
+                        <span class="meta-item">Друзей: @Model.FriendsCount</span>
+                        @if (!Model.EmailConfirmed)
+                        {
+                            <span class="meta-sep">•</span>
+                            <a asp-action="SendEmailConfirmationToken" class="email-unconfirmed-subtle" title="Нажмите для отправки ссылки с подтверждением">
+                                Подтвердить Email
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Layout with Sidebar Tabs -->
+        <div class="profile-main-layout">
+            
+            <!-- Left Sidebar Navigation (Icons only here) -->
+            <aside class="profile-sidebar">
+                <nav class="profile-nav">
+                    <button type="button" class="profile-nav__btn active" data-tab="tab-profile" onclick="switchProfileTab('tab-profile')">
+                        <i class='bx bx-user'></i>
+                        <span>Профиль</span>
+                    </button>
+                    <button type="button" class="profile-nav__btn" data-tab="tab-wardrobe" onclick="switchProfileTab('tab-wardrobe')">
+                        <i class='bx bx-closet'></i>
+                        <span>Гардероб</span>
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Content Area for Active Tab -->
+            <main class="profile-content-area">
+                
+                <!-- TAB 1: ПРОФИЛЬ -->
+                <div id="tab-profile" class="profile-tab-pane active">
+                    
+                    <!-- Basic Info: Username & Minecraft Username (No icon in title) -->
+                    <div class="profile-card">
+                        <div class="profile-card__head">
+                            <h2 class="profile-card__title">Основная информация</h2>
+                        </div>
+
+                        <form asp-action="UpdateProfileInfo" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="profile-identity-grid">
+                                <!-- Блок 1: Профиль на веб-сайте -->
+                                <div class="identity-card identity-card--web">
+                                    <div class="identity-card__badge">
+                                        <span class="badge-tag">Сайт</span>
+                                        <span class="badge-desc">Публичный аккаунт</span>
+                                    </div>
+                                    <div class="identity-card__body">
+                                        <label class="identity-card__label" for="siteNameInput">Имя на сайте</label>
+                                        <input class="field__input-profile" id="siteNameInput" type="text" name="siteName" value="@Model.SiteName" required minlength="3" maxlength="20" placeholder="Ваше имя на сайте" />
+                                        <div class="identity-card__hint">
+                                            Отображается на сайте, в комментариях и списках пользователей
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Блок 2: Игровой аккаунт Minecraft -->
+                                <div class="identity-card identity-card--mc">
+                                    <div class="identity-card__badge">
+                                        <span class="badge-tag badge-tag--mc">Minecraft</span>
+                                        <span class="badge-desc">Игровой клиент</span>
+                                    </div>
+                                    <div class="identity-card__body">
+                                        <label class="identity-card__label" for="mcNameInput">Ник в Minecraft</label>
+                                        <input class="field__input-profile" id="mcNameInput" type="text" name="minecraftUsername" value="@Model.MinecraftUsername" required minlength="3" maxlength="20" placeholder="Игровой ник в лаунчере VEC" />
+                                        <div class="identity-card__hint">
+                                            Используется в лаунчере VEC для входа на сервер и привязки скина
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="identity-actions">
+                                <button type="submit" class="panel-btn panel-btn--primary">
+                                    <span>Сохранить изменения</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Friends System -->
+                    <div class="profile-card" id="friendsCardSection">
+                        <div class="profile-card__head friends-header-row">
+                            <div class="friends-header-left">
+                                <h2 class="profile-card__title">Друзья</h2>
+                                <span class="friends-count-badge" id="friendsTotalCountBadge">@Model.Friends.Count</span>
+                            </div>
+                            <div class="friends-subnav">
+                                <button type="button" class="friends-subtab-btn active" data-tab="list" onclick="switchFriendsTab('list')">
+                                    <span>Список</span>
+                                    <span class="subtab-count" id="subtabCountList">@Model.Friends.Count</span>
+                                </button>
+                                <button type="button" class="friends-subtab-btn" data-tab="incoming" onclick="switchFriendsTab('incoming')">
+                                    <span>Входящие</span>
+                                    @if (Model.IncomingRequests.Count > 0)
+                                    {
+                                        <span class="subtab-count subtab-count--alert" id="subtabCountIncoming">@Model.IncomingRequests.Count</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="subtab-count" id="subtabCountIncoming" style="display: none;">0</span>
+                                    }
+                                </button>
+                                <button type="button" class="friends-subtab-btn" data-tab="outgoing" onclick="switchFriendsTab('outgoing')">
+                                    <span>Исходящие</span>
+                                    <span class="subtab-count" id="subtabCountOutgoing" style="@(Model.OutgoingRequests.Count > 0 ? "" : "display: none;")">@Model.OutgoingRequests.Count</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Поиск друзей -->
+                        <div class="friends-search-container">
+                            <div class="friends-search-box">
+                                <i class="bx bx-search friends-search-icon"></i>
+                                <input class="field__input-profile friends-search-input" type="text" id="friendSearchInput" placeholder="Поиск по нику на сайте или в Minecraft..." autocomplete="off" />
+                                <button type="button" class="panel-btn panel-btn--secondary" id="friendSearchBtn" onclick="searchFriend()">
+                                    <span>Найти</span>
+                                </button>
+                            </div>
+                            <div id="friendSearchResults" class="friends-search-results" style="display: none;"></div>
+                        </div>
+
+                        <!-- TAB: Список друзей -->
+                        <div id="friendsPaneList" class="friends-tab-pane active">
+                            @if (Model.Friends.Any())
+                            {
+                                <div class="friends-grid" id="friendsGrid">
+                                    @foreach (var f in Model.Friends)
+                                    {
+                                        <div class="friend-card" id="friendCard_@f.FriendshipId">
+                                            <div class="friend-card__left">
+                                                <div class="friend-card__avatar-wrap">
+                                                    <canvas class="mc-head-canvas" data-skin="@f.SkinUrl" width="40" height="40"></canvas>
+                                                </div>
+                                                <div class="friend-card__meta">
+                                                    <a href="/user/@f.Username" class="friend-card__name">@f.Username</a>
+                                                    <div class="friend-card__nick">MC: @(string.IsNullOrEmpty(f.MinecraftUsername) ? f.Username : f.MinecraftUsername)</div>
+                                                </div>
+                                            </div>
+                                            <div class="friend-card__actions">
+                                                <a href="/user/@f.Username" class="btn-friend-action btn-friend-action--profile" title="Посмотреть профиль">
+                                                    <span>Профиль</span>
+                                                </a>
+                                                <button type="button" class="btn-friend-action btn-friend-action--remove" title="Удалить из друзей" onclick="removeFriend(@f.FriendshipId, '@f.Username')">
+                                                    <i class="bx bx-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="friends-empty-placeholder" id="friendsEmptyList">
+                                    <div class="friends-empty-title">У вас пока нет друзей</div>
+                                    <div class="friends-empty-desc">Воспользуйтесь поиском выше, чтобы найти игроков по нику на сайте или в игре!</div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- TAB: Входящие заявки -->
+                        <div id="friendsPaneIncoming" class="friends-tab-pane" style="display: none;">
+                            @if (Model.IncomingRequests.Any())
+                            {
+                                <div class="friends-grid" id="incomingGrid">
+                                    @foreach (var inc in Model.IncomingRequests)
+                                    {
+                                        <div class="friend-card" id="incomingCard_@inc.FriendshipId">
+                                            <div class="friend-card__left">
+                                                <div class="friend-card__avatar-wrap">
+                                                    <canvas class="mc-head-canvas" data-skin="@inc.SkinUrl" width="40" height="40"></canvas>
+                                                </div>
+                                                <div class="friend-card__meta">
+                                                    <a href="/user/@inc.Username" class="friend-card__name">@inc.Username</a>
+                                                    <div class="friend-card__nick">MC: @(string.IsNullOrEmpty(inc.MinecraftUsername) ? inc.Username : inc.MinecraftUsername)</div>
+                                                </div>
+                                            </div>
+                                            <div class="friend-card__actions">
+                                                <button type="button" class="btn-friend-action btn-friend-action--accept" onclick="acceptFriend(@inc.FriendshipId, this)">
+                                                    <span>Принять</span>
+                                                </button>
+                                                <button type="button" class="btn-friend-action btn-friend-action--reject" onclick="rejectFriend(@inc.FriendshipId, this)">
+                                                    <span>Отклонить</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="friends-empty-placeholder" id="incomingEmptyList">
+                                    <div class="friends-empty-title">Нет входящих заявок</div>
+                                    <div class="friends-empty-desc">Когда кто-то отправит вам приглашение в друзья, оно появится здесь.</div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- TAB: Исходящие заявки -->
+                        <div id="friendsPaneOutgoing" class="friends-tab-pane" style="display: none;">
+                            @if (Model.OutgoingRequests.Any())
+                            {
+                                <div class="friends-grid" id="outgoingGrid">
+                                    @foreach (var outReq in Model.OutgoingRequests)
+                                    {
+                                        <div class="friend-card" id="outgoingCard_@outReq.FriendshipId">
+                                            <div class="friend-card__left">
+                                                <div class="friend-card__avatar-wrap">
+                                                    <canvas class="mc-head-canvas" data-skin="@outReq.SkinUrl" width="40" height="40"></canvas>
+                                                </div>
+                                                <div class="friend-card__meta">
+                                                    <a href="/user/@outReq.Username" class="friend-card__name">@outReq.Username</a>
+                                                    <div class="friend-card__nick">MC: @(string.IsNullOrEmpty(outReq.MinecraftUsername) ? outReq.Username : outReq.MinecraftUsername)</div>
+                                                </div>
+                                            </div>
+                                            <div class="friend-card__actions">
+                                                <span class="friend-card__pending-tag">Ожидание</span>
+                                                <button type="button" class="btn-friend-action btn-friend-action--cancel" onclick="cancelOutgoingRequest(@outReq.FriendshipId, this)">
+                                                    <span>Отменить</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="friends-empty-placeholder" id="outgoingEmptyList">
+                                    <div class="friends-empty-title">Нет исходящих заявок</div>
+                                    <div class="friends-empty-desc">Все отправленные вами заявки уже приняты или вы пока никому их не отправляли.</div>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+
+                    <!-- Microsoft / Xbox License Card -->
+                    <div class="profile-card" id="msLicenseCardSection" style="margin-top: 24px;">
+                        <div class="profile-card__head" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
+                                    <rect x="13" y="1" width="10" height="10" fill="#7FBA00"/>
+                                    <rect x="1" y="13" width="10" height="10" fill="#00A4EF"/>
+                                    <rect x="13" y="13" width="10" height="10" fill="#FFB900"/>
+                                </svg>
+                                <h2 class="profile-card__title">Лицензия Minecraft (Microsoft / Xbox)</h2>
+                            </div>
+                            @if (Model.HasMinecraftLicense)
+                            {
+                                <span class="status-badge status-badge--success">Лицензия активна</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-badge--warn">Не привязана</span>
+                            }
+                        </div>
+
+                        <div style="font-size: 14px; color: #9ca3af; margin-bottom: 20px; font-family: 'minecraft', sans-serif; text-shadow: none !important;">
+                            Привязка официальной учетной записи Microsoft / Xbox к VMS ID.
+                        </div>
+
+                        @if (Model.HasMinecraftLicense)
+                        {
+                            <div class="settings-info-list" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px;">
+                                <div class="settings-info-row" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #838a9a;">Xbox Gamertag / Имя в игре</span>
+                                    <span style="font-size: 15px; color: #34d399; font-weight: 700;">@Model.MicrosoftGamertag</span>
+                                </div>
+                                <div class="settings-info-row" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #838a9a;">Minecraft UUID</span>
+                                    <span style="font-size: 15px; color: #ffffff;"><code style="color: #f59e0b; background: transparent; padding: 0;">@Model.MicrosoftUuid</code></span>
+                                </div>
+                                <div class="settings-info-row" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #838a9a;">Дата привязки</span>
+                                    <span style="font-size: 15px; color: #ffffff;">@(Model.MicrosoftLicenseLinkedAt?.ToString("dd.MM.yyyy HH:mm") ?? "—")</span>
+                                </div>
+                                <div class="settings-info-row" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #838a9a;">Официальные плащи Mojang</span>
+                                    <span style="font-size: 15px; color: #ffffff;">
+                                        Доступно в гардеробе: <b style="color: #60a5fa;">@Model.MojangCapes.Count</b>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <button type="button" class="panel-btn panel-btn--secondary" onclick="unlinkMicrosoftAccount()" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                                    <span>Отвязать лицензию</span>
+                                </button>
+                                <button type="button" class="panel-btn panel-btn--secondary" onclick="syncOfficialSkin()" id="syncSkinBtn">
+                                    <i class='bx bx-refresh'></i> <span>Синхронизировать скин Mojang</span>
+                                </button>
+                                <button type="button" class="panel-btn panel-btn--primary" onclick="startMicrosoftLink()">
+                                    <span>Синхронизировать плащи</span>
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <button type="button" class="btn-download-auth" onclick="startMicrosoftLink()" style="width: auto; padding: 12px 28px; display: inline-flex; align-items: center; gap: 10px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
+                                        <rect x="13" y="1" width="10" height="10" fill="#7FBA00"/>
+                                        <rect x="1" y="13" width="10" height="10" fill="#00A4EF"/>
+                                        <rect x="13" y="13" width="10" height="10" fill="#FFB900"/>
+                                    </svg>
+                                    <span>Привязать аккаунт Microsoft</span>
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+
+                <!-- TAB 2: ГАРДЕРОБ -->
+                <div id="tab-wardrobe" class="profile-tab-pane">
+                    
+                    <!-- 3D Viewer & Skin Upload -->
+                    <div class="wardrobe-top-grid">
+                        
+                        <!-- 3D Model Viewport with Minecraft Switches Underneath -->
+                        <div class="viewer-viewport-box">
+                            <div class="viewer-canvas-frame" id="skinCanvasContainer">
+                                <canvas id="skinCanvas" width="280" height="380"></canvas>
+                                <div class="viewer-loading" id="skinViewerLoading">
+                                    <div class="viewer-spinner"></div>
+                                    <span>Загрузка 3D модели...</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Official Minecraft Pixel Switches under 3D Model -->
+                            <div class="viewer-under-controls">
+                                <div class="under-control-group">
+                                    <div class="under-control-info">
+                                        <span class="under-control-label">Руки</span>
+                                        <span class="under-control-val" id="modelStatusVal">@(Model.SkinModel == "slim" ? "Slim" : "Classic")</span>
+                                    </div>
+                                    <label class="mc-toggle" for="modelSwitch" id="labelModelSwitch" title="Переключить Classic / Slim">
+                                        <input type="checkbox" id="modelSwitch" @(Model.SkinModel == "slim" ? "checked" : "") onchange="onModelSwitchToggle(this)" />
+                                        <span class="mc-toggle__track">
+                                            <span class="mc-toggle__thumb"></span>
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="under-control-group">
+                                    <div class="under-control-info">
+                                        <span class="under-control-label">Режим элитр</span>
+                                        <span class="under-control-val" id="elytraStatusVal">Выкл</span>
+                                    </div>
+                                    <label class="mc-toggle" for="elytraSwitch" id="labelElytraSwitch" title="Переключить режим элитр">
+                                        <input type="checkbox" id="elytraSwitch" onchange="onElytraSwitchToggle(this)" />
+                                        <span class="mc-toggle__track">
+                                            <span class="mc-toggle__thumb"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Skin Customization Form (Auto upload on select/drop, no save button) -->
+                        <div class="profile-card" style="margin-bottom: 0;">
+                            <div class="profile-card__head">
+                                <h2 class="profile-card__title">Управление скином</h2>
+                            </div>
+
+                            <div class="skin-upload-wrapper">
+                                <div class="skin-drop-field" id="skinDropZone">
+                                    <i class='bx bx-cloud-upload skin-drop-field__icon'></i>
+                                    <div class="skin-drop-field__label">Перетащите сюда файл скина (.png) или выберите на компьютере</div>
+                                    <input type="file" id="skinFileInput" accept=".png" style="display: none;" onchange="handleSkinFileSelect(this)" />
+                                    <button type="button" class="panel-btn panel-btn--secondary" onclick="document.getElementById('skinFileInput').click()">
+                                        <span>Обзор файла скина</span>
+                                    </button>
+                                    <span class="skin-drop-field__filename" id="selectedSkinFileName"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Capes Section: Official Minecraft Grid (as on photo) -->
+                    <div class="profile-card mc-capes-card">
+                        <div class="mc-capes-card__tab">
+                            <span>Выберите свой плащ</span>
+                        </div>
+                        <div class="mc-capes-card__header">
+                            <h3 class="mc-capes-card__title">ПРИОБРЕТЕННЫЕ ПЛАЩИ</h3>
+                            <p class="mc-capes-card__desc">
+                                Плащи — это особые награды, которые игроки могут разблокировать во время событий, кампаний и прочих веселых приключений.
+                            </p>
+                        </div>
+
+                        <div class="mc-capes-grid" id="mcCapesGrid">
+                            <!-- Slot 1: Без плаща -->
+                            <div class="mc-cape-item @(string.IsNullOrEmpty(Model.EquippedCapeId) ? "selected" : "")" 
+                                 data-cape-id="none" 
+                                 onclick="selectCape('none')">
+                                <div class="mc-cape-item__preview">
+                                    <div class="mc-cape-item__dashed-frame"></div>
+                                </div>
+                                <div class="mc-cape-item__footer">
+                                    <span class="mc-radio-circle"></span>
+                                    <span class="mc-cape-item__name">Без плаща</span>
+                                </div>
+                            </div>
+
+                            <!-- Available capes from launcher -->
+                            @foreach (var cape in Model.AvailableCapes)
+                            {
+                                <div class="mc-cape-item @(cape.IsEquipped ? "selected" : "")" 
+                                     data-cape-id="@cape.Id" 
+                                     data-cape-url="@(string.IsNullOrEmpty(cape.DownloadUrl) ? cape.PreviewUrl : cape.DownloadUrl)" 
+                                     onclick="selectCape('@cape.Id')">
+                                    <div class="mc-cape-item__preview">
+                                        <canvas class="mc-cape-item__canvas" width="44" height="70" data-cape-url="@(string.IsNullOrEmpty(cape.DownloadUrl) ? cape.PreviewUrl : cape.DownloadUrl)"></canvas>
+                                    </div>
+                                    <div class="mc-cape-item__footer">
+                                        <span class="mc-radio-circle"></span>
+                                        <span class="mc-cape-item__name" title="@cape.Name">@cape.Name</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Redeem Promo Code Section -->
+                        <div class="mc-capes-card__header" style="margin-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 20px;">
+                            <h3 class="mc-capes-card__title">АКТИВАЦИЯ ПРОМОКОДА НА ПЛАЩ</h3>
+                            <p class="mc-capes-card__desc">
+                                Введите полученный промокод для разблокировки и надевания плаща.
+                            </p>
+                            <div style="display: flex; gap: 10px; max-width: 500px; flex-wrap: wrap; margin-top: 12px;">
+                                <input type="text" id="capeRedeemCodeInput" class="field__input-profile" placeholder="VEC-XXXX-XXXX-XXXX" style="flex: 1; min-width: 180px; text-transform: uppercase; font-family: monospace; font-size: 14px; letter-spacing: 1px;" maxlength="40" />
+                                <button type="button" class="panel-btn panel-btn--secondary" id="btnRedeemCape" onclick="submitCapeCode()">
+                                    <span>Активировать</span>
+                                </button>
+                            </div>
+                            <div id="redeemCodeStatusMsg" style="margin-top: 10px; font-size: 13px; display: none;"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal 1: Banner Crop Modal -->
+<div id="bannerCropModal" class="crop-modal-backdrop">
+    <div class="crop-modal-window">
+        <div class="crop-modal-header">
+            <h3 class="crop-modal-title">Настройка баннера</h3>
+            <button type="button" class="crop-modal-close" onclick="closeBannerCrop()">&times;</button>
+        </div>
+        <div class="crop-modal-body">
+            <img id="bannerCropImage" alt="Crop banner" />
+        </div>
+        <div class="crop-modal-footer">
+            <button type="button" class="panel-btn panel-btn--secondary" onclick="closeBannerCrop()">Отмена</button>
+            <button type="button" class="panel-btn panel-btn--primary" onclick="applyBannerCrop()">Сохранить баннер</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: Avatar Crop Modal -->
+<div id="avatarCropModal" class="crop-modal-backdrop">
+    <div class="crop-modal-window" style="max-width: 480px;">
+        <div class="crop-modal-header">
+            <h3 class="crop-modal-title">Настройка аватара</h3>
+            <button type="button" class="crop-modal-close" onclick="closeAvatarCrop()">&times;</button>
+        </div>
+        <div class="crop-modal-body">
+            <img id="avatarCropImage" alt="Crop avatar" />
+        </div>
+        <div class="crop-modal-footer">
+            <button type="button" class="panel-btn panel-btn--secondary" onclick="closeAvatarCrop()">Отмена</button>
+            <button type="button" class="panel-btn panel-btn--primary" onclick="applyAvatarCrop()">Сохранить аватар</button>
+        </div>
+    </div>
+</div>
+
+<partial name="_MicrosoftLinkModalPartial" />
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/bundles/skinview3d.bundle.js"></script>
+    <script>
+        const initialSkinUrl = "@Model.SkinUrl";
+        let currentCapeUrl = "@(string.IsNullOrEmpty(Model.CapeUrl) ? "" : Model.CapeUrl)";
+        let currentSkinModel = "@Model.SkinModel";
+        let currentBackEquipment = "cape";
+        let skinViewer = null;
+
+        function showToast(message, isError = false) {
+            // Toast notifications disabled by user request
+        }
+
+        // --- Tabs Navigation ---
+        function switchProfileTab(tabId) {
+            document.querySelectorAll('.profile-nav__btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+            });
+            document.querySelectorAll('.profile-tab-pane').forEach(pane => {
+                pane.classList.toggle('active', pane.id === tabId);
+            });
+            window.location.hash = tabId === 'tab-wardrobe' ? 'wardrobe' : 'profile';
+
+            if (tabId === 'tab-wardrobe') {
+                setTimeout(() => {
+                    initSkinViewer();
+                    renderCapePreviews();
+                }, 100);
+            }
+        }
+
+        function searchFriend() {
+            const val = document.getElementById('friendSearchInput')?.value?.trim();
+            if (!val) {
+                showToast('Введите никнейм для поиска', true);
+                return;
+            }
+            showToast(`Пользователь «${val}» не найден`);
+        }
+
+        let bannerCropper = null;
+
+        function handleBannerSelect(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('bannerCropImage');
+                if (bannerCropper) {
+                    bannerCropper.destroy();
+                    bannerCropper = null;
+                }
+                document.getElementById('bannerCropModal').classList.add('open');
+                img.onload = function() {
+                    bannerCropper = new Cropper(img, {
+                        aspectRatio: 1200 / 220,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                        background: false,
+                        responsive: true
+                    });
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            input.value = '';
+        }
+
+        function closeBannerCrop() {
+            document.getElementById('bannerCropModal').classList.remove('open');
+            if (bannerCropper) {
+                bannerCropper.destroy();
+                bannerCropper = null;
+            }
+        }
+
+        function applyBannerCrop() {
+            if (!bannerCropper) return;
+            showToast('Сохранение баннера...');
+            const canvas = bannerCropper.getCroppedCanvas({
+                width: 1240,
+                height: 220,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+            if (!canvas) {
+                showToast('Не удалось сформировать баннер', true);
+                return;
+            }
+            canvas.toBlob(async function(blob) {
+                if (!blob) {
+                    showToast('Ошибка при формировании изображения баннера', true);
+                    return;
+                }
+                closeBannerCrop();
+                const formData = new FormData();
+                formData.append('bannerFile', blob, 'banner.png');
+
+                try {
+                    const res = await fetch('/Account/UploadBanner', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        const bannerBox = document.getElementById('profileBannerBox');
+                        if (bannerBox) bannerBox.style.backgroundImage = `url('${data.bannerUrl}')`;
+                        showToast(data.message || 'Баннер обновлен!');
+                    } else {
+                        showToast(data.error || 'Ошибка загрузки баннера', true);
+                    }
+                } catch (e) {
+                    showToast('Ошибка сети при загрузке баннера', true);
+                }
+            }, 'image/png');
+        }
+
+        let avatarCropper = null;
+
+        function handleAvatarSelect(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('avatarCropImage');
+                if (avatarCropper) {
+                    avatarCropper.destroy();
+                    avatarCropper = null;
+                }
+                document.getElementById('avatarCropModal').classList.add('open');
+                img.onload = function() {
+                    avatarCropper = new Cropper(img, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                        background: false,
+                        responsive: true
+                    });
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            input.value = '';
+        }
+
+        function closeAvatarCrop() {
+            document.getElementById('avatarCropModal').classList.remove('open');
+            if (avatarCropper) {
+                avatarCropper.destroy();
+                avatarCropper = null;
+            }
+        }
+
+        function applyAvatarCrop() {
+            if (!avatarCropper) return;
+            showToast('Сохранение аватара...');
+            const canvas = avatarCropper.getCroppedCanvas({
+                width: 256,
+                height: 256,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+            if (!canvas) {
+                showToast('Не удалось сформировать аватар', true);
+                return;
+            }
+            canvas.toBlob(async function(blob) {
+                if (!blob) {
+                    showToast('Ошибка при формировании изображения аватара', true);
+                    return;
+                }
+                closeAvatarCrop();
+                const formData = new FormData();
+                formData.append('avatarFile', blob, 'avatar.png');
+
+                try {
+                    const res = await fetch('/Account/UploadAvatar', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        const avatarImg = document.getElementById('profileAvatarImg');
+                        if (avatarImg) avatarImg.src = data.avatarUrl;
+                        const headerAvatar = document.querySelector('.dropdown__avatar-box img');
+                        if (headerAvatar) headerAvatar.src = data.avatarUrl;
+                        showToast(data.message || 'Аватар успешно обновлен!');
+                    } else {
+                        showToast(data.error || 'Ошибка загрузки аватара', true);
+                    }
+                } catch (e) {
+                    showToast('Ошибка сети при загрузке аватара', true);
+                }
+            }, 'image/png');
+        }
+        // Apply scale to elytras (medium, comfortable size)
+        function applyElytraScale() {
+            try {
+                if (skinViewer && skinViewer.playerObject && skinViewer.playerObject.elytra) {
+                    skinViewer.playerObject.elytra.scale.set(0.8, 0.8, 0.8);
+                }
+            } catch (err) {}
+        }
+
+        // --- 3D Viewer Initialization ---
+        function initSkinViewer() {
+            const canvas = document.getElementById('skinCanvas');
+            const loading = document.getElementById('skinViewerLoading');
+            if (!canvas || !window.skinview3d) return;
+
+            try {
+                if (skinViewer) {
+                    if (loading) loading.style.display = 'none';
+                    return;
+                }
+
+                skinViewer = new skinview3d.SkinViewer({
+                    canvas: canvas,
+                    width: 280,
+                    height: 380,
+                    skin: initialSkinUrl,
+                    model: currentSkinModel
+                });
+
+                skinViewer.camera.position.set(0, 0, 70);
+                skinViewer.fov = 70;
+                skinViewer.zoom = 0.95;
+
+                // Built-in orbit controls in skinview3d v3
+                if (skinViewer.controls) {
+                    skinViewer.controls.enableRotate = true;
+                    skinViewer.controls.enableZoom = true;
+                    skinViewer.controls.enablePan = false;
+                }
+
+                // Walking animation
+                try {
+                    skinViewer.animation = new skinview3d.WalkingAnimation();
+                    skinViewer.animation.speed = 0.6;
+                } catch (animErr) {
+                    console.warn("WalkingAnimation err:", animErr);
+                }
+
+                // Load equipped cape with back equipment mode (cape vs elytra)
+                if (currentCapeUrl && currentCapeUrl.length > 0) {
+                    skinViewer.loadCape(currentCapeUrl, { backEquipment: currentBackEquipment });
+                    setTimeout(applyElytraScale, 100);
+                }
+
+                if (loading) loading.style.display = 'none';
+
+            } catch (e) {
+                console.error("SkinViewer init error", e);
+                if (loading) loading.innerHTML = '<span>Ошибка 3D: ' + e.message + '</span>';
+            }
+        }
+
+        // Toggle Model Switch (Classic vs Slim) via official Minecraft Switch
+        function onModelSwitchToggle(cb) {
+            currentSkinModel = cb.checked ? 'slim' : 'classic';
+            const statusVal = document.getElementById('modelStatusVal');
+            if (statusVal) {
+                statusVal.textContent = currentSkinModel === 'slim' ? 'Slim' : 'Classic';
+            }
+
+            if (skinViewer) {
+                const skinToLoad = skinViewer.skinUrl || initialSkinUrl;
+                skinViewer.loadSkin(skinToLoad, { model: currentSkinModel });
+            }
+
+            fetch('/Account/UpdateSkinModel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `model=${encodeURIComponent(currentSkinModel)}`
+            }).catch(() => {});
+        }
+
+        // Toggle Elytra Switch via official Minecraft Switch
+        function onElytraSwitchToggle(cb) {
+            currentBackEquipment = cb.checked ? 'elytra' : 'cape';
+            const statusVal = document.getElementById('elytraStatusVal');
+            if (statusVal) {
+                statusVal.textContent = cb.checked ? 'Вкл' : 'Выкл';
+            }
+
+            if (skinViewer && currentCapeUrl && currentCapeUrl.length > 0) {
+                skinViewer.loadCape(currentCapeUrl, { backEquipment: currentBackEquipment });
+                setTimeout(applyElytraScale, 50);
+            }
+        }
+
+        let lastKnownSkinUrl = initialSkinUrl;
+        let lastKnownCapeUrl = currentCapeUrl;
+        let lastKnownSkinModel = currentSkinModel;
+        let lastKnownCapeId = "@(Model.EquippedCapeId ?? "")";
+
+        async function selectCape(capeId) {
+            if (capeId === 'none') {
+                try {
+                    const res = await fetch('/Account/RemoveCape', { method: 'POST' });
+                    const data = await res.json();
+                    if (data.success) {
+                        currentCapeUrl = null;
+                        lastKnownCapeUrl = null;
+                        lastKnownCapeId = '';
+                        if (skinViewer) {
+                            skinViewer.loadCape(null);
+                        }
+                        document.querySelectorAll('.mc-cape-item').forEach(el => {
+                            el.classList.toggle('selected', el.getAttribute('data-cape-id') === 'none');
+                        });
+                    }
+                } catch (e) {}
+            } else {
+                try {
+                    const res = await fetch('/Account/EquipCape', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `capeId=${encodeURIComponent(capeId)}`
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        currentCapeUrl = data.capeUrl;
+                        lastKnownCapeUrl = data.capeUrl;
+                        lastKnownCapeId = capeId;
+                        if (skinViewer && currentCapeUrl) {
+                            skinViewer.loadCape(currentCapeUrl, { backEquipment: currentBackEquipment });
+                            setTimeout(applyElytraScale, 50);
+                        }
+                        document.querySelectorAll('.mc-cape-item').forEach(el => {
+                            el.classList.toggle('selected', el.getAttribute('data-cape-id') === capeId);
+                        });
+                    }
+                } catch (e) {}
+            }
+        }
+
+        async function syncOfficialSkin() {
+            const btn = document.getElementById('syncSkinBtn');
+            if (btn) btn.disabled = true;
+            try {
+                const res = await fetch('/Account/SyncMojangSkin', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    if (data.skinUrl && skinViewer) {
+                        skinViewer.loadSkin(data.skinUrl, { model: data.model || 'classic' });
+                        currentSkinModel = data.model || 'classic';
+                        const modelSwitch = document.getElementById('modelSwitch');
+                        if (modelSwitch) modelSwitch.checked = (currentSkinModel === 'slim');
+                        const statusVal = document.getElementById('modelStatusVal');
+                        if (statusVal) statusVal.textContent = currentSkinModel === 'slim' ? 'Slim' : 'Classic';
+                    }
+                    if (data.minecraftUsername) {
+                        const mcInput = document.getElementById('mcNameInput');
+                        if (mcInput) mcInput.value = data.minecraftUsername;
+                        const metaItems = document.querySelectorAll('.profile-header__meta .meta-item');
+                        metaItems.forEach(item => {
+                            if (item.textContent.trim().startsWith('Minecraft:')) {
+                                item.textContent = 'Minecraft: ' + data.minecraftUsername;
+                            }
+                        });
+                    }
+                    alert(data.message || 'Официальный скин Mojang успешно установлен!');
+                } else {
+                    alert(data.error || 'Не удалось синхронизировать скин.');
+                }
+            } catch (err) {
+                alert('Ошибка сети при синхронизации скина.');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function submitCapeCode() {
+            const input = document.getElementById('capeRedeemCodeInput');
+            const btn = document.getElementById('btnRedeemCape');
+            const msg = document.getElementById('redeemCodeStatusMsg');
+            if (!input) return;
+
+            const code = input.value.trim();
+            if (!code) {
+                if (msg) {
+                    msg.style.display = 'block';
+                    msg.style.color = '#c0392b';
+                    msg.textContent = 'Пожалуйста, введите промокод.';
+                }
+                return;
+            }
+
+            btn.disabled = true;
+            if (msg) msg.style.display = 'none';
+
+            try {
+                const res = await fetch('/Account/RedeemCapeCode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    input.value = '';
+                    if (msg) {
+                        msg.style.display = 'block';
+                        msg.style.color = '#27ae60';
+                        msg.textContent = data.message;
+                    }
+
+                    if (data.cape) {
+                        const grid = document.getElementById('mcCapesGrid');
+                        if (grid) {
+                            const newCapeEl = document.createElement('div');
+                            newCapeEl.className = 'mc-cape-item';
+                            newCapeEl.setAttribute('data-cape-id', data.cape.id);
+                            newCapeEl.setAttribute('data-cape-url', data.cape.previewUrl);
+                            newCapeEl.onclick = () => selectCape(data.cape.id);
+                            newCapeEl.innerHTML = `
+                                <div class="mc-cape-item__preview">
+                                    <canvas class="mc-cape-item__canvas" width="44" height="70" data-cape-url="${data.cape.previewUrl}"></canvas>
+                                </div>
+                                <div class="mc-cape-item__footer">
+                                    <span class="mc-radio-circle"></span>
+                                    <span class="mc-cape-item__name" title="${data.cape.name}">${data.cape.name}</span>
+                                </div>
+                            `;
+                            grid.appendChild(newCapeEl);
+                            renderAllCapeCanvases();
+                            selectCape(data.cape.id);
+                        }
+                    }
+                } else {
+                    if (msg) {
+                        msg.style.display = 'block';
+                        msg.style.color = '#c0392b';
+                        msg.textContent = data.message || 'Ошибка активации кода.';
+                    }
+                }
+            } catch {
+                if (msg) {
+                    msg.style.display = 'block';
+                    msg.style.color = '#c0392b';
+                    msg.textContent = 'Ошибка сети. Попробуйте еще раз.';
+                }
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function checkWardrobeUpdates() {
+            try {
+                const res = await fetch('/Account/GetWardrobeState');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data || !data.success) return;
+
+                if (data.skinModel && data.skinModel !== currentSkinModel) {
+                    currentSkinModel = data.skinModel;
+                    lastKnownSkinModel = data.skinModel;
+                    const modelSwitch = document.getElementById('modelSwitch');
+                    if (modelSwitch) modelSwitch.checked = (currentSkinModel === 'slim');
+                    const statusVal = document.getElementById('modelStatusVal');
+                    if (statusVal) statusVal.textContent = currentSkinModel === 'slim' ? 'Slim' : 'Classic';
+                    if (skinViewer && data.skinUrl) {
+                        skinViewer.loadSkin(data.skinUrl, { model: currentSkinModel });
+                    }
+                } else if (data.skinUrl && data.skinUrl !== lastKnownSkinUrl) {
+                    lastKnownSkinUrl = data.skinUrl;
+                    if (skinViewer) {
+                        skinViewer.loadSkin(data.skinUrl, { model: currentSkinModel });
+                    }
+                }
+
+                const currentCapId = data.equippedCapeId || '';
+                if (data.capeUrl !== lastKnownCapeUrl || currentCapId !== lastKnownCapeId) {
+                    lastKnownCapeUrl = data.capeUrl;
+                    lastKnownCapeId = currentCapId;
+                    currentCapeUrl = data.capeUrl;
+                    if (skinViewer) {
+                        if (currentCapeUrl) {
+                            skinViewer.loadCape(currentCapeUrl, { backEquipment: currentBackEquipment });
+                            setTimeout(applyElytraScale, 50);
+                        } else {
+                            skinViewer.loadCape(null);
+                        }
+                    }
+                    const targetId = currentCapId ? currentCapId : 'none';
+                    document.querySelectorAll('.mc-cape-item').forEach(el => {
+                        el.classList.toggle('selected', el.getAttribute('data-cape-id') === targetId);
+                    });
+                }
+            } catch (err) {}
+        }
+
+        window.addEventListener('focus', checkWardrobeUpdates);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) checkWardrobeUpdates();
+        });
+        setInterval(() => {
+            const wardrobeTab = document.getElementById('tab-wardrobe');
+            if (wardrobeTab && wardrobeTab.classList.contains('active')) {
+                checkWardrobeUpdates();
+            }
+        }, 2500);
+
+        // Render clean 2D cape front side previews on canvases
+        function renderAllCapeCanvases() {
+            document.querySelectorAll('.mc-cape-item__canvas').forEach(canvas => {
+                const url = canvas.getAttribute('data-cape-url');
+                if (!url) return;
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = function() {
+                    const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = false;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 1, 1, 10, 16, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = url;
+            });
+        }
+
+        // --- Auto Upload Skin (No save button, AJAX instant upload) ---
+        function handleSkinFileSelect(input) {
+            if (input.files && input.files[0]) {
+                uploadSkinFileDirectly(input.files[0]);
+            }
+            input.value = '';
+        }
+
+        async function uploadSkinFileDirectly(file) {
+            if (!file.name.toLowerCase().endsWith('.png')) {
+                return;
+            }
+
+            const fileNameEl = document.getElementById('selectedSkinFileName');
+            if (fileNameEl) {
+                fileNameEl.textContent = `Загрузка: ${file.name}...`;
+            }
+
+            // Immediately preview in 3D viewer
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (skinViewer) {
+                    skinViewer.loadSkin(e.target.result, { model: currentSkinModel });
+                }
+            };
+            reader.readAsDataURL(file);
+
+            const formData = new FormData();
+            formData.append('skinFile', file);
+            formData.append('model', currentSkinModel);
+
+            try {
+                const res = await fetch('/Account/UploadSkin', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (fileNameEl) {
+                        fileNameEl.textContent = `Скин применен: ${file.name}`;
+                    }
+                    if (skinViewer && data.skinUrl) {
+                        skinViewer.loadSkin(data.skinUrl, { model: currentSkinModel });
+                    }
+                } else {
+                    if (fileNameEl) fileNameEl.textContent = '';
+                }
+            } catch (e) {
+                if (fileNameEl) fileNameEl.textContent = '';
+            }
+        }
+
+        const dropZone = document.getElementById('skinDropZone');
+        if (dropZone) {
+            ['dragenter', 'dragover'].forEach(name => {
+                dropZone.addEventListener(name, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('dragover');
+                });
+            });
+            ['dragleave', 'drop'].forEach(name => {
+                dropZone.addEventListener(name, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                });
+            });
+            dropZone.addEventListener('drop', (e) => {
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    uploadSkinFileDirectly(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        // ===================== Friends System Logic =====================
+        function switchFriendsTab(tab) {
+            const tabs = ['list', 'incoming', 'outgoing'];
+            tabs.forEach(t => {
+                const pane = document.getElementById('friendsPane' + t.charAt(0).toUpperCase() + t.slice(1));
+                const btn = document.querySelector(`.friends-subtab-btn[data-tab="${t}"]`);
+                if (pane) pane.style.display = (t === tab) ? 'block' : 'none';
+                if (btn) {
+                    if (t === tab) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+            if (window.renderAllHeadCanvases) window.renderAllHeadCanvases();
+        }
+
+        async function searchFriend() {
+            const input = document.getElementById('friendSearchInput');
+            const resultsBox = document.getElementById('friendSearchResults');
+            if (!input || !resultsBox) return;
+
+            const q = input.value.trim();
+            if (!q) {
+                resultsBox.style.display = 'none';
+                resultsBox.innerHTML = '';
+                return;
+            }
+
+            resultsBox.style.display = 'block';
+            resultsBox.innerHTML = '<div class="friends-searching-state"><i class="bx bx-loader-alt bx-spin"></i> Поиск игроков...</div>';
+
+            try {
+                const res = await fetch('/Account/SearchUsers?query=' + encodeURIComponent(q));
+                const data = await res.json();
+                const users = data.results || (Array.isArray(data) ? data : []);
+
+                if (!Array.isArray(users) || users.length === 0) {
+                    resultsBox.innerHTML = '<div class="friends-empty-search">Игроков с таким ником не найдено</div>';
+                    return;
+                }
+
+                let html = '<div class="friends-results-list">';
+                users.forEach(u => {
+                    let actionHtml = '';
+                    if (u.friendshipStatus === 'Self') {
+                        actionHtml = `
+                            <span class="friend-badge-status" style="color: #60a5fa; border-color: #1e3a8a; background: #0f172a;">Это вы</span>
+                            <a href="/user/${encodeURIComponent(u.username)}" class="btn-friend-action btn-friend-action--profile">Профиль</a>
+                        `;
+                    } else if (u.friendshipStatus === 'Friends') {
+                        actionHtml = `
+                            <span class="friend-badge-status">В друзьях</span>
+                            <a href="/user/${encodeURIComponent(u.username)}" class="btn-friend-action btn-friend-action--profile">Профиль</a>
+                        `;
+                    } else if (u.friendshipStatus === 'PendingOutgoing') {
+                        actionHtml = `
+                            <span class="friend-badge-status">Заявка отправлена</span>
+                            <a href="/user/${encodeURIComponent(u.username)}" class="btn-friend-action btn-friend-action--profile">Профиль</a>
+                        `;
+                    } else if (u.friendshipStatus === 'PendingIncoming') {
+                        actionHtml = `
+                            <button type="button" class="btn-friend-action btn-friend-action--accept" onclick="acceptFriend(${u.friendshipId}, this)">Принять</button>
+                            <a href="/user/${encodeURIComponent(u.username)}" class="btn-friend-action btn-friend-action--profile">Профиль</a>
+                        `;
+                    } else {
+                        actionHtml = `
+                            <button type="button" class="btn-friend-action btn-friend-action--accept" onclick="sendFriendRequestFromSearch('${u.userId}', this)">Добавить</button>
+                            <a href="/user/${encodeURIComponent(u.username)}" class="btn-friend-action btn-friend-action--profile">Профиль</a>
+                        `;
+                    }
+
+                    const mcNick = u.minecraftUsername || u.username;
+                    html += `
+                        <div class="friend-card friend-card--search">
+                            <div class="friend-card__left">
+                                <div class="friend-card__avatar-wrap">
+                                    <canvas class="mc-head-canvas" data-skin="${u.skinUrl}" width="38" height="38"></canvas>
+                                </div>
+                                <div class="friend-card__meta">
+                                    <a href="/user/${encodeURIComponent(u.username)}" class="friend-card__name">${u.username}</a>
+                                    <div class="friend-card__nick">MC: ${mcNick}</div>
+                                </div>
+                            </div>
+                            <div class="friend-card__actions">
+                                ${actionHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                resultsBox.innerHTML = html;
+
+                if (window.renderAllHeadCanvases) {
+                    window.renderAllHeadCanvases();
+                }
+            } catch (err) {
+                resultsBox.innerHTML = '<div class="friends-empty-search">Ошибка при поиске игроков</div>';
+            }
+        }
+
+        async function sendFriendRequestFromSearch(targetUserId, btn) {
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i>';
+            }
+            try {
+                const res = await fetch('/Account/SendFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'targetUserId=' + encodeURIComponent(targetUserId)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (btn) {
+                        btn.outerHTML = '<span class="friend-badge-status">Заявка отправлена</span>';
+                    }
+                } else {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = 'Ошибка';
+                    }
+                }
+            } catch (e) {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Ошибка';
+                }
+            }
+        }
+
+        async function acceptFriend(friendshipId, btn) {
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i>';
+            }
+            try {
+                const res = await fetch('/Account/AcceptFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'friendshipId=' + friendshipId
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Ошибка');
+                    if (btn) btn.disabled = false;
+                }
+            } catch (e) {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function rejectFriend(friendshipId, btn) {
+            try {
+                const res = await fetch('/Account/RejectFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'friendshipId=' + friendshipId
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const card = document.getElementById('incomingCard_' + friendshipId);
+                    if (card) card.remove();
+                    updateIncomingCount();
+                }
+            } catch (e) {}
+        }
+
+        async function cancelOutgoingRequest(friendshipId, btn) {
+            try {
+                const res = await fetch('/Account/CancelFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'friendshipId=' + friendshipId
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const card = document.getElementById('outgoingCard_' + friendshipId);
+                    if (card) card.remove();
+                    updateOutgoingCount();
+                }
+            } catch (e) {}
+        }
+
+        async function removeFriend(friendshipId, username) {
+            if (!confirm(`Удалить ${username} из друзей?`)) return;
+            try {
+                const res = await fetch('/Account/RemoveFriend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'friendshipId=' + friendshipId
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const card = document.getElementById('friendCard_' + friendshipId);
+                    if (card) card.remove();
+                    updateFriendsCount();
+                }
+            } catch (e) {}
+        }
+
+        function updateFriendsCount() {
+            const count = document.querySelectorAll('#friendsGrid .friend-card').length;
+            const badge = document.getElementById('friendsTotalCountBadge');
+            const subtab = document.getElementById('subtabCountList');
+            if (badge) badge.textContent = count;
+            if (subtab) subtab.textContent = count;
+            if (count === 0) {
+                const grid = document.getElementById('friendsGrid');
+                if (grid) {
+                    grid.outerHTML = `
+                        <div class="friends-empty-placeholder" id="friendsEmptyList">
+                            <div class="friends-empty-title">У вас пока нет друзей</div>
+                            <div class="friends-empty-desc">Воспользуйтесь поиском выше, чтобы найти игроков по нику на сайте или в игре!</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function updateIncomingCount() {
+            const count = document.querySelectorAll('#incomingGrid .friend-card').length;
+            const subtab = document.getElementById('subtabCountIncoming');
+            if (subtab) {
+                subtab.textContent = count;
+                subtab.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+            if (count === 0) {
+                const grid = document.getElementById('incomingGrid');
+                if (grid) {
+                    grid.outerHTML = `
+                        <div class="friends-empty-placeholder" id="incomingEmptyList">
+                            <div class="friends-empty-title">Нет входящих заявок</div>
+                            <div class="friends-empty-desc">Когда кто-то отправит вам приглашение в друзья, оно появится здесь.</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function updateOutgoingCount() {
+            const count = document.querySelectorAll('#outgoingGrid .friend-card').length;
+            const subtab = document.getElementById('subtabCountOutgoing');
+            if (subtab) {
+                subtab.textContent = count;
+                subtab.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+            if (count === 0) {
+                const grid = document.getElementById('outgoingGrid');
+                if (grid) {
+                    grid.outerHTML = `
+                        <div class="friends-empty-placeholder" id="outgoingEmptyList">
+                            <div class="friends-empty-title">Нет исходящих заявок</div>
+                            <div class="friends-empty-desc">Все отправленные вами заявки уже приняты или вы пока никому их не отправляли.</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Init on DOM ready
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAllCapeCanvases();
+            if (window.renderAllHeadCanvases) window.renderAllHeadCanvases();
+            
+            const searchInput = document.getElementById('friendSearchInput');
+            if (searchInput) {
+                let debounceTimer = null;
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        searchFriend();
+                    }, 250);
+                });
+
+                searchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        clearTimeout(debounceTimer);
+                        searchFriend();
+                    }
+                });
+            }
+
+            if (window.location.hash === '#wardrobe') {
+                switchProfileTab('tab-wardrobe');
+            }
+        });
+    </script>
+}

@@ -1,148 +1,247 @@
 .footer {
     height: fit-content;
-    padding: 40px 0;
+    padding: 60px 0 36px 0;
     width: 100%;
-
     text-align: left;
+    color: #9ca3af;
+    background: #08090d;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    text-shadow: none !important;
+}
 
-    color: var(--footer-text-color);
-    background: var(--footer-background);
+.footer * {
+    text-shadow: none !important;
+    box-sizing: border-box;
 }
 
 .footer__container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto auto auto;
-    gap: 30px;
+    grid-template-columns: 1.3fr 1fr 1.1fr 1fr;
+    gap: 36px 32px;
+    align-items: start;
+}
+
+.footer__header {
+    font-family: 'minecraft-title', 'minecraft', sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.8px;
+    color: #ffffff !important;
+    text-transform: uppercase;
+    margin: 0 0 16px 0;
+}
+
+.footer p {
+    margin: 0 0 8px 0;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #9ca3af;
+}
+
+.footer__author-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer__author-info p {
+    color: #9ca3af;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.footer__navigation {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer__nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer__nav-link {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 14px;
+    color: #9ca3af !important;
+    text-decoration: none;
+    transition: color 0.15s ease, transform 0.15s ease;
+    display: inline-block;
+    width: fit-content;
+}
+
+.footer__nav-link:hover {
+    color: #fbbf24 !important;
+    transform: translateX(3px);
+}
+
+.footer__server-status {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer__status-text {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.footer__status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 14px;
+    font-weight: 700;
+    color: #e5e7eb;
+    margin-bottom: 8px;
+}
+.footer__server-status-icon {
+    height: 18px;
+    width: auto;
+    object-fit: contain;
+    image-rendering: pixelated;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.footer__players-count {
+    font-weight: 700;
+    color: #ffffff;
 }
 
 .footer__project-media {
     display: flex;
     flex-direction: column;
-    grid-column: 1;
-    grid-row: 1;
 }
 
-.footer__media-links {
+.footer__social-links {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-.footer__server-status {
-    grid-column: 2;
-    grid-row: 1;
+.footer__social-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #d1d5db !important;
+    text-decoration: none;
+    font-size: 22px;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
-.footer__author-info {
-    grid-column: 3;
-    grid-row: 1;
+.footer__social-btn:hover {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.4);
+    color: #fbbf24 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .footer__center-row {
-    grid-column: span 3;
-    grid-row: 2;
-
+    grid-column: 1 / -1;
     text-align: center;
+    padding: 24px 0 16px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 12px;
+}
+
+.footer__center-row p {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 14px;
+    color: #9ca3af;
+    margin: 0;
+}
+
+.footer__center-row a {
+    color: #fbbf24 !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+}
+
+.footer__center-row a:hover {
+    color: #f59e0b !important;
 }
 
 .footer__bottom {
-    grid-column: span 3;
-    grid-row: 3;
-
+    grid-column: 1 / -1;
     text-align: center;
-    font-size: 8pt;
-
-    color: #999999;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
 }
 
-.footer__server-status-icon {
-    height: var(--normal-font-size);
-    object-fit: contain;
+.footer__copy {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 13px !important;
+    color: #6b7280 !important;
+    margin: 0 !important;
 }
 
-.footer__header {
-    margin-bottom: 15px;
+.footer__mojang-disclaimer {
+    font-family: 'minecraft', sans-serif !important;
+    font-size: 12px !important;
+    line-height: 1.6;
+    color: #6b7280 !important;
+    max-width: 860px;
+    margin: 0 auto !important;
 }
 
-.footer p {
-    margin: 5px 0;
+.footer__mojang-disclaimer a {
+    color: #9ca3af !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
 }
 
-@media (max-width: 768px) {
+.footer__mojang-disclaimer a:hover {
+    color: #fbbf24 !important;
+}
+
+@media (max-width: 992px) {
     .footer__container {
-        display: grid;
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: repeat(4, auto);
-    }
-
-    .footer__author-info {
-        grid-column: span 2;
-        grid-row: 1;
-        text-align: center;
-    }
-
-    .footer__server-status {
-        grid-column: 2;
-        grid-row: 2;
-    }
-
-    .footer__project-media {
-        grid-column: 1;
-        grid-row: 2;
-    }
-
-    .footer__center-row {
-        grid-column: span 2;
-        grid-row: 3;
-    }
-
-    .footer__bottom {
-        grid-column: span 2;
-        grid-row: 4;
+        gap: 32px 24px;
     }
 }
 
-@media (max-width: 426px) {
+@media (max-width: 576px) {
     .footer {
+        padding: 44px 0 28px 0;
         text-align: center;
     }
 
     .footer__container {
-        display: grid;
-        grid-template-columns: 100%;
-        grid-template-rows: repeat(5, auto);
+        grid-template-columns: 1fr;
+        gap: 28px;
     }
 
-    .footer__author-info {
-        grid-column: 1;
-        grid-row: 1;
+    .footer__header {
+        text-align: center;
     }
 
-    .footer__server-status {
-        grid-column: 1;
-        grid-row: 2;
+    .footer__nav-list {
+        align-items: center;
     }
 
-    .footer__project-media {
-        grid-column: 1;
-        grid-row: 3;
-    }
-
-    .footer__media-links {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+    .footer__social-links {
         justify-content: center;
-        gap: 0 15px;
     }
 
-    .footer__center-row {
-        grid-column: 1;
-        grid-row: 4;
-    }
-
-    .footer__bottom {
-        grid-column: 1;
-        grid-row: 5;
+    .footer__status-badge {
+        justify-content: center;
     }
 }

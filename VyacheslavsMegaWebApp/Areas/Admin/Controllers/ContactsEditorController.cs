@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VyacheslavsMegaWebApp.Areas.Admin.Models;
@@ -91,7 +91,6 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
                     { "contactId", contactId }
                 };
                 return RedirectToAction(nameof(ContactLinks), routeValues);
-                //return RedirectToAction(nameof(Index));
             }
             ViewBag.SelectContactItems = (await _contactsInfoRepository.GetAllContacts())
                 .OrderBy(c => c.Id)

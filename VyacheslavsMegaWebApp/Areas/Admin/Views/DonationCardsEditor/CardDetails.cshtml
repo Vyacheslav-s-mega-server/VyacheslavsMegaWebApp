@@ -1,4 +1,4 @@
-﻿@model DonationCard
+@model DonationCard
 
 <div class="block block--first">
     <div class="container">
@@ -16,10 +16,8 @@
 
                     <div class="form__validation-summary" asp-validation-summary="All"></div>
 
-                    <!-- CardName -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="CardName"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="CardName">
@@ -27,10 +25,8 @@
                         </div>
                     </div>
 
-                    <!-- BankName -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="BankName"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="BankName">
@@ -38,10 +34,8 @@
                         </div>
                     </div>
 
-                    <!-- CardNumber -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="CardNumber"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="CardNumber">
@@ -49,10 +43,8 @@
                         </div>
                     </div>
 
-                    <!-- CardHolder -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="CardHolder"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="CardHolder">
@@ -63,7 +55,6 @@
                     <div class="form__row">
                         <div class="form-group form-group--parent form-group--size-50">
                             
-                            <!-- ColorDownLeft -->
                             <div class="form-group">
                                  <label class="form-group__label" asp-for="ColorDownLeft"></label>
 
@@ -80,7 +71,6 @@
                                 </div>
                             </div>
                                 
-                            <!-- ColorUpRight -->
                             <div class="form-group">
                                 <label class="form-group__label" asp-for="ColorUpRight"></label>
 
@@ -146,7 +136,6 @@
     function updateColors(event) {
         let colorUpRight = colorUpRightInput.value;
         let colorDownLeft = colorDownLeftInput.value;
-        //console.log(`linear-gradient(45deg, ${colorDownLeft}, ${colorUpRight})`)
         cardExample.style.background = `linear-gradient(45deg, ${colorDownLeft}, ${colorUpRight})`;
     }
 </script>

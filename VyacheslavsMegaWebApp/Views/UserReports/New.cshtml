@@ -1,56 +1,86 @@
-﻿@model UserReport
+@model UserReport
 
-<link rel="stylesheet" href="~/css/pages/report.css" />
-<link rel="stylesheet" href="~/css/components/form.css" />
-<link rel="stylesheet" href="~/css/components/mc-button.css" />
+@{
+    ViewData["Title"] = "Сообщить о сбое - Vyacheslav's Mega Server";
+}
 
-<div class="block block--first block--report">
-    <div class="container">
-        <div class="section">
-            <h2 class="section__title">Не работает сервер? Сообщите о сбоях:</h2>
+@section Styles {
+    <link rel="stylesheet" href="~/css/pages/report.css" asp-append-version="true" />
+}
 
-            <div class="form-container">
-                <form class="form" method="post" asp-action="New">
+<div class="report-page">
+    <div class="report-admin-peeker">
+        <img src="~/img/report_admin.png" alt="Администратор VEC" class="report-admin-img" />
+    </div>
 
-                    <div class="form__body">
+    <div class="report-container">
+        
+        <div class="report-header">
+            <span class="donation-hero__badge">СЛУЖБА ПОДДЕРЖКИ</span>
+            <h1 class="donation-hero__title">
+                СООБЩИТЬ О <span class="hero-title__accent">СБОЕ</span>
+            </h1>
+            <p class="donation-hero__desc">
+                Не работает сервер или столкнулись с багом? Опишите проблему ниже — администрация изучит логи и оперативно устранит неполадку.
+            </p>
+        </div>
 
-                        <div class="form__validation-summary" asp-validation-summary="All"></div>
+        <div class="report-card">
+            <form class="report-form" method="post" asp-action="New">
+                
+                <div class="form__validation-summary" asp-validation-summary="All"></div>
 
-                        <div class="form-group">
-                            <label class="form-group__label" asp-for="Subject"></label>
+                <div class="report-form-group">
+                    <label class="report-label" asp-for="Subject">
+                        <i class='bx bx-edit-alt'></i>
+                        <span>Тема обращения</span>
+                    </label>
 
-                            <div class="form-group__control">
-                                <div class="field">
-                                    <input class="field__input" asp-for="Subject">
-                                </div>
-                            </div>
+                    <div class="report-control">
+                        <div class="field">
+                            <input class="field__input" asp-for="Subject" placeholder="Краткая суть проблемы" autofocus />
                         </div>
+                    </div>
+                    <span asp-validation-for="Subject" class="form-group__error"></span>
+                </div>
 
-                        <div class="form-group">
-                            <label class="form-group__label" asp-for="ReportText"></label>
+                <div class="report-form-group">
+                    <label class="report-label" asp-for="ReportText">
+                        <i class='bx bx-message-square-detail'></i>
+                        <span>Подробное описание проблемы</span>
+                    </label>
 
-                            <div class="form-group__control">
-                                <div class="field">
-                                    <textarea class="field__input field__input--no-resize" placeholder="Введите минимум 5 символов" rows="8"
-                                              asp-for="ReportText" id="reportText"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="form-group__hint" id="counter">
-                                (<span id="current">0</span>&nbsp;/
-                                <span>500</span> символов)
-                            </div>
-
+                    <div class="report-control">
+                        <div class="field">
+                            <textarea class="field__input field__input--no-resize" 
+                                      placeholder="Введите минимум 5 символов" 
+                                      rows="7"
+                                      asp-for="ReportText" 
+                                      id="reportText"></textarea>
                         </div>
                     </div>
 
-                    <div class="form__footer">
-                        <button class="mc-button mc-button--wide" type="submit">
-                            <span class="mc-button__title">Сохранить</span>
-                        </button>
+                    <div class="report-meta-row">
+                        <span asp-validation-for="ReportText" class="form-group__error"></span>
+                        <div class="form-group__hint report-counter" id="counter">
+                            (<span id="current">0</span>&nbsp;/ <span>500</span> символов)
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <div class="report-tips">
+                    <i class='bx bx-info-circle'></i>
+                    <div>
+                        Если сбой произошёл в игре, рекомендуем указать ваш игровой никнейм и примерные координаты или время инцидента.
+                    </div>
+                </div>
+
+                <div class="report-footer">
+                    <button class="mc-button mc-button--wide" type="submit">
+                        <span class="mc-button__title">Отправить обращение</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

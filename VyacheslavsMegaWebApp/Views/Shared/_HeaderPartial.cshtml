@@ -1,78 +1,283 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
+@using VyacheslavsMegaWebApp.Data
+@using VyacheslavsMegaWebApp.Data.Entities
 @using VyacheslavsMegaWebApp.Data.Entities.Identity
 @using VyacheslavsMegaWebApp.Data.Repositories
+@using VyacheslavsMegaWebApp.Service
 @inject UserManager<VmsIdentityUser> _userManager;
+@inject AppDbContext _db;
+@inject SkinStorageService _skinStorage;
 
 @{
     VmsIdentityUser? user = await _userManager.GetUserAsync(User);
     bool isAdmin = user is null ? false : await _userManager.IsInRoleAsync(user, "Admin");
+    int incomingCount = user is null ? 0 : _db.Friendships.Count(f => f.AddresseeId == user.Id && f.Status == FriendshipStatus.Pending);
+    string userDisplayName = user == null ? "" : _skinStorage.GetUserProfileData(user.UserName).siteName;
+    if (string.IsNullOrWhiteSpace(userDisplayName)) userDisplayName = user?.UserName ?? "";
 }
 
-<div class="header">
-    <div class="container">
-        <div class="header__inner">
-            <a class="header__logo-link" href="/">
-                <div class="logo">
-                    <img class="logo__image" src="~/img/logo.svg" />
-                    <span class="logo__text">МЕГА СЕРВЕР<br>ВЯЧЕСЛАВА</span>
-                </div>
-            </a>
-        
-            <nav class="header__menu">
-                <a class="header__menu-link" href="/">Главная</a>
-                <a class="header__menu-link" asp-area="" asp-controller="Home" asp-action="DonationPage">Пожертвования</a>
-                <a class="header__menu-link" asp-area="" asp-controller="UserReports" asp-action="New">Сообщить о неисправности</a>
-                <a class="header__menu-link" href="/#contacts">Контакты</a>
-            </nav>
+<div class="header-capsule-wrapper">
+    <div class="header-capsule">
+        <a class="header__logo-link" href="/">
+            <div class="logo">
+                <img class="logo__image" src="~/img/logo.svg" alt="VEC" />
+                <span class="logo__text">VEC</span>
+            </div>
+        </a>
+    
+        <nav class="header__menu">
+            <a class="header__menu-link" href="/">Главная</a>
+            <a class="header__menu-link" asp-area="" asp-controller="Home" asp-action="DonationPage">Пожертвования</a>
+            <a class="header__menu-link" asp-area="" asp-controller="UserReports" asp-action="New">Помощь</a>
+            <a class="header__menu-link" asp-area="" asp-controller="Home" asp-action="Contacts">Контакты</a>
+        </nav>
 
-            <div class="header__user">
-            @if (user is null)
-            {
-                <a class="header__menu-link header__menu-link--account" asp-area="" asp-controller="Account" asp-action="Login">Вход</a>
-            }
-            else
-            {
-                <div class="dropdown">
-                    @if (!user.EmailConfirmed)
+        <div class="header__user">
+        @if (user is null)
+        {
+            <a class="header__auth-btn btn-download" asp-area="" asp-controller="Account" asp-action="Login">Войти</a>
+        }
+        else
+        {
+            <div class="dropdown header-notif-dropdown" id="headerNotifDropdown">
+                <button type="button" class="header-notif-btn" id="btnHeaderNotif" aria-expanded="false" title="Уведомления">
+                    <i class='bx bx-bell'></i>
+                    @if (incomingCount > 0)
                     {
-                        <span class="warning-blink">⚠️</span>
-                    }     
-                    <a class="header__menu-link header__menu-link--account dropdown__content">@user.UserName</a>
-                    <div class="dropdown__menu">
-                        <table class="header__table-menu">
-                            @if (!user.EmailConfirmed)
-                            {
-                                <tr>
-                                    <td><span class="warning-blink">⚠️</span></td>
-                                        <td class="dropdown__menu-link"><a class="header__menu-link" asp-area="" asp-controller="Account" asp-action="SendEmailConfirmationToken">Подтвердите e-mail</a></td>
-                                </tr>
-                            }
-                            <tr> 
-                                <td></td>
-                                    <td class="dropdown__menu-link"><a class="header__menu-link" asp-area="" asp-controller="Account" asp-action="AccountSettings">Настройки профиля</a></td>
-                            </tr>
-                            @if (isAdmin)
-                            {
-                                <tr>
-                                    <td></td>
-                                    <td class ="dropdown__menu-link"><a class="header__menu-link" asp-area="Admin" asp-controller="Home" asp-action="Index">Панель администратора</a></td>
-                                </tr>
-                            }
-                            <tr>
-                                <td></td>
-                                <td class="dropdown__menu-link"><a class="header__menu-link" asp-area="" asp-controller="Account" asp-action="Logout">Выйти</a></td>
-                            </tr>
-                        </table>
+                        <span class="header-notif-badge" id="headerNotifBadge">@incomingCount</span>
+                    }
+                </button>
+                <div class="dropdown__menu header-notif-menu">
+                    <div class="dropdown__menu-inner" style="min-width: 280px; padding: 12px;">
+                        <div class="header-notif-menu__header">
+                            <span class="header-notif-title">Уведомления</span>
+                            <span class="header-notif-count-label" id="headerNotifCountLabel">@(incomingCount > 0 ? $"({incomingCount})" : "")</span>
+                        </div>
+                        <div class="header-notif-list" id="headerNotifList">
+                            <div class="header-notif-empty">Загрузка...</div>
+                        </div>
                     </div>
                 </div>
-            }
             </div>
 
-            <div class="header__burger">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="dropdown" id="headerUserDropdown">
+                <button type="button" class="dropdown__content" aria-expanded="false">
+                    <span class="dropdown__avatar-box" title="@user.UserName">
+                        <canvas class="mc-head-canvas" data-skin="/api/skin/@(user.UserName).png" width="22" height="22"></canvas>
+                    </span>
+                    <span class="dropdown__username">@userDisplayName</span>
+                    @if (!user.EmailConfirmed)
+                    {
+                        <span class="user-warn-dot" title="Email не подтвержден">⚠️</span>
+                    }
+                    <svg class="mc-pixel-arrow" width="14" height="8" viewBox="0 0 14 8" fill="currentColor">
+                        <path d="M0 0h2v2H0zM2 2h2v2H2zM4 4h2v2H4zM6 6h2v2H6zM8 4h2v2H8zM10 2h2v2h-2zM12 0h2v2h-2z" />
+                    </svg>
+                </button>
+                <div class="dropdown__menu">
+                    <div class="dropdown__menu-inner">
+                        @if (!user.EmailConfirmed)
+                        {
+                            <a class="dropdown__item dropdown__item--warn" asp-area="" asp-controller="Account" asp-action="SendEmailConfirmationToken">
+                                <i class='bx bx-error-circle'></i>
+                                <span>Подтвердить Email</span>
+                            </a>
+                        }
+                        <a class="dropdown__item" asp-area="" asp-controller="Account" asp-action="Profile">
+                            <i class='bx bx-user'></i>
+                            <span>Личный профиль</span>
+                        </a>
+                        <a class="dropdown__item" asp-area="" asp-controller="Account" asp-action="AccountSettings">
+                            <i class='bx bx-cog'></i>
+                            <span>Настройки</span>
+                        </a>
+                        @if (isAdmin)
+                        {
+                            <a class="dropdown__item dropdown__item--admin" asp-area="Admin" asp-controller="Home" asp-action="Index">
+                                <i class='bx bx-shield-quarter'></i>
+                                <span>Панель админа</span>
+                            </a>
+                        }
+                        <div class="dropdown__divider"></div>
+                        <a class="dropdown__item dropdown__item--logout" asp-area="" asp-controller="Account" asp-action="Logout">
+                            <i class='bx bx-log-out'></i>
+                            <span>Выйти</span>
+                        </a>
+                    </div>
+                </div>
             </div>
+        }
+        </div>
+
+        <div class="header__burger">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
     </div>
 </div>
+
+<script>
+    window.renderHeadCanvas = function (canvas) {
+        var skinUrl = canvas.getAttribute('data-skin');
+        if (!skinUrl) return;
+        var img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function () {
+            var ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            var w = canvas.width;
+            var h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(img, 8, 8, 8, 8, 0, 0, w, h);
+            ctx.drawImage(img, 40, 8, 8, 8, 0, 0, w, h);
+        };
+        img.onerror = function () {
+            var ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#2d3340';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        };
+        img.src = skinUrl;
+    };
+
+    window.renderAllHeadCanvases = function () {
+        var canvases = document.querySelectorAll('.mc-head-canvas');
+        canvases.forEach(function (canvas) {
+            window.renderHeadCanvas(canvas);
+        });
+    };
+
+    (function () {
+        var notifBtn = document.getElementById('btnHeaderNotif');
+        var notifList = document.getElementById('headerNotifList');
+        if (notifBtn && notifList) {
+            notifBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var dd = document.getElementById('headerNotifDropdown');
+                if (dd) dd.classList.toggle('open');
+                loadHeaderNotifications();
+            });
+
+            document.addEventListener('click', function() {
+                var dd = document.getElementById('headerNotifDropdown');
+                if (dd) dd.classList.remove('open');
+            });
+        }
+
+        async function loadHeaderNotifications() {
+            var listEl = document.getElementById('headerNotifList');
+            if (!listEl) return;
+            try {
+                var res = await fetch('/Account/GetNotifications');
+                var data = await res.json();
+                if (data.success) {
+                    var badge = document.getElementById('headerNotifBadge');
+                    var countLbl = document.getElementById('headerNotifCountLabel');
+                    if (countLbl) {
+                        countLbl.textContent = data.count > 0 ? '(' + data.count + ')' : '';
+                    }
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count;
+                            badge.style.display = 'block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+
+                    var items = data.notifications || data.requests || [];
+                    if (!items || items.length === 0) {
+                        listEl.innerHTML = '<div class="header-notif-empty">Нет новых уведомлений</div>';
+                        return;
+                    }
+
+                    var html = '';
+                    items.forEach(function(item) {
+                        if (item.type === 'friend_request' || item.friendshipId) {
+                            html += `
+                                <div class="header-notif-item" id="notifItem_${item.friendshipId}">
+                                    <div class="header-notif-avatar">
+                                        <canvas class="mc-head-canvas" data-skin="${item.skinUrl}" width="26" height="26"></canvas>
+                                    </div>
+                                    <div class="header-notif-info">
+                                        <div class="header-notif-tag">Запрос в друзья</div>
+                                        <a href="/user/${encodeURIComponent(item.username)}" class="header-notif-user">${item.username}</a>
+                                        <div class="header-notif-mc">MC: ${item.minecraftUsername}</div>
+                                    </div>
+                                    <div class="header-notif-btns">
+                                        <button type="button" class="notif-btn notif-btn--accept" onclick="acceptNotif(${item.friendshipId}, event)" title="Принять">
+                                             <i class='bx bx-check'></i>
+                                        </button>
+                                        <button type="button" class="notif-btn notif-btn--reject" onclick="rejectNotif(${item.friendshipId}, event)" title="Отклонить">
+                                            <i class='bx bx-x'></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            html += `
+                                <div class="header-notif-item header-notif-item--system">
+                                    <div class="header-notif-icon">
+                                        <i class='bx bx-info-circle'></i>
+                                    </div>
+                                    <div class="header-notif-info">
+                                        <div class="header-notif-tag header-notif-tag--sys">${item.title || 'Оповещение'}</div>
+                                        <div class="header-notif-desc">${item.message || ''}</div>
+                                        <div class="header-notif-date">${item.date || ''}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                    listEl.innerHTML = html;
+                    if (window.renderAllHeadCanvases) window.renderAllHeadCanvases();
+                }
+            } catch (err) {
+                listEl.innerHTML = '<div class="header-notif-empty">Нет новых уведомлений</div>';
+            }
+        }
+
+        setInterval(loadHeaderNotifications, 25000);
+
+        window.acceptNotif = async function(fId, ev) {
+            if (ev) ev.stopPropagation();
+            try {
+                var res = await fetch('/Account/AcceptFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'friendshipId=' + fId
+                });
+                var data = await res.json();
+                if (data.success) {
+                    var el = document.getElementById('notifItem_' + fId);
+                    if (el) el.remove();
+                    loadHeaderNotifications();
+                }
+            } catch (e) {}
+        };
+
+        window.rejectNotif = async function(fId, ev) {
+            if (ev) ev.stopPropagation();
+            try {
+                var res = await fetch('/Account/RejectFriendRequest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'friendshipId=' + fId
+                });
+                var data = await res.json();
+                if (data.success) {
+                    var el = document.getElementById('notifItem_' + fId);
+                    if (el) el.remove();
+                    loadHeaderNotifications();
+                }
+            } catch (e) {}
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', window.renderAllHeadCanvases);
+        } else {
+            window.renderAllHeadCanvases();
+        }
+        window.renderHeaderHeads = window.renderAllHeadCanvases;
+    })();
+</script>

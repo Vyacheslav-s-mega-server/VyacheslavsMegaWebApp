@@ -1,4 +1,4 @@
-﻿using MimeKit;
+using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit.Utils;
@@ -84,15 +84,24 @@ namespace VyacheslavsMegaWebApp.Service
             return emailMessage;
         }
         
-        public async Task SendEmail(MimeMessage message)
+        public async Task<bool> SendEmail(MimeMessage message)
         {
-            using (var client = new SmtpClient())
+            try
             {
-                await client.ConnectAsync(SmtpServerConfig.Address, SmtpServerConfig.Port, SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync(EmailServiceConfig.Email, EmailServiceConfig.Password);
-                await client.SendAsync(message);
+                using (var client = new SmtpClient())
+                {
+                    await client.ConnectAsync(SmtpServerConfig.Address, SmtpServerConfig.Port, SecureSocketOptions.StartTls);
+                    await client.AuthenticateAsync(EmailServiceConfig.Email, EmailServiceConfig.Password);
+                    await client.SendAsync(message);
 
-                await client.DisconnectAsync(true);
+                    await client.DisconnectAsync(true);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[EmailService] Не удалось отправить письмо через SMTP ({SmtpServerConfig.Address}:{SmtpServerConfig.Port}): {ex.Message}");
+                return false;
             }
         }
 

@@ -1,43 +1,145 @@
-﻿@model DonationPageViewModel
+@model DonationPageViewModel
 
-<div class="block block--first block--donation-intro">
-    <div class="container">
-        <div class="section section--centered">
-            <h1 class="section__title section__title--main">Пожертвования</h1>
-            @if (Model.HasCards)
-            {
-                <p>Пожертвовать на развитие проекта можно по номеру карты:</p>
-                <div class="cards-container donation-intro__cards-container">
-                    @foreach (DonationCard card in Model.DonationCards)
-                    {
-                        <div class="card" style="background: linear-gradient(45deg, @card.ColorDownLeft, @card.ColorUpRight);">
-                            <div class="card__header">
-                                <span>@card.BankName</span>
-                            </div>
-                            <div class="card__body">
-                                <p class="card__number">@card.CardNumber</p>
-                                <a href="#" class="card__copy-link" onclick="copyCardNumber(event, @card.CardNumderNormalized)">Скопировать номер</a>
-                            </div>
-                            <div class="card__footer">
-                                <span>@card.CardHolder</span>
-                            </div>
-                        </div>
-                    }
+@{
+    ViewData["Title"] = "Пожертвования - Vyacheslav's Mega Server";
+}
+
+<section class="donation-hero">
+    <div class="donation-hero__container">
+        <div class="donation-hero__grid">
+            <div class="donation-hero__content">
+                <span class="donation-hero__badge">ПОДДЕРЖКА ПРОЕКТА</span>
+                <h1 class="donation-hero__title">
+                    ПОЖЕРТВОВАНИЯ <span class="hero-title__accent">VEC</span>
+                </h1>
+                <p class="donation-hero__desc">
+                    Vyacheslav's Mega Server — некоммерческий проект. Все добровольные пожертвования направляются напрямую на аренду мощного выделенного сервера, регулярные бэкапы, развитие и надёжную защиту.
+                </p>
+
+                <div class="donation-hero__features">
+                    <div class="donation-feature-item">
+                        <i class='bx bx-check-shield'></i>
+                        <span>100% средств идут исключительно на развитие сервера</span>
+                    </div>
+                    <div class="donation-feature-item">
+                        <i class='bx bx-wallet-alt'></i>
+                        <span>Прямой перевод на карту без комиссии сторонних сервисов</span>
+                    </div>
+                    <div class="donation-feature-item">
+                        <i class='bx bx-equalizer'></i>
+                        <span>Честное выживание — игра без платных донат-привилегий</span>
+                    </div>
                 </div>
-            }
-            <p>Если вы сюда попали рекомендуется прочитать <a href="#attention">этот раздел</a></p>
+
+                <div class="donation-hero__actions">
+                    <a href="#cards" class="btn-download">
+                        <i class='bx bx-credit-card'></i>
+                        <span>Реквизиты карт</span>
+                    </a>
+                    <a href="#fund" class="btn-secondary">
+                        <i class='bx bx-target-lock'></i>
+                        <span>Цель фонда</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="donation-hero__visual">
+                <div class="donation-char-wrapper">
+                    <div class="donation-char-aura"></div>
+                    <img class="donation-char-img" src="~/img/vyacheslav-money.png" alt="Вячеслав с монетами" />
+                    <div class="donation-char-chip">
+                        <div class="donation-chip-text">
+                            <span class="donation-chip-label">ТЕКУЩАЯ ЦЕЛЬ</span>
+                            <span class="donation-chip-value">@Model.Goal.Name</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="block block--donation-fund">
-    <div class="container">
-        <div class="section section--centered">
-            <h2 class="section__title">Состояние фонда сервера</h2>
+@if (Model.HasCards)
+{
+    <section class="donation-cards-section" id="cards">
+        <div class="donation-hero__container">
+            <div class="donation-section-head">
+                <span class="donation-section-tag">РЕКВИЗИТЫ</span>
+                <h2 class="donation-section-title">Банковские карты для поддержки</h2>
+                <p class="donation-section-desc">Нажмите на номер карты или кнопку копирования для быстрого перевода через мобильное приложение вашего банка:</p>
+            </div>
 
-            <p>Текущая цель - @Model.Goal.Name</p>
-            <p>Денег собрано:</p>
-            
+            <div class="donation-cards-grid">
+                @foreach (DonationCard card in Model.DonationCards)
+                {
+                    <div class="donation-bank-card" 
+                         style="background: linear-gradient(45deg, @card.ColorDownLeft, @card.ColorUpRight);"
+                         onclick="copyCardNumber(event, '@card.CardNumderNormalized')">
+                        
+                        <div class="card-top-row">
+                            <div class="card-chip-group">
+                                <div class="card-emv-chip"></div>
+                                <i class='bx bx-wifi card-nfc-icon'></i>
+                            </div>
+                            <span class="card-bank-name">@card.BankName</span>
+                        </div>
+
+                        <div class="card-mid-row">
+                            <p class="card-number-text">@card.CardNumber</p>
+                            <div class="card-copy-pill" onclick="copyCardNumber(event, '@card.CardNumderNormalized')">
+                                <i class='bx bx-copy'></i>
+                                <span>Скопировать номер</span>
+                            </div>
+                        </div>
+
+                        <div class="card-bottom-row">
+                            <div class="card-holder-group">
+                                <span class="card-holder-label">Владелец карты</span>
+                                <span class="card-holder-name">@card.CardHolder</span>
+                            </div>
+                            <span class="card-system-brand">@card.CardName</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<section class="donation-fund-section" id="fund">
+    <div class="donation-hero__container">
+        <div class="donation-section-head">
+            <span class="donation-section-tag">ПРОЗРАЧНОСТЬ</span>
+            <h2 class="donation-section-title">Состояние фонда и сборов</h2>
+            <p class="donation-section-desc">Вся статистика открыта для сообщества — следите за прогрессом сбора на апгрейды инфраструктуры:</p>
+        </div>
+
+        <div class="fund-stats-grid">
+            <div class="fund-stat-card">
+                <div class="fund-stat-body">
+                    <span class="fund-stat-label">Собрано в фонде</span>
+                    <span class="fund-stat-val">@Model.FundAmount.ToString("N0") ₸</span>
+                </div>
+            </div>
+
+            <div class="fund-stat-card">
+                <div class="fund-stat-body">
+                    <span class="fund-stat-label">Стоимость цели</span>
+                    <span class="fund-stat-val">@(Model.Goal.Price == 0 ? "Пока не задана" : Model.Goal.Price.ToString("N0") + " ₸")</span>
+                </div>
+            </div>
+
+            <div class="fund-stat-card">
+                <div class="fund-stat-body">
+                    <span class="fund-stat-label">Текущая цель</span>
+                    <span class="fund-stat-val">@Model.Goal.Name</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="fund-progress-card">
+            <h3 class="fund-progress-title">Шкала прогресса цели: @Model.Goal.Name</h3>
+
             <div class="mc-bar donation-fund__bar">
                 <div class="mc-bar__text" id="xpText">0/100</div>
                 <div class="mc-bar__progress" id="xpBar"></div>
@@ -45,8 +147,10 @@
                 <input id="fundCurrent" type="hidden" value="@Model.FundAmount" />
                 <input id="goalPrice" type="hidden" value="@Model.Goal.Price" />
             </div>
+        </div>
 
-            <p class="section_text font_size_normal">Последние транзакции:</p>
+        <div class="fund-table-card">
+            <h3 class="fund-table-title">Последние транзакции фонда:</h3>
             <div class="mc-table-container">
                 <table class="mc-table mc-table--wide">
                     <tr class="mc-table--center-aligment">
@@ -66,41 +170,22 @@
                         foreach (FundTransaction transaction in Model.LastTransactions)
                         {
                             <tr>
-                                <td>@transaction.Amount</td>
-                                <td>@transaction.Purpose.Name</td>
-                                <td>@transaction.Note</td>
+                                <td class="mc-table--center-aligment">+@transaction.Amount ₸</td>
+                                <td>@transaction.Purpose?.Name</td>
+                                <td>@(string.IsNullOrWhiteSpace(transaction.Note) ? "—" : transaction.Note)</td>
                             </tr>
                         }
                         <tr class="mc-table--center-aligment">
-                            <td colspan="3"><a asp-controller="Home" asp-action="TransactionsHistory">Остальные транзакции</a></td>
+                            <td colspan="3">
+                                <a asp-controller="Home" asp-action="TransactionsHistory">Остальные транзакции</a>
+                            </td>
                         </tr>
                     }
                 </table>
             </div>
         </div>
     </div>
-</div>
-
-<div class="block block--donation-attention" id="attention">
-    <div class="container">
-        <div class="section">
-            <h2 class="section__title">Внимание!</h2>
-            <p>Прочитайте этот раздел, здесь могут быть ответы на ваши вопросы</p>
-            <ul>
-                <li>У проекта пока нет конкретной цели - просто развиваемся как по кайфу.</li>
-                <li>Проект является некоммерческим, не приносит прибыли создателю и не обещает никаких выгод или
-                    привилегий от пожертвований.</li>
-                <li>Пожертвования тратятся на содержание проекта и рекламные расходы.</li>
-                <li>Помимо денег можно жертвовать предметы и/или своё время. Для подробностей свяжитесь с
-                    создателем
-                    проекта в разделе <a href="/#contacts">контактов</a>.</li>
-                <li>Возможно позже сделаю топ донатеров.</li>
-                <li>Не "DonationAlerts" или другая платформа - по причине того, что там жадные капиталисты берут
-                    комиссию, наживаясь на работягах.</li>
-            </ul>
-        </div>
-    </div>
-</div>
+</section>
 
 <script src="~/js/donation-progress.js"></script>
 <script src="~/js/copy-card-number.js"></script>

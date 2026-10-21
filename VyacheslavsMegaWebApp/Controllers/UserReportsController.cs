@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using VyacheslavsMegaWebApp.Data.Entities;
 using VyacheslavsMegaWebApp.Data.Repositories;
 using VyacheslavsMegaWebApp.Models;
@@ -33,6 +33,17 @@ namespace VyacheslavsMegaWebApp.Controllers
         public IActionResult SuccessSending()
         {
             return View();
+        }
+
+        [HttpPost("api/reports/submit")]
+        public async Task<IActionResult> ApiSubmitReport([FromBody] UserReport model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Subject) || string.IsNullOrWhiteSpace(model.ReportText))
+            {
+                return BadRequest(new { error = "Тема и описание обязательны." });
+            }
+            await _reportsRepository.SaveReportAsync(model);
+            return Ok(new { success = true, id = model.Id });
         }
     }
 }

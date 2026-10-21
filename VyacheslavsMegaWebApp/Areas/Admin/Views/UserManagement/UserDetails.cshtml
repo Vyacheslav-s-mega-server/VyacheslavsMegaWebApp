@@ -1,0 +1,145 @@
+@model VyacheslavsMegaWebApp.Areas.Admin.Models.UserDetailsViewModel
+
+<div class="block block--first">
+    <div class="container">
+        <div class="form-container">
+            <form class="form" asp-area="Admin" asp-controller="UserManagement" asp-action="UserDetails" method="post">
+
+                <div class="form__header">
+                    <h2 class="form__title form__title--main">Пользователь @Model.UserName</h2>
+                </div>
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="mc-table-container" style="color: #27ae60; font-weight: bold; text-align: center;">
+                        @TempData["Success"]
+                    </div>
+                }
+
+                <input type="hidden" asp-for="Id" readonly />
+                <input type="hidden" asp-for="UserName" readonly />
+
+                <div class="form__body">
+
+                    <div class="form__validation-summary" asp-validation-summary="All"></div>
+
+                    <div class="form-group">
+                        <label class="form-group__label">Имя пользователя (Логин)</label>
+                        <div class="form-group__control">
+                            <div class="field">
+                                <input class="field__input" value="@Model.UserName" disabled />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-group__label">Email</label>
+                        <div class="form-group__control">
+                            <div class="field">
+                                <input class="field__input" value="@Model.Email" disabled />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form__row">
+                        <div class="form-group form-group--size-50">
+                            <div class="form-group__control">
+                                <label class="mc-checkbox">
+                                    <input class="mc-checkbox__input" asp-for="EmailConfirmed" />
+                                    <span class="mc-checkbox__box"></span>
+                                    <span class="mc-checkbox__label">Email подтверждён</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group form-group--size-50">
+                            <div class="form-group__control">
+                                <label class="mc-checkbox">
+                                    <input class="mc-checkbox__input" asp-for="IsAdmin" />
+                                    <span class="mc-checkbox__box"></span>
+                                    <span class="mc-checkbox__label">Администратор</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-group__control">
+                            <label class="mc-checkbox">
+                                <input class="mc-checkbox__input" asp-for="IsLockedOut" />
+                                <span class="mc-checkbox__box"></span>
+                                <span class="mc-checkbox__label">Заблокировать аккаунт</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-group__label">Привязка лаунчера (HWID)</label>
+                        <div class="form-group__control">
+                            <div class="field">
+                                <input class="field__input" value="@(string.IsNullOrEmpty(Model.LastHwid) ? "Нет активной привязки" : Model.LastHwid)" disabled />
+                            </div>
+                        </div>
+                        @if (Model.LastSessionDate.HasValue)
+                        {
+                            <span style="font-size: 11px; color: #888; margin-top: 4px;">
+                                Последний запуск через лаунчер: @Model.LastSessionDate.Value.ToString("dd.MM.yyyy HH:mm")
+                            </span>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-group__label">Гардероб (Скин и Плащ)</label>
+                        <div style="display: flex; gap: 20px; align-items: center; margin-top: 6px;">
+                            <div style="text-align: center;">
+                                <div style="width: 64px; height: 64px; background: #222; border: 2px solid #555; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                    @if (Model.HasSkin)
+                                    {
+                                        <img src="@Model.SkinUrl" style="image-rendering: pixelated; width: 48px; height: 48px; object-fit: contain;" alt="Скин" />
+                                    }
+                                    else
+                                    {
+                                        <span style="font-size: 10px; color: #777;">Дефолт</span>
+                                    }
+                                </div>
+                                <span style="font-size: 11px; color: #aaa; margin-top: 4px; display: block;">Скин (@Model.SkinModel)</span>
+                            </div>
+
+                            <div style="text-align: center;">
+                                <div style="width: 64px; height: 64px; background: #222; border: 2px solid #555; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                    @if (Model.HasCape)
+                                    {
+                                        <img src="@Model.CapeUrl" style="image-rendering: pixelated; width: 40px; height: 56px; object-fit: contain;" alt="Плащ" />
+                                    }
+                                    else
+                                    {
+                                        <span style="font-size: 10px; color: #777;">Нет</span>
+                                    }
+                                </div>
+                                <span style="font-size: 11px; color: #aaa; margin-top: 4px; display: block;">Плащ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form__footer">
+                    <button class="mc-button mc-button--wide" type="submit">
+                        <span class="mc-button__title">Сохранить</span>
+                    </button>
+
+                    @if (!string.IsNullOrEmpty(Model.LastHwid))
+                    {
+                        <p style="margin-top: 15px;">
+                            <a asp-action="ResetHwid" asp-route-id="@Model.Id" onclick="return confirm('Сбросить привязку HWID для этого игрока? При следующем входе привяжется новый ПК.');" style="color: #e67e22; text-decoration: underline;">
+                                Сбросить привязку HWID ПК
+                            </a>
+                        </p>
+                    }
+
+                    <p style="margin-top: 15px;"><a asp-area="Admin" asp-controller="UserManagement" asp-action="Index">Назад</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

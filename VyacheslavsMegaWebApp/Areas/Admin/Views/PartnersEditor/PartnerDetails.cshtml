@@ -1,4 +1,4 @@
-﻿@model Partner
+@model Partner
 
 <div class="block block--first">
     <div class="container">
@@ -17,10 +17,8 @@
 
                     <div class="form__validation-summary" asp-validation-summary="All"></div>
 
-                    <!-- Name -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="Name"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" asp-for="Name">
@@ -28,10 +26,8 @@
                         </div>
                     </div>
 
-                    <!-- Subtitle -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="Subtitle"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <textarea class="field__input" rows="4" asp-for="Subtitle"></textarea>
@@ -39,10 +35,8 @@
                         </div>
                     </div>
 
-                    <!-- Description -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="Description"></label>
-
                         <div class="form-group__control">
                             <div class="field">
                                 <textarea class="field__input" rows="4" asp-for="Description"></textarea>
@@ -50,14 +44,9 @@
                         </div>
                     </div>
 
-                    
-
-                    <!-- LogoFileName -->
                     <div class="form-group">
                         <label class="form-group__label" asp-for="LogoFileName"></label>
-
                         <div class="mc-file">
-
                             <div class="mc-file__preview">
                                 @if (Model.HasLogo)
                                 {
@@ -70,7 +59,6 @@
                             </div>
 
                             <div class="mc-file__controls">
-
                                 <input class="mc-file__input"
                                        type="file"
                                        accept="image/*"
@@ -87,12 +75,10 @@
                                 <div class="mc-file__filename" id="fileName">
                                     @(Model.HasLogo ? Model.LogoFullPath : "Файл не выбран")
                                 </div>
-
                             </div>
                         </div>
                     </div>
 
-                    <!-- ShowPartner -->
                     <div class="form-group">
                         <div class="form-group__control">
                             <label class="mc-checkbox">
@@ -118,4 +104,4 @@
     </div>
 </div>
 
-<script src="~/js/form-image-previewer.js"></script>        
+<script src="~/js/form-image-previewer.js"></script>

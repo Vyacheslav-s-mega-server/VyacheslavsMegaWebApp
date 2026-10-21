@@ -1,26 +1,115 @@
-﻿@model DownloadButtonsViewModel
+@model DownloadButtonsViewModel
 
 <div class="block block--first">
     <div class="container">
         <div class="section">
-            <h2 class="section__title section__title--main">Кнопки загрузки</h2>
+            <h2 class="section__title section__title--main">Кнопки и файл загрузки</h2>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="mc-table-container" style="color: #27ae60; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="mc-table-container" style="color: #c0392b; font-weight: bold; margin-bottom: 15px; font-size: 15px;">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="form-container" style="margin-bottom: 35px;">
+                <form class="form" asp-area="Admin" asp-controller="DownloadButtons" asp-action="UploadLauncher" method="post" enctype="multipart/form-data" style="max-width: 1000px; width: 100%;">
+                    <div class="form__header">
+                        <h3 class="form__title">Исполняемый файл VECLauncher.exe</h3>
+                    </div>
+                    <div class="form__body">
+                        <div class="mc-table-container">
+                            <table class="mc-table mc-table--wide">
+                                <tr>
+                                    <td style="width: 270px;">Установщик (VEC_Setup.exe):</td>
+                                    <td>
+                                        @if (Model.SetupFileExists)
+                                        {
+                                            <span style="color: #27ae60; font-weight: bold;">Готов к раздаче игрокам</span>
+                                            <span>(@($"{(Model.SetupFileSizeBytes / 1024.0 / 1024.0):F2} МБ"), обновлен: @(Model.SetupLastModified?.ToString("dd.MM.yyyy HH:mm") ?? "—"))</span>
+                                            <span style="margin-left: 10px;">
+                                                <a href="/downloads/VEC_Setup.exe" download style="text-decoration: underline;">Скачать для проверки</a>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: #c0392b; font-weight: bold;">Файл отсутствует в wwwroot/downloads/</span>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 270px;">Пакет клиента (VECLauncher.exe / .zip):</td>
+                                    <td>
+                                        @if (Model.LauncherFileExists)
+                                        {
+                                            <span style="color: #27ae60; font-weight: bold;">Готов к установке через установщик</span>
+                                            <span>(EXE: @($"{(Model.LauncherFileSizeBytes / 1024.0 / 1024.0):F2} МБ")@(Model.ZipFileExists ? $", ZIP: {(Model.ZipFileSizeBytes / 1024.0 / 1024.0):F2} МБ" : ""), обновлен: @(Model.LauncherLastModified?.ToString("dd.MM.yyyy HH:mm") ?? "—"))</span>
+                                            <span style="margin-left: 10px;">
+                                                <a href="/downloads/VECLauncher.exe" download style="text-decoration: underline;">Скачать EXE</a>
+                                            </span>
+                                            @if (Model.ZipFileExists)
+                                            {
+                                                <span style="margin-left: 6px;">
+                                                    <a href="/downloads/VECLauncher-win-x64.zip" download style="text-decoration: underline;">Скачать ZIP</a>
+                                                </span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span style="color: #c0392b; font-weight: bold;">Файл отсутствует в wwwroot/downloads/</span>
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 10px;">
+                            <label class="form-group__label">Загрузить новый .exe файл лаунчера для замены:</label>
+                            <div class="form-group__control">
+                                <div class="field">
+                                    <input class="field__input" type="file" name="launcherFile" accept=".exe" required />
+                                </div>
+                            </div>
+                            <div class="form-group__hint">
+                                При загрузке файл (VEC_Setup.exe или VECLauncher.exe) автоматически обновится на сервере для скачивания игроками.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form__footer">
+                        <button class="mc-button mc-button--wide" type="submit">
+                            <span class="mc-button__title">Загрузить и обновить VECLauncher.exe</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
 
             <div class="mc-table-container">
                 <table class="mc-table mc-table--wide">
                     <tr class="mc-table--center-aligment">
                         <td>Текст кнопки</td>
+                        <td>URL</td>
+                        <td>Тип</td>
                         <td colspan="2">Действия</td>
                     </tr>
                     @foreach (DownloadButton button in Model.DownloadButtons)
                     {
                         <tr>
                             <td>@button.Title</td>
+                            <td style="word-break: break-all;">@button.Url</td>
+                            <td>@(button.IsResourceLocal ? "Локальный" : "Внешний")</td>
                             <td><a asp-action="ButtonDetails" asp-route-buttonId="@button.Id">Редактировать</a></td>
                             <td><a asp-action="RemoveButton" asp-route-buttonId="@button.Id">Удалить</a></td>
                         </tr>
                     }
                     <tr class="mc-table--center-aligment">
-                        <td colspan="6"><a asp-action="ButtonDetails">Добавить кнопку</a></td>
+                        <td colspan="5"><a asp-action="ButtonDetails">Добавить кнопку</a></td>
                     </tr>
                 </table>
             </div>

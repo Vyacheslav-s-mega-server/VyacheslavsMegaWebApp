@@ -1,45 +1,5 @@
-﻿.dropdown {
-    position: relative;
-}
-
-.dropdown__content::after{
-    position:relative;
-    top: 3px;
-    left: 4px;
-
-    display: inline-block;
-    content: '';
-    height: var(--header-font-size);
-    width: var(--header-font-size);
-
-    background-color: var(--text-color);
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Crect x='0' y='1' width='1' height='1' fill='white'/%3E%3Crect x='1' y='2' width='1' height='1' fill='white'/%3E%3Crect x='2' y='3' width='1' height='1' fill='white'/%3E%3Crect x='3' y='2' width='1' height='1' fill='white'/%3E%3Crect x='4' y='1' width='1' height='1' fill='white'/%3E%3C/svg%3E");
-    mask-size: cover;
-}
-
-.dropdown__menu {
-    position: absolute;
-    right: 0;
-    z-index: 5;
-
-    display: none;
-    padding-bottom: 10px;
-    min-width: 160px;
-    
-    border-top: 33px solid transparent;
-    background-color: var(--header-background);
-    background-clip: padding-box;
-}
-
-.dropdown__menu-link {
-    padding: 10px 16px;
-    display: block;
-}
-
-.dropdown:hover .dropdown__menu {
-    display: block;
-}
-
-.dropdown:hover .dropdown__content::after {
-    background-color: var(--text-color-hover);
+/* Legacy dropdown-menu.css cleared to prevent conflict with .header-capsule dropdown */
+.dropdown__content::after {
+    display: none !important;
+    content: none !important;
 }
