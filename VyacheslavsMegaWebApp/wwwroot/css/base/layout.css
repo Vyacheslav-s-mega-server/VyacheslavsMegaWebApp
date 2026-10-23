@@ -1,4 +1,4 @@
-﻿a {
+a {
     color: inherit;
 }
 
@@ -32,10 +32,19 @@ h6 {
 
 html {
     scroll-behavior: smooth;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
 }
 
 body {
     margin: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
+    position: relative;
 
     font-family: minecraft;
     font-optical-sizing: auto;
@@ -50,15 +59,35 @@ body {
     background-color: #222;
 }
 
+main {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
 body.lock {
-    overflow: hidden;
+    overflow: hidden !important;
 }
 
 .container {
     width: 100%;
     height: 100%;
-    max-width: 85vw;
+    max-width: 1360px;
     margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .container {
+        padding: 0 10px;
+    }
 }
 
 .block-stripe {

@@ -135,6 +135,8 @@
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease;
     user-select: none;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .ip-pill:hover {
@@ -148,6 +150,11 @@
     font-weight: 700;
     color: #ffffff !important;
     letter-spacing: 0.8px;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ip-pill__copy {
@@ -159,6 +166,7 @@
     padding: 0;
     cursor: pointer;
     transition: color 0.15s ease;
+    flex-shrink: 0;
 }
 
 .ip-pill:hover .ip-pill__copy {
@@ -172,6 +180,8 @@
     color: #9ca3af;
     padding-left: 12px;
     border-left: 1px solid rgba(255, 255, 255, 0.12);
+    white-space: nowrap !important;
+    flex-shrink: 0;
 }
 
 .section-dossier {
@@ -816,17 +826,31 @@
     }
 
     .hero-title {
-        font-size: 46px !important;
+        font-size: 42px !important;
     }
 }
 
 @media (max-width: 768px) {
     .intro {
-        padding: 110px 0 50px 0;
+        padding: 100px 0 45px 0;
+        min-height: auto;
+        background-position: 80% center;
+    }
+
+    .intro__container {
+        padding: 0 16px;
     }
 
     .hero-title {
-        font-size: 36px !important;
+        font-size: 32px !important;
+        line-height: 1.25 !important;
+        margin-bottom: 14px !important;
+    }
+
+    .hero-subtitle {
+        font-size: 15px !important;
+        line-height: 1.55 !important;
+        margin-bottom: 22px !important;
     }
 
     .hero-hud {
@@ -844,37 +868,267 @@
         padding-left: 0;
     }
 
+    .brochure-container {
+        padding: 0 16px;
+    }
+
+    .brochure-title {
+        font-size: 24px !important;
+    }
+
+    .founder-chair-stage {
+        min-height: 260px;
+        padding: 16px 12px 6px 12px;
+    }
+
+    .founder-chair-img {
+        max-height: 300px;
+    }
+
     .partner-showcase-card {
         grid-template-columns: 1fr;
-        padding: 22px;
-        gap: 20px;
+        padding: 20px 16px;
+        gap: 18px;
+        position: relative;
     }
 
     .partner-showcase-card__media {
-        height: 240px;
-        min-height: 240px;
-        padding: 16px;
+        height: 220px;
+        min-height: 220px;
+        padding: 14px;
+        position: relative;
     }
 
     .partner-showcase-card__img {
-        max-height: 200px;
+        max-height: 180px;
     }
 
     .partner-showcase-card__name {
+        font-size: 20px !important;
+    }
+
+    .carousel-arrow {
+        top: 130px !important;
+        transform: translateY(-50%) !important;
+        width: 38px !important;
+        height: 38px !important;
         font-size: 22px !important;
+        background: rgba(14, 17, 24, 0.92) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        z-index: 15 !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
     }
 
     .carousel-arrow--prev {
-        left: -12px;
-        width: 44px;
-        height: 44px;
-        font-size: 26px;
+        left: 8px !important;
     }
 
     .carousel-arrow--next {
-        right: -12px;
-        width: 44px;
-        height: 44px;
-        font-size: 26px;
+        right: 8px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .intro {
+        padding: 85px 0 35px 0;
+        overflow: hidden;
+    }
+
+    .hero-title {
+        font-size: 26px !important;
+        letter-spacing: 0.8px !important;
+        word-break: break-word;
+    }
+
+    .hero-row {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .btn-download {
+        width: 100%;
+        box-sizing: border-box;
+        justify-content: center;
+        padding: 12px 18px;
+        font-size: 16px !important;
+    }
+
+    .ip-pill {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .ip-pill__text {
+        font-size: 13.5px !important;
+        letter-spacing: 0.2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ip-pill__copy {
+        flex-shrink: 0;
+    }
+
+    .ip-pill__players {
+        font-size: 13px !important;
+        white-space: nowrap !important;
+        padding-left: 8px;
+        border-left: 1px solid rgba(255, 255, 255, 0.15);
+        flex-shrink: 0;
+    }
+
+    .brochure-item {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .brochure-item__icon {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+    }
+
+    .founder-chair-stage {
+        min-height: 220px;
+    }
+
+    .founder-chair-img {
+        max-height: 240px;
+    }
+}
+
+@media (max-width: 360px) {
+    .intro__container {
+        padding: 0 10px;
+    }
+
+    .hero-title {
+        font-size: 21px !important;
+        letter-spacing: 0.3px !important;
+        line-height: 1.25 !important;
+    }
+
+    .hero-subtitle {
+        font-size: 13px !important;
+        line-height: 1.45 !important;
+        margin-bottom: 18px !important;
+    }
+
+    .btn-download {
+        font-size: 14px !important;
+        padding: 10px 12px;
+    }
+
+    .ip-pill {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+
+    .ip-pill__text {
+        font-size: 11.5px !important;
+    }
+
+    .ip-pill__players {
+        font-size: 11.5px !important;
+        padding-left: 6px;
+    }
+
+    .dossier-brochure {
+        padding: 16px 10px;
+    }
+
+    .brochure-title {
+        font-size: 19px !important;
+    }
+
+    .brochure-item {
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .founder-chair-stage {
+        min-height: 180px;
+        padding: 10px 8px 4px 8px;
+    }
+
+    .founder-chair-img {
+        max-height: 190px;
+    }
+
+    .founder-info-block {
+        padding: 16px 10px;
+    }
+
+    .founder-title-name {
+        font-size: 18px !important;
+    }
+
+    .founder-quote-text {
+        font-size: 12px !important;
+        line-height: 1.5;
+    }
+
+    .founder-contact-pill {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .founder-contact-pill__icon {
+        font-size: 22px !important;
+    }
+
+    .founder-contact-pill__desc {
+        font-size: 10px;
+    }
+
+    .founder-contact-pill__nick {
+        font-size: 12px;
+    }
+
+    .partner-showcase-card {
+        padding: 14px 10px;
+        border-radius: 14px;
+        gap: 14px;
+    }
+
+    .partner-showcase-card__media {
+        height: 170px;
+        min-height: 170px;
+        padding: 8px;
+    }
+
+    .partner-showcase-card__img {
+        max-height: 150px;
+    }
+
+    .carousel-arrow {
+        top: 105px !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 18px !important;
+    }
+
+    .partner-showcase-card__name {
+        font-size: 17px !important;
+    }
+
+    .partner-showcase-card__desc {
+        font-size: 12.5px;
+        line-height: 1.5;
+    }
+
+    .partner-showcase-card__btn {
+        width: 100%;
+        justify-content: center;
+        padding: 9px 12px;
+        font-size: 12.5px;
     }
 }

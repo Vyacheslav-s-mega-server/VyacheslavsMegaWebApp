@@ -1456,10 +1456,18 @@ namespace VyacheslavsMegaWebApp.Controllers
 
             var cleanQuery = query.Trim();
 
-            var matchedUsers = _userManager.Users
-                .Where(u => u.UserName != null && EF.Functions.Like(u.UserName, $"%{cleanQuery}%"))
-                .Take(15)
-                .ToList();
+            var allUsers = _userManager.Users.ToList();
+            var matchedUsers = allUsers.Where(u =>
+            {
+                if (u.UserName != null && u.UserName.Contains(cleanQuery, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                var (siteName, mcUser, _) = _skinStorage.GetUserProfileData(u.UserName ?? "");
+                if (!string.IsNullOrEmpty(siteName) && siteName.Contains(cleanQuery, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (!string.IsNullOrEmpty(mcUser) && mcUser.Contains(cleanQuery, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                return false;
+            }).Take(15).ToList();
 
             var matchedIds = matchedUsers.Select(u => u.Id).ToList();
 
@@ -1669,14 +1677,19 @@ namespace VyacheslavsMegaWebApp.Controllers
         {
             if (string.IsNullOrWhiteSpace(username)) return RedirectToAction("Index", "Home");
 
-            var targetUser = await _userManager.FindByNameAsync(username);
+            string cleanName = Uri.UnescapeDataString(username).Trim();
+
+            var targetUser = await _userManager.FindByNameAsync(cleanName);
             if (targetUser is null)
             {
                 var allUsers = _userManager.Users.ToList();
                 targetUser = allUsers.FirstOrDefault(u =>
                 {
-                    var (_, mc, _) = _skinStorage.GetUserProfileData(u.UserName);
-                    return string.Equals(mc, username, StringComparison.OrdinalIgnoreCase);
+                    if (string.Equals(u.UserName, cleanName, StringComparison.OrdinalIgnoreCase)) return true;
+                    var (siteName, mc, _) = _skinStorage.GetUserProfileData(u.UserName ?? "");
+                    if (!string.IsNullOrEmpty(siteName) && string.Equals(siteName, cleanName, StringComparison.OrdinalIgnoreCase)) return true;
+                    if (!string.IsNullOrEmpty(mc) && string.Equals(mc, cleanName, StringComparison.OrdinalIgnoreCase)) return true;
+                    return false;
                 });
             }
 

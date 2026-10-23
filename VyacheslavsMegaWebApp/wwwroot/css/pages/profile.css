@@ -1315,3 +1315,367 @@
     margin-right: auto;
 }
 
+/* ========================================================
+   Mobile & Tablet Responsiveness for Profile & Wardrobe
+   ======================================================== */
+
+@media (max-width: 860px) {
+    .profile-page {
+        padding: 95px 0 50px 0;
+    }
+
+    .profile-container {
+        padding: 0 14px;
+    }
+
+    .profile-banner {
+        height: 160px;
+    }
+
+    .profile-banner__actions {
+        top: 10px;
+        right: 10px;
+        gap: 6px;
+    }
+
+    .banner-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .profile-identity-bar {
+        padding: 0 16px 18px 16px;
+        gap: 16px;
+    }
+
+    .profile-avatar-container {
+        margin-top: -50px;
+    }
+
+    .profile-avatar-frame {
+        width: 90px;
+        height: 90px;
+        min-width: 90px;
+    }
+
+    .profile-username {
+        font-size: 22px !important;
+    }
+
+    .profile-main-layout {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .profile-sidebar {
+        padding: 8px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+    .profile-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+    }
+
+    .profile-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .profile-nav__btn {
+        width: auto;
+        flex-shrink: 0;
+        padding: 8px 14px;
+        font-size: 13px;
+        white-space: nowrap;
+        border-radius: 6px;
+    }
+
+    .profile-card {
+        padding: 18px 16px;
+        margin-bottom: 16px;
+        border-radius: 8px;
+    }
+
+    .wardrobe-top-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .viewer-canvas-frame {
+        height: 320px;
+    }
+
+    .mc-capes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+        gap: 10px;
+    }
+
+    .friends-subnav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        white-space: nowrap;
+    }
+
+    .friends-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 540px) {
+    .profile-page {
+        padding: 88px 0 36px 0;
+    }
+
+    .profile-container {
+        padding: 0 10px;
+    }
+
+    .profile-banner {
+        height: 130px;
+    }
+
+    .profile-banner__actions {
+        top: 6px;
+        right: 6px;
+    }
+
+    .banner-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .banner-btn span {
+        display: none;
+    }
+
+    .profile-identity-bar {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 0 12px 14px 12px;
+        gap: 10px;
+    }
+
+    .profile-avatar-container {
+        margin-top: -45px;
+    }
+
+    .profile-avatar-frame {
+        width: 82px;
+        height: 82px;
+        min-width: 82px;
+    }
+
+    .profile-identity-info {
+        min-width: unset;
+        width: 100%;
+        text-align: center;
+    }
+
+    .profile-username {
+        font-size: 18px !important;
+    }
+
+    .profile-meta-line {
+        justify-content: center;
+        font-size: 12px;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .profile-nav__btn {
+        padding: 7px 11px;
+        font-size: 12px;
+    }
+
+    .profile-card {
+        padding: 14px 10px;
+    }
+
+    .profile-card__head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .profile-identity-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .identity-card {
+        padding: 14px 12px;
+        min-width: 0 !important;
+    }
+
+    .viewer-canvas-frame {
+        height: 250px;
+    }
+
+    .skin-drop-field {
+        padding: 16px 10px;
+    }
+
+    .mc-capes-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .friends-header-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+
+    .friends-subnav {
+        display: flex !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        gap: 4px !important;
+        padding: 3px !important;
+        box-sizing: border-box !important;
+    }
+
+    .friends-subnav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .friends-subtab-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: 6px 8px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+        min-width: 0 !important;
+        gap: 4px !important;
+    }
+
+    .subtab-count {
+        min-width: 16px;
+        height: 16px;
+        font-size: 10px;
+        padding: 0 4px;
+    }
+
+    .friends-search-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .friends-search-input {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .friend-card {
+        padding: 10px 10px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .friend-card__left {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .friend-card__meta {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .friend-card__name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .friend-card__actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .btn-friend-action {
+        padding: 6px 10px;
+        font-size: 11.5px;
+    }
+}
+
+@media (max-width: 360px) {
+    .profile-page {
+        padding: 78px 0 28px 0;
+    }
+
+    .profile-container {
+        padding: 0 6px;
+    }
+
+    .profile-banner {
+        height: 110px;
+    }
+
+    .profile-avatar-frame {
+        width: 74px;
+        height: 74px;
+        min-width: 74px;
+    }
+
+    .profile-avatar-container {
+        margin-top: -37px;
+    }
+
+    .profile-username {
+        font-size: 17px !important;
+    }
+
+    .profile-meta-line {
+        font-size: 11px;
+        gap: 4px;
+    }
+
+    .profile-card {
+        padding: 12px 8px;
+        border-radius: 6px;
+    }
+
+    .profile-nav__btn {
+        padding: 6px 9px;
+        font-size: 11px;
+    }
+
+    .friends-subtab-btn {
+        padding: 5px 4px !important;
+        font-size: 10.5px !important;
+        gap: 3px !important;
+    }
+
+    .viewer-canvas-frame {
+        height: 210px;
+    }
+
+    .mc-capes-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .btn-friend-action {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+}
+
