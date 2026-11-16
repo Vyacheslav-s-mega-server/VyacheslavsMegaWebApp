@@ -6,8 +6,10 @@ using VyacheslavsMegaWebApp.Models;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class MainPageRepository : RepositoryBase
+    public class MainPageRepository : DbRepository
     {
+        public MainPageRepository(AppDbContext db) : base(db) { }
+
         public async Task<MainPageData> GetMainPageData()
         {
             return await DB.MainPageData.OrderBy(m => m.Id).LastAsync();

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using VyacheslavsMegaWebApp.Data;
+using VyacheslavsMegaWebApp.Api.Models;
 using VyacheslavsMegaWebApp.Data.Entities;
 using VyacheslavsMegaWebApp.Data.Entities.Identity;
+using VyacheslavsMegaWebApp.Data.Repositories;
 
 namespace VyacheslavsMegaWebApp.Api.Controllers
 {
@@ -16,40 +17,18 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
     [Route("api/friends")]
     public class FriendsApiController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly FriendshipsRepository _friendshipsRepository;
+        private readonly LauncherSessionRepository _sessionRepository;
         private readonly UserManager<VmsIdentityUser> _userManager;
 
-        public FriendsApiController(AppDbContext db, UserManager<VmsIdentityUser> userManager)
+        public FriendsApiController(
+            FriendshipsRepository friendshipsRepository,
+            LauncherSessionRepository sessionRepository,
+            UserManager<VmsIdentityUser> userManager)
         {
-            _db = db;
+            _friendshipsRepository = friendshipsRepository;
+            _sessionRepository = sessionRepository;
             _userManager = userManager;
-        }
-
-        public class FriendDto
-        {
-            public int FriendshipId { get; set; }
-            public string UserId { get; set; } = string.Empty;
-            public string Username { get; set; } = string.Empty;
-            public string AvatarUrl { get; set; } = string.Empty;
-            public bool IsOnline { get; set; }
-            public string Status { get; set; } = "Accepted";
-            public DateTime CreatedAt { get; set; }
-        }
-
-        public class FriendRequestDto
-        {
-            public int FriendshipId { get; set; }
-            public string RequesterId { get; set; } = string.Empty;
-            public string RequesterUsername { get; set; } = string.Empty;
-            public string AvatarUrl { get; set; } = string.Empty;
-            public DateTime CreatedAt { get; set; }
-        }
-
-        public class FriendsListResponse
-        {
-            public List<FriendDto> Friends { get; set; } = new();
-            public List<FriendRequestDto> IncomingRequests { get; set; } = new();
-            public List<FriendRequestDto> OutgoingRequests { get; set; } = new();
         }
 
         [HttpGet("list")]
@@ -58,91 +37,68 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             if (string.IsNullOrWhiteSpace(username))
                 return BadRequest(new { error = "Username required." });
 
-            var cleanUser = Path.GetFileNameWithoutExtension(username).Trim();
-            var user = await _userManager.FindByNameAsync(cleanUser);
+            string cleanUser = username.Trim();
+            VmsIdentityUser? user = await _userManager.FindByNameAsync(cleanUser);
             if (user == null)
                 return NotFound(new { error = "User not found." });
 
-            var accepted = await _db.Friendships
-                .Include(f => f.Requester)
-                .Include(f => f.Addressee)
-                .Where(f => (f.RequesterId == user.Id || f.AddresseeId == user.Id) && f.Status == FriendshipStatus.Accepted)
-                .ToListAsync();
+            List<Friendship> accepted = await _friendshipsRepository.GetAcceptedFriendsAsync(user.Id);
+            List<Friendship> incoming = await _friendshipsRepository.GetIncomingRequestsAsync(user.Id);
+            List<Friendship> outgoing = await _friendshipsRepository.GetOutgoingRequestsAsync(user.Id);
 
-            var incoming = await _db.Friendships
-                .Include(f => f.Requester)
-                .Where(f => f.AddresseeId == user.Id && f.Status == FriendshipStatus.Pending)
-                .ToListAsync();
+            List<string> activeSessionUserIds = await _sessionRepository.GetActiveSessionUserIds();
+            HashSet<string> activeSessionSet = new HashSet<string>(activeSessionUserIds);
 
-            var outgoing = await _db.Friendships
-                .Include(f => f.Addressee)
-                .Where(f => f.RequesterId == user.Id && f.Status == FriendshipStatus.Pending)
-                .ToListAsync();
+            FriendsListResponse response = new FriendsListResponse();
 
-            var activeSessionUserIds = await _db.LauncherSessions
-                .Where(s => s.ExpiresAt > DateTime.UtcNow)
-                .Select(s => s.UserId)
-                .Distinct()
-                .ToListAsync();
-
-            var activeSessionSet = new HashSet<string>(activeSessionUserIds);
-
-            var response = new FriendsListResponse();
-
-            foreach (var f in accepted)
+            foreach (Friendship friendship in accepted)
             {
-                var isRequester = f.RequesterId == user.Id;
-                var other = isRequester ? f.Addressee : f.Requester;
+                bool isRequester = friendship.RequesterId == user.Id;
+                VmsIdentityUser? other = isRequester ? friendship.Addressee : friendship.Requester;
                 if (other == null) continue;
 
-                var otherName = other.UserName ?? "Player";
+                string otherName = other.UserName ?? "Player";
                 response.Friends.Add(new FriendDto
                 {
-                    FriendshipId = f.Id,
+                    FriendshipId = friendship.Id,
                     UserId = other.Id,
                     Username = otherName,
                     AvatarUrl = $"/api/skin/{otherName}.png",
                     IsOnline = activeSessionSet.Contains(other.Id),
                     Status = "Accepted",
-                    CreatedAt = f.CreatedAt
+                    CreatedAt = friendship.CreatedAt
                 });
             }
 
-            foreach (var req in incoming)
+            foreach (Friendship friendshipRequest in incoming)
             {
-                if (req.Requester == null) continue;
-                var rName = req.Requester.UserName ?? "Player";
+                if (friendshipRequest.Requester == null) continue;
+                string rName = friendshipRequest.Requester.UserName ?? "Player";
                 response.IncomingRequests.Add(new FriendRequestDto
                 {
-                    FriendshipId = req.Id,
-                    RequesterId = req.RequesterId,
+                    FriendshipId = friendshipRequest.Id,
+                    RequesterId = friendshipRequest.RequesterId,
                     RequesterUsername = rName,
                     AvatarUrl = $"/api/skin/{rName}.png",
-                    CreatedAt = req.CreatedAt
+                    CreatedAt = friendshipRequest.CreatedAt
                 });
             }
 
-            foreach (var req in outgoing)
+            foreach (Friendship friendshipRequest in outgoing)
             {
-                if (req.Addressee == null) continue;
-                var aName = req.Addressee.UserName ?? "Player";
+                if (friendshipRequest.Addressee == null) continue;
+                string aName = friendshipRequest.Addressee.UserName ?? "Player";
                 response.OutgoingRequests.Add(new FriendRequestDto
                 {
-                    FriendshipId = req.Id,
-                    RequesterId = req.RequesterId,
+                    FriendshipId = friendshipRequest.Id,
+                    RequesterId = friendshipRequest.RequesterId,
                     RequesterUsername = aName,
                     AvatarUrl = $"/api/skin/{aName}.png",
-                    CreatedAt = req.CreatedAt
+                    CreatedAt = friendshipRequest.CreatedAt
                 });
             }
 
             return Ok(response);
-        }
-
-        public class SendRequestModel
-        {
-            public string Requester { get; set; } = string.Empty;
-            public string Target { get; set; } = string.Empty;
         }
 
         [HttpPost("request")]
@@ -151,68 +107,57 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             if (string.IsNullOrWhiteSpace(model.Requester) || string.IsNullOrWhiteSpace(model.Target))
                 return BadRequest(new { error = "Requester and Target required." });
 
-            var cleanRequester = Path.GetFileNameWithoutExtension(model.Requester).Trim();
-            var cleanTarget = Path.GetFileNameWithoutExtension(model.Target).Trim();
+            string cleanRequester = model.Requester.Trim();
+            string cleanTarget = model.Target.Trim();
 
             if (cleanRequester.Equals(cleanTarget, StringComparison.OrdinalIgnoreCase))
                 return BadRequest(new { error = "Cannot add yourself as a friend." });
 
-            var reqUser = await _userManager.FindByNameAsync(cleanRequester);
-            var tarUser = await _userManager.FindByNameAsync(cleanTarget);
+            VmsIdentityUser? requestUser = await _userManager.FindByNameAsync(cleanRequester);
+            VmsIdentityUser? tarUser = await _userManager.FindByNameAsync(cleanTarget);
 
-            if (reqUser == null || tarUser == null)
+            if (requestUser == null || tarUser == null)
                 return NotFound(new { error = "User not found." });
 
-            var existing = await _db.Friendships
-                .FirstOrDefaultAsync(f =>
-                    (f.RequesterId == reqUser.Id && f.AddresseeId == tarUser.Id) ||
-                    (f.RequesterId == tarUser.Id && f.AddresseeId == reqUser.Id));
+            Friendship? existing = await _friendshipsRepository.GetFriendshipBetweenAsync(requestUser.Id, tarUser.Id);
 
             if (existing != null)
             {
-                if (existing.Status == FriendshipStatus.Accepted)
+                if (existing.Status == Friendship.FriendshipStatus.Accepted)
                     return BadRequest(new { error = "Already friends." });
 
-                if (existing.Status == FriendshipStatus.Pending)
+                if (existing.Status == Friendship.FriendshipStatus.Pending)
                 {
                     if (existing.RequesterId == tarUser.Id)
                     {
-                        existing.Status = FriendshipStatus.Accepted;
+                        existing.Status = Friendship.FriendshipStatus.Accepted;
                         existing.UpdatedAt = DateTime.UtcNow;
-                        await _db.SaveChangesAsync();
+                        await _friendshipsRepository.UpdateFriendship(existing);
                         return Ok(new { success = true, status = "Accepted", message = "Friend request accepted." });
                     }
                     return BadRequest(new { error = "Friend request already sent." });
                 }
 
-                existing.Status = FriendshipStatus.Pending;
-                existing.RequesterId = reqUser.Id;
+                existing.Status = Friendship.FriendshipStatus.Pending;
+                existing.RequesterId = requestUser.Id;
                 existing.AddresseeId = tarUser.Id;
                 existing.CreatedAt = DateTime.UtcNow;
                 existing.UpdatedAt = null;
-                await _db.SaveChangesAsync();
+                await _friendshipsRepository.UpdateFriendship(existing);
                 return Ok(new { success = true, status = "Pending", message = "Friend request sent." });
             }
 
-            var friendship = new Friendship
+            Friendship friendship = new Friendship
             {
-                RequesterId = reqUser.Id,
+                RequesterId = requestUser.Id,
                 AddresseeId = tarUser.Id,
-                Status = FriendshipStatus.Pending,
+                Status = Friendship.FriendshipStatus.Pending,
                 CreatedAt = DateTime.UtcNow
             };
 
-            _db.Friendships.Add(friendship);
-            await _db.SaveChangesAsync();
+            await _friendshipsRepository.AddFriendship(friendship);
 
             return Ok(new { success = true, status = "Pending", message = "Friend request sent." });
-        }
-
-        public class RespondModel
-        {
-            public int FriendshipId { get; set; }
-            public string Username { get; set; } = string.Empty;
-            public bool Accept { get; set; }
         }
 
         [HttpPost("respond")]
@@ -221,12 +166,12 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             if (string.IsNullOrWhiteSpace(model.Username))
                 return BadRequest(new { error = "Username required." });
 
-            var cleanUser = Path.GetFileNameWithoutExtension(model.Username).Trim();
-            var user = await _userManager.FindByNameAsync(cleanUser);
+            string cleanUser = Path.GetFileNameWithoutExtension(model.Username).Trim();
+            VmsIdentityUser? user = await _userManager.FindByNameAsync(cleanUser);
             if (user == null)
                 return NotFound(new { error = "User not found." });
 
-            var friendship = await _db.Friendships.FirstOrDefaultAsync(f => f.Id == model.FriendshipId);
+            Friendship? friendship = await _friendshipsRepository.GetFriendshipById(model.FriendshipId);
             if (friendship == null)
                 return NotFound(new { error = "Friendship not found." });
 
@@ -235,23 +180,16 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
 
             if (model.Accept)
             {
-                friendship.Status = FriendshipStatus.Accepted;
+                friendship.Status = Friendship.FriendshipStatus.Accepted;
                 friendship.UpdatedAt = DateTime.UtcNow;
-                await _db.SaveChangesAsync();
+                await _friendshipsRepository.UpdateFriendship(friendship);
                 return Ok(new { success = true, status = "Accepted" });
             }
             else
             {
-                _db.Friendships.Remove(friendship);
-                await _db.SaveChangesAsync();
+                await _friendshipsRepository.RemoveFriendship(friendship);
                 return Ok(new { success = true, status = "Declined" });
             }
-        }
-
-        public class RemoveFriendModel
-        {
-            public string Username { get; set; } = string.Empty;
-            public string Target { get; set; } = string.Empty;
         }
 
         [HttpPost("remove")]
@@ -260,35 +198,23 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             if (string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Target))
                 return BadRequest(new { error = "Username and Target required." });
 
-            var cleanUser = Path.GetFileNameWithoutExtension(model.Username).Trim();
-            var cleanTarget = Path.GetFileNameWithoutExtension(model.Target).Trim();
+            string cleanUser = Path.GetFileNameWithoutExtension(model.Username).Trim();
+            string cleanTarget = Path.GetFileNameWithoutExtension(model.Target).Trim();
 
-            var u1 = await _userManager.FindByNameAsync(cleanUser);
-            var u2 = await _userManager.FindByNameAsync(cleanTarget);
+            VmsIdentityUser? u1 = await _userManager.FindByNameAsync(cleanUser);
+            VmsIdentityUser? u2 = await _userManager.FindByNameAsync(cleanTarget);
 
             if (u1 == null || u2 == null)
                 return NotFound(new { error = "User not found." });
 
-            var friendship = await _db.Friendships.FirstOrDefaultAsync(f =>
-                (f.RequesterId == u1.Id && f.AddresseeId == u2.Id) ||
-                (f.RequesterId == u2.Id && f.AddresseeId == u1.Id));
+            Friendship? friendship = await _friendshipsRepository.GetFriendshipBetweenAsync(u1.Id, u2.Id);
 
             if (friendship == null)
                 return NotFound(new { error = "Friendship not found." });
 
-            _db.Friendships.Remove(friendship);
-            await _db.SaveChangesAsync();
+            await _friendshipsRepository.RemoveFriendship(friendship);
 
             return Ok(new { success = true, message = "Friend removed." });
-        }
-
-        public class SearchUserDto
-        {
-            public string Id { get; set; } = string.Empty;
-            public string Username { get; set; } = string.Empty;
-            public string AvatarUrl { get; set; } = string.Empty;
-            public bool IsFriend { get; set; }
-            public bool IsPending { get; set; }
         }
 
         [HttpGet("search")]
@@ -297,38 +223,36 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             if (string.IsNullOrWhiteSpace(q) || q.Trim().Length < 2)
                 return Ok(new List<SearchUserDto>());
 
-            var query = q.Trim().ToLower();
-            var currentUser = !string.IsNullOrWhiteSpace(current) ? await _userManager.FindByNameAsync(current.Trim()) : null;
+            string query = q.Trim().ToLower();
+            VmsIdentityUser? currentUser = !string.IsNullOrWhiteSpace(current) ? await _userManager.FindByNameAsync(current.Trim()) : null;
 
-            var matchedUsers = await _userManager.Users
+            List<VmsIdentityUser> matchedUsers = await _userManager.Users
                 .Where(u => u.UserName != null && u.UserName.ToLower().Contains(query))
                 .Take(15)
                 .ToListAsync();
 
-            var friendIds = new HashSet<string>();
-            var pendingIds = new HashSet<string>();
+            HashSet<string> friendIds = new HashSet<string>();
+            HashSet<string> pendingIds = new HashSet<string>();
 
             if (currentUser != null)
             {
-                var friendships = await _db.Friendships
-                    .Where(f => f.RequesterId == currentUser.Id || f.AddresseeId == currentUser.Id)
-                    .ToListAsync();
+                List<Friendship> friendships = await _friendshipsRepository.GetAllFriendshipsForUser(currentUser.Id);
 
-                foreach (var f in friendships)
+                foreach (Friendship f in friendships)
                 {
-                    var otherId = f.RequesterId == currentUser.Id ? f.AddresseeId : f.RequesterId;
-                    if (f.Status == FriendshipStatus.Accepted)
+                    string otherId = f.RequesterId == currentUser.Id ? f.AddresseeId : f.RequesterId;
+                    if (f.Status == Friendship.FriendshipStatus.Accepted)
                         friendIds.Add(otherId);
-                    else if (f.Status == FriendshipStatus.Pending)
+                    else if (f.Status == Friendship.FriendshipStatus.Pending)
                         pendingIds.Add(otherId);
                 }
             }
 
-            var result = new List<SearchUserDto>();
-            foreach (var u in matchedUsers)
+            List<SearchUserDto> result = new List<SearchUserDto>();
+            foreach (VmsIdentityUser u in matchedUsers)
             {
                 if (currentUser != null && u.Id == currentUser.Id) continue;
-                var uName = u.UserName ?? "Player";
+                string uName = u.UserName ?? "Player";
                 result.Add(new SearchUserDto
                 {
                     Id = u.Id,

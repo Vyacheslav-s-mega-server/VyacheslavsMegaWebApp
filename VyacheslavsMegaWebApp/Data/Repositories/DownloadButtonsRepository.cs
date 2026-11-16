@@ -3,8 +3,10 @@ using VyacheslavsMegaWebApp.Data.Entities;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class DownloadButtonsRepository : Base.RepositoryBase
+    public class DownloadButtonsRepository : Base.DbRepository
     {
+        public DownloadButtonsRepository(AppDbContext db) : base(db) { }
+
         public async Task<List<DownloadButton>> GetAllButtons()
         {
             return await DB.DownloadButtons.ToListAsync() ?? new List<DownloadButton>();

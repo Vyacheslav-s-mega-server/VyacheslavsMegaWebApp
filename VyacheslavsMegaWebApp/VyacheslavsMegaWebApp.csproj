@@ -44,10 +44,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Data\Repositories\Database\" />
     <Folder Include="wwwroot\uploaded-resources\img\partners\" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="AppResources\EmailTemplates\EmailChange\Template.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="AppResources\EmailTemplates\EmailChange\Template.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="AppResources\EmailTemplates\EmailConfirmation\Template.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

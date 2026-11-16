@@ -11,5 +11,9 @@
         public string Category { get; set; } = "Core";
         public string DisplayName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string? IconUrl { get; set; }
+        public string? BannerUrl { get; set; }
+        public string? ModrinthSlug { get; set; }
+        public string? Source { get; set; }
     }
 }

@@ -1,0 +1,148 @@
+@model List<VyacheslavsMegaWebApp.Data.Entities.CustomCape>
+
+<div class="block block--first">
+    <div class="container">
+        <div class="section">
+            <h2 class="section__title section__title--main">Управление плащами и промокодами</h2>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="mc-table-container" style="color: #27ae60; font-weight: bold; margin-bottom: 10px;">
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="mc-table-container" style="color: #c0392b; font-weight: bold; margin-bottom: 10px;">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="mc-table-container">
+                <table class="mc-table mc-table--wide">
+                    <tr class="mc-table--center-aligment">
+                        <td style="width: 60px;">Вид</td>
+                        <td>Название</td>
+                        <td>Идентификатор</td>
+                        <td>Доступ</td>
+                        <td>Промокоды</td>
+                        <td>Владельцев</td>
+                        <td>Дата создания</td>
+                        <td colspan="3">Действия</td>
+                    </tr>
+                    @if (Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="10" style="text-align: center; color: #7f8c8d; padding: 20px;">
+                                Плащей пока нет. Нажмите «Добавить плащ» ниже.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var cape in Model)
+                    {
+                        var totalCodes = cape.Codes.Count;
+                        var usedCodes = cape.Codes.Count(c => c.IsUsed);
+                        var freeCodes = totalCodes - usedCodes;
+
+                        <tr>
+                            <td class="mc-table--center-aligment">
+                                <div style="display: inline-block; width: 44px; height: 70px; background: #1a1a1a; border: 1px solid #333; vertical-align: middle;">
+                                    <canvas class="cape-canvas-admin" width="44" height="70" data-hash="@cape.TextureHash"></canvas>
+                                </div>
+                            </td>
+                            <td>
+                                <b>@cape.Name</b>
+                                @if (!string.IsNullOrEmpty(cape.Description))
+                                {
+                                    <div style="font-size: 12px; color: #7f8c8d; margin-top: 2px;">@cape.Description</div>
+                                }
+                            </td>
+                            <td><code>@cape.Slug</code></td>
+                            <td class="mc-table--center-aligment">
+                                @(cape.IsPublic ? "Публичный" : "По промокодам")
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                @if (cape.IsPublic)
+                                {
+                                    <span>—</span>
+                                }
+                                else
+                                {
+                                    <span>@freeCodes своб. / @usedCodes исп.</span>
+                                }
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                @cape.Ownerships.Count
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                @cape.CreatedAt.ToString("dd.MM.yyyy")
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                @if (!cape.IsPublic)
+                                {
+                                    <a asp-action="Codes" asp-route-id="@cape.Id">Коды (@freeCodes)</a>
+                                }
+                                else
+                                {
+                                    <span>—</span>
+                                }
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                <a asp-action="Edit" asp-route-id="@cape.Id">Редактировать</a>
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                @if (cape.Slug != "vec")
+                                {
+                                    <form asp-action="DeleteCape" method="post" style="display: inline;" onsubmit="return confirm('Удалить плащ «@cape.Name» и все его промокоды?');">
+                                        <input type="hidden" name="id" value="@cape.Id" />
+                                        <button type="submit" style="background: none; border: none; color: #c0392b; cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; font-size: inherit;">
+                                            Удалить
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span style="color: #7f8c8d;">Базовый</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+
+            <div class="button-container">
+                <a asp-action="Create">
+                    <button class="mc-button">
+                        <span class="mc-button__title">Добавить плащ</span>
+                    </button>
+                </a>
+                <a asp-area="Admin" asp-controller="Home" asp-action="Index">
+                    <button class="mc-button">
+                        <span class="mc-button__title">Назад в админку</span>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const canvases = document.querySelectorAll('.cape-canvas-admin');
+        canvases.forEach(canvas => {
+            const hash = canvas.getAttribute('data-hash');
+            if (!hash) return;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Draw cape front from texture coordinates (sx=1, sy=1, sw=10, sh=16)
+                ctx.drawImage(img, 1, 1, 10, 16, 2, 3, 40, 64);
+            };
+            img.src = '/textures/' + hash;
+        });
+    });
+</script>

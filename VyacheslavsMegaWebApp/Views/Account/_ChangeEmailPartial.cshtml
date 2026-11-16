@@ -1,0 +1,16 @@
+﻿@model ChangeEmailViewModel
+
+<form class="form account-form" asp-controller="Account" asp-action="RequestEmailChange" id="changeEmailForm" method="post" style="max-width: 520px;">
+    <div asp-validation-summary='All' class="mc-status-bar mc-status-bar--danger"></div>
+    
+    <div class="form-group" style="margin-bottom: 18px;">
+        <label class="settings-field-label">Новая электронная почта</label>
+        <input class="field__input" asp-for="NewEmail" placeholder="name@example.com" />
+    </div>
+
+    <div>
+        <button class="btn-download-auth" type="submit" style="width: auto; padding: 12px 28px;">
+            <span>Подтвердить смену почты</span>
+        </button>
+    </div>
+</form>

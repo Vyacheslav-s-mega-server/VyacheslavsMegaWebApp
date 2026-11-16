@@ -26,13 +26,26 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
         {
             var root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
             var launcherPath = Path.Combine(root, "downloads", "VECLauncher.exe");
-            var fileInfo = new FileInfo(launcherPath);
+            var launcherInfo = new FileInfo(launcherPath);
+
+            var setupPath = Path.Combine(root, "downloads", "VEC_Setup.exe");
+            var setupInfo = new FileInfo(setupPath);
+
+            var zipPath = Path.Combine(root, "downloads", "VECLauncher-win-x64.zip");
+            var zipInfo = new FileInfo(zipPath);
 
             var model = new DownloadButtonsViewModel(await _downloadButtonssRepository.GetAllButtons())
             {
-                LauncherFileExists = fileInfo.Exists,
-                LauncherFileSizeBytes = fileInfo.Exists ? fileInfo.Length : 0,
-                LauncherLastModified = fileInfo.Exists ? fileInfo.LastWriteTime : null
+                LauncherFileExists = launcherInfo.Exists,
+                LauncherFileSizeBytes = launcherInfo.Exists ? launcherInfo.Length : 0,
+                LauncherLastModified = launcherInfo.Exists ? launcherInfo.LastWriteTime : null,
+
+                SetupFileExists = setupInfo.Exists,
+                SetupFileSizeBytes = setupInfo.Exists ? setupInfo.Length : 0,
+                SetupLastModified = setupInfo.Exists ? setupInfo.LastWriteTime : null,
+
+                ZipFileExists = zipInfo.Exists,
+                ZipFileSizeBytes = zipInfo.Exists ? zipInfo.Length : 0
             };
             return View(model);
         }
@@ -44,7 +57,7 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
         {
             if (launcherFile == null || launcherFile.Length == 0)
             {
-                TempData["Error"] = "Пожалуйста, выберите .exe файл лаунчера для загрузки.";
+                TempData["Error"] = "Пожалуйста, выберите .exe файл для загрузки.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -64,8 +77,11 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
                     Directory.CreateDirectory(dir);
                 }
 
-                var targetPath = Path.Combine(dir, "VECLauncher.exe");
-                var tempPath = Path.Combine(dir, "VECLauncher.exe.tmp");
+                var isSetup = launcherFile.FileName.Contains("Setup", StringComparison.OrdinalIgnoreCase);
+                var targetFileName = isSetup ? "VEC_Setup.exe" : "VECLauncher.exe";
+
+                var targetPath = Path.Combine(dir, targetFileName);
+                var tempPath = Path.Combine(dir, targetFileName + ".tmp");
 
                 if (System.IO.File.Exists(tempPath))
                 {
@@ -85,7 +101,7 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
                 System.IO.File.Move(tempPath, targetPath);
 
                 var mb = launcherFile.Length / (1024.0 * 1024.0);
-                TempData["Success"] = $"Файл VECLauncher.exe успешно обновлён ({mb:F2} МБ)!";
+                TempData["Success"] = $"Файл {targetFileName} успешно обновлён ({mb:F2} МБ)!";
             }
             catch (Exception ex)
             {

@@ -307,6 +307,83 @@
 
                     </div>
 
+                    <!-- Microsoft / Xbox License Card -->
+                    <div class="profile-card" id="msLicenseCardSection" style="margin-top: 24px;">
+                        <div class="profile-card__head" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
+                                    <rect x="13" y="1" width="10" height="10" fill="#7FBA00"/>
+                                    <rect x="1" y="13" width="10" height="10" fill="#00A4EF"/>
+                                    <rect x="13" y="13" width="10" height="10" fill="#FFB900"/>
+                                </svg>
+                                <h2 class="profile-card__title">Лицензия Minecraft (Microsoft / Xbox)</h2>
+                            </div>
+                            @if (Model.HasMinecraftLicense)
+                            {
+                                <span class="status-badge status-badge--success">Лицензия активна</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-badge--warn">Не привязана</span>
+                            }
+                        </div>
+
+                        <div style="font-size: 14px; color: #9ca3af; margin-bottom: 20px; font-family: 'minecraft', sans-serif; text-shadow: none !important;">
+                            Привязка официальной учетной записи Microsoft / Xbox к VMS ID.
+                        </div>
+
+                        @if (Model.HasMinecraftLicense)
+                        {
+                            <div class="settings-info-list" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px;">
+                                <div class="settings-info-row" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #838a9a;">Xbox Gamertag / Имя в игре</span>
+                                    <span style="font-size: 15px; color: #34d399; font-weight: 700;">@Model.MicrosoftGamertag</span>
+                                </div>
+                                <div class="settings-info-row" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #838a9a;">Minecraft UUID</span>
+                                    <span style="font-size: 15px; color: #ffffff;"><code style="color: #f59e0b; background: transparent; padding: 0;">@Model.MicrosoftUuid</code></span>
+                                </div>
+                                <div class="settings-info-row" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #838a9a;">Дата привязки</span>
+                                    <span style="font-size: 15px; color: #ffffff;">@(Model.MicrosoftLicenseLinkedAt?.ToString("dd.MM.yyyy HH:mm") ?? "—")</span>
+                                </div>
+                                <div class="settings-info-row" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #838a9a;">Официальные плащи Mojang</span>
+                                    <span style="font-size: 15px; color: #ffffff;">
+                                        Доступно в гардеробе: <b style="color: #60a5fa;">@Model.MojangCapes.Count</b>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <button type="button" class="panel-btn panel-btn--secondary" onclick="unlinkMicrosoftAccount()" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                                    <span>Отвязать лицензию</span>
+                                </button>
+                                <button type="button" class="panel-btn panel-btn--secondary" onclick="syncOfficialSkin()" id="syncSkinBtn">
+                                    <i class='bx bx-refresh'></i> <span>Синхронизировать скин Mojang</span>
+                                </button>
+                                <button type="button" class="panel-btn panel-btn--primary" onclick="startMicrosoftLink()">
+                                    <span>Синхронизировать плащи</span>
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <button type="button" class="btn-download-auth" onclick="startMicrosoftLink()" style="width: auto; padding: 12px 28px; display: inline-flex; align-items: center; gap: 10px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
+                                        <rect x="13" y="1" width="10" height="10" fill="#7FBA00"/>
+                                        <rect x="1" y="13" width="10" height="10" fill="#00A4EF"/>
+                                        <rect x="13" y="13" width="10" height="10" fill="#FFB900"/>
+                                    </svg>
+                                    <span>Привязать аккаунт Microsoft</span>
+                                </button>
+                            </div>
+                        }
+                    </div>
+
                 </div>
 
                 <!-- TAB 2: ГАРДЕРОБ -->
@@ -418,6 +495,21 @@
                                 </div>
                             }
                         </div>
+
+                        <!-- Redeem Promo Code Section -->
+                        <div class="mc-capes-card__header" style="margin-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 20px;">
+                            <h3 class="mc-capes-card__title">АКТИВАЦИЯ ПРОМОКОДА НА ПЛАЩ</h3>
+                            <p class="mc-capes-card__desc">
+                                Введите полученный промокод для разблокировки и надевания плаща.
+                            </p>
+                            <div style="display: flex; gap: 10px; max-width: 500px; flex-wrap: wrap; margin-top: 12px;">
+                                <input type="text" id="capeRedeemCodeInput" class="field__input-profile" placeholder="VEC-XXXX-XXXX-XXXX" style="flex: 1; min-width: 180px; text-transform: uppercase; font-family: monospace; font-size: 14px; letter-spacing: 1px;" maxlength="40" />
+                                <button type="button" class="panel-btn panel-btn--secondary" id="btnRedeemCape" onclick="submitCapeCode()">
+                                    <span>Активировать</span>
+                                </button>
+                            </div>
+                            <div id="redeemCodeStatusMsg" style="margin-top: 10px; font-size: 13px; display: none;"></div>
+                        </div>
                     </div>
 
                 </div>
@@ -461,6 +553,8 @@
         </div>
     </div>
 </div>
+
+<partial name="_MicrosoftLinkModalPartial" />
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -797,6 +891,117 @@
                         });
                     }
                 } catch (e) {}
+            }
+        }
+
+        async function syncOfficialSkin() {
+            const btn = document.getElementById('syncSkinBtn');
+            if (btn) btn.disabled = true;
+            try {
+                const res = await fetch('/Account/SyncMojangSkin', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    if (data.skinUrl && skinViewer) {
+                        skinViewer.loadSkin(data.skinUrl, { model: data.model || 'classic' });
+                        currentSkinModel = data.model || 'classic';
+                        const modelSwitch = document.getElementById('modelSwitch');
+                        if (modelSwitch) modelSwitch.checked = (currentSkinModel === 'slim');
+                        const statusVal = document.getElementById('modelStatusVal');
+                        if (statusVal) statusVal.textContent = currentSkinModel === 'slim' ? 'Slim' : 'Classic';
+                    }
+                    if (data.minecraftUsername) {
+                        const mcInput = document.getElementById('mcNameInput');
+                        if (mcInput) mcInput.value = data.minecraftUsername;
+                        const metaItems = document.querySelectorAll('.profile-header__meta .meta-item');
+                        metaItems.forEach(item => {
+                            if (item.textContent.trim().startsWith('Minecraft:')) {
+                                item.textContent = 'Minecraft: ' + data.minecraftUsername;
+                            }
+                        });
+                    }
+                    alert(data.message || 'Официальный скин Mojang успешно установлен!');
+                } else {
+                    alert(data.error || 'Не удалось синхронизировать скин.');
+                }
+            } catch (err) {
+                alert('Ошибка сети при синхронизации скина.');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function submitCapeCode() {
+            const input = document.getElementById('capeRedeemCodeInput');
+            const btn = document.getElementById('btnRedeemCape');
+            const msg = document.getElementById('redeemCodeStatusMsg');
+            if (!input) return;
+
+            const code = input.value.trim();
+            if (!code) {
+                if (msg) {
+                    msg.style.display = 'block';
+                    msg.style.color = '#c0392b';
+                    msg.textContent = 'Пожалуйста, введите промокод.';
+                }
+                return;
+            }
+
+            btn.disabled = true;
+            if (msg) msg.style.display = 'none';
+
+            try {
+                const res = await fetch('/Account/RedeemCapeCode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    input.value = '';
+                    if (msg) {
+                        msg.style.display = 'block';
+                        msg.style.color = '#27ae60';
+                        msg.textContent = data.message;
+                    }
+
+                    if (data.cape) {
+                        const grid = document.getElementById('mcCapesGrid');
+                        if (grid) {
+                            const newCapeEl = document.createElement('div');
+                            newCapeEl.className = 'mc-cape-item';
+                            newCapeEl.setAttribute('data-cape-id', data.cape.id);
+                            newCapeEl.setAttribute('data-cape-url', data.cape.previewUrl);
+                            newCapeEl.onclick = () => selectCape(data.cape.id);
+                            newCapeEl.innerHTML = `
+                                <div class="mc-cape-item__preview">
+                                    <canvas class="mc-cape-item__canvas" width="44" height="70" data-cape-url="${data.cape.previewUrl}"></canvas>
+                                </div>
+                                <div class="mc-cape-item__footer">
+                                    <span class="mc-radio-circle"></span>
+                                    <span class="mc-cape-item__name" title="${data.cape.name}">${data.cape.name}</span>
+                                </div>
+                            `;
+                            grid.appendChild(newCapeEl);
+                            renderAllCapeCanvases();
+                            selectCape(data.cape.id);
+                        }
+                    }
+                } else {
+                    if (msg) {
+                        msg.style.display = 'block';
+                        msg.style.color = '#c0392b';
+                        msg.textContent = data.message || 'Ошибка активации кода.';
+                    }
+                }
+            } catch {
+                if (msg) {
+                    msg.style.display = 'block';
+                    msg.style.color = '#c0392b';
+                    msg.textContent = 'Ошибка сети. Попробуйте еще раз.';
+                }
+            } finally {
+                btn.disabled = false;
             }
         }
 

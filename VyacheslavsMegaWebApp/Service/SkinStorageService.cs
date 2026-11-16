@@ -6,16 +6,19 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace VyacheslavsMegaWebApp.Service
 {
     public class SkinStorageService
     {
         private readonly IWebHostEnvironment _env;
+        private readonly IServiceProvider _serviceProvider;
 
-        public SkinStorageService(IWebHostEnvironment env)
+        public SkinStorageService(IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             _env = env;
+            _serviceProvider = serviceProvider;
             EnsureDirectories();
         }
 
@@ -209,8 +212,50 @@ namespace VyacheslavsMegaWebApp.Service
             catch { }
         }
 
+        public string ResolveUsername(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username)) return username;
+            var clean = username.Trim();
+
+            var directSkin = Path.Combine(WebUploadsSkinDir, $"{clean}.png");
+            var directMeta = Path.Combine(WebUploadsSkinDir, $"{clean}.json");
+            var directProfile = Path.Combine(WebUploadsProfileDir, $"{clean}.json");
+            if (File.Exists(directSkin) || File.Exists(directMeta) || File.Exists(directProfile))
+            {
+                return clean;
+            }
+
+            try
+            {
+                if (Directory.Exists(WebUploadsProfileDir))
+                {
+                    foreach (var file in Directory.EnumerateFiles(WebUploadsProfileDir, "*.json"))
+                    {
+                        try
+                        {
+                            var json = File.ReadAllText(file);
+                            using var doc = JsonDocument.Parse(json);
+                            if (doc.RootElement.TryGetProperty("minecraftUsername", out var m))
+                            {
+                                var mcNick = m.GetString();
+                                if (!string.IsNullOrEmpty(mcNick) && string.Equals(mcNick, clean, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    return Path.GetFileNameWithoutExtension(file);
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
+
+            return clean;
+        }
+
         public string? GetSkinHash(string username)
         {
+            username = ResolveUsername(username);
             var metaFile = Path.Combine(WebUploadsSkinDir, $"{username}.json");
             if (File.Exists(metaFile))
             {
@@ -240,6 +285,7 @@ namespace VyacheslavsMegaWebApp.Service
 
         public string? GetCapeHash(string username)
         {
+            username = ResolveUsername(username);
             var metaFile = Path.Combine(WebUploadsSkinDir, $"{username}.json");
             if (File.Exists(metaFile))
             {
@@ -269,6 +315,7 @@ namespace VyacheslavsMegaWebApp.Service
 
         public string GetSkinModel(string username)
         {
+            username = ResolveUsername(username);
             var metaFile = Path.Combine(WebUploadsSkinDir, $"{username}.json");
             if (File.Exists(metaFile))
             {
@@ -310,6 +357,7 @@ namespace VyacheslavsMegaWebApp.Service
 
         public byte[] GetSkinBytes(string username)
         {
+            username = ResolveUsername(username);
             var metaFile = Path.Combine(WebUploadsSkinDir, $"{username}.json");
             if (File.Exists(metaFile))
             {
@@ -435,6 +483,7 @@ namespace VyacheslavsMegaWebApp.Service
 
         public bool HasCape(string username)
         {
+            username = ResolveUsername(username);
             var metaFile = Path.Combine(WebUploadsSkinDir, $"{username}.json");
             if (File.Exists(metaFile))
             {
@@ -465,6 +514,7 @@ namespace VyacheslavsMegaWebApp.Service
 
         public byte[]? GetCapeBytes(string username)
         {
+            username = ResolveUsername(username);
             var metaFile = Path.Combine(WebUploadsSkinDir, $"{username}.json");
             if (File.Exists(metaFile))
             {
@@ -562,29 +612,130 @@ namespace VyacheslavsMegaWebApp.Service
                     return "vec_default";
             }
 
+            var mojangDir = Path.Combine(WebImgCapesDir, "mojang");
+            if (!Directory.Exists(mojangDir))
+            {
+                var fallback = Path.Combine(_env.ContentRootPath, "wwwroot", "img", "capes", "mojang");
+                if (Directory.Exists(fallback)) mojangDir = fallback;
+            }
+
+            if (Directory.Exists(mojangDir))
+            {
+                foreach (var file in Directory.GetFiles(mojangDir, "*.png"))
+                {
+                    try
+                    {
+                        var mcBytes = File.ReadAllBytes(file);
+                        if (userCape.SequenceEqual(mcBytes))
+                        {
+                            var mcId = Path.GetFileNameWithoutExtension(file);
+                            return $"mojang_{mcId}";
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            try
+            {
+                var userCapeHash = GetCapeHash(username);
+                if (!string.IsNullOrEmpty(userCapeHash))
+                {
+                    using var scope = _serviceProvider.CreateScope();
+                    var db = scope.ServiceProvider.GetRequiredService<Data.AppDbContext>();
+                    var custom = db.CustomCapes.FirstOrDefault(c => c.TextureHash == userCapeHash);
+                    if (custom != null)
+                    {
+                        return custom.Slug == "vec" ? "vec_default" : $"custom_{custom.Id}";
+                    }
+                }
+            }
+            catch { }
+
             return "custom";
         }
 
         public bool EquipLauncherCape(string username, string capeId)
         {
             EnsureDirectories();
-            string? templateFile = capeId switch
-            {
-                "vec_default" or "vec" => "cape_vec.png",
-                _ => null
-            };
+            string? srcPath = null;
+            byte[]? directBytes = null;
 
-            if (templateFile == null) return false;
-
-            var srcPath = Path.Combine(WebImgCapesDir, templateFile);
-            if (!File.Exists(srcPath))
+            if (capeId.Equals("vec_default", StringComparison.OrdinalIgnoreCase) || capeId.Equals("vec", StringComparison.OrdinalIgnoreCase))
             {
-                var fallback = Path.Combine(_env.ContentRootPath, "wwwroot", "img", "capes", templateFile);
-                if (File.Exists(fallback)) srcPath = fallback;
-                else return false;
+                var p = Path.Combine(WebImgCapesDir, "cape_vec.png");
+                if (!File.Exists(p))
+                {
+                    var fallback = Path.Combine(_env.ContentRootPath, "wwwroot", "img", "capes", "cape_vec.png");
+                    if (File.Exists(fallback)) p = fallback;
+                }
+                if (File.Exists(p)) srcPath = p;
+            }
+            else if (capeId.StartsWith("mojang_", StringComparison.OrdinalIgnoreCase))
+            {
+                var mcId = capeId.Substring(7);
+                var p = Path.Combine(WebImgCapesDir, "mojang", $"{mcId}.png");
+                if (!File.Exists(p))
+                {
+                    var fallback = Path.Combine(_env.ContentRootPath, "wwwroot", "img", "capes", "mojang", $"{mcId}.png");
+                    if (File.Exists(fallback)) p = fallback;
+                }
+                if (File.Exists(p))
+                {
+                    srcPath = p;
+                }
+                else
+                {
+                    try
+                    {
+                        using var scope = _serviceProvider.CreateScope();
+                        var userMgr = scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<Data.Entities.Identity.VmsIdentityUser>>();
+                        var usr = userMgr.FindByNameAsync(username).GetAwaiter().GetResult();
+                        if (usr != null && !string.IsNullOrWhiteSpace(usr.OwnedMojangCapesJson))
+                        {
+                            var list = JsonSerializer.Deserialize<List<Models.MojangCapeInfo>>(usr.OwnedMojangCapesJson);
+                            var match = list?.FirstOrDefault(c => c.Id.Equals(mcId, StringComparison.OrdinalIgnoreCase) || c.Alias.Equals(mcId, StringComparison.OrdinalIgnoreCase));
+                            if (match != null && !string.IsNullOrEmpty(match.Url))
+                            {
+                                using var http = new HttpClient();
+                                directBytes = http.GetByteArrayAsync(match.Url).GetAwaiter().GetResult();
+                                if (directBytes != null && directBytes.Length > 0)
+                                {
+                                    var dir = Path.Combine(WebImgCapesDir, "mojang");
+                                    Directory.CreateDirectory(dir);
+                                    File.WriteAllBytes(Path.Combine(dir, $"{mcId}.png"), directBytes);
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            else if (capeId.StartsWith("custom_", StringComparison.OrdinalIgnoreCase))
+            {
+                var idStr = capeId.Substring(7);
+                try
+                {
+                    using var scope = _serviceProvider.CreateScope();
+                    var db = scope.ServiceProvider.GetRequiredService<Data.AppDbContext>();
+                    int.TryParse(idStr, out var cId);
+                    var cape = db.CustomCapes.FirstOrDefault(c => c.Id == cId || c.Slug == idStr);
+                    if (cape != null)
+                    {
+                        directBytes = GetTextureBytesByHash(cape.TextureHash);
+                    }
+                }
+                catch { }
             }
 
-            var bytes = File.ReadAllBytes(srcPath);
+            byte[]? bytes = directBytes;
+            if (bytes == null && srcPath != null && File.Exists(srcPath))
+            {
+                bytes = File.ReadAllBytes(srcPath);
+            }
+
+            if (bytes == null || bytes.Length == 0) return false;
+
             var hash = SaveTextureBytes(bytes);
             UpdateUserSkinMeta(username, capeHash: hash);
 
@@ -618,6 +769,24 @@ namespace VyacheslavsMegaWebApp.Service
                     url = $"/textures/{hash}"
                 });
             }
+
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<Data.AppDbContext>();
+                var publicCapes = db.CustomCapes.Where(c => c.IsPublic).ToList();
+                foreach (var c in publicCapes)
+                {
+                    if (c.Slug == "vec") continue;
+                    list.Add(new
+                    {
+                        id = $"custom_{c.Id}",
+                        name = c.Name,
+                        url = $"/textures/{c.TextureHash}"
+                    });
+                }
+            }
+            catch { }
 
             return list;
         }

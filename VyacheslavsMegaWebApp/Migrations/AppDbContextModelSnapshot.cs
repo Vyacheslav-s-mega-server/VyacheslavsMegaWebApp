@@ -171,11 +171,58 @@ namespace VyacheslavsMegaWebApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.CapeRedeemCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("CapeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime?>("RedeemedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("RedeemedByUserId")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CapeId");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("RedeemedByUserId");
+
+                    b.ToTable("CapeRedeemCodes");
+                });
+
             modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.ClientBuildFile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("BannerUrl")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("BuildSlug")
                         .IsRequired()
@@ -200,8 +247,14 @@ namespace VyacheslavsMegaWebApp.Migrations
                     b.Property<long>("FileSizeBytes")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("IconUrl")
+                        .HasColumnType("longtext");
+
                     b.Property<bool>("IsRequired")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ModrinthSlug")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("RelativePath")
                         .IsRequired()
@@ -209,6 +262,9 @@ namespace VyacheslavsMegaWebApp.Migrations
 
                     b.Property<string>("Sha256")
                         .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SourceType")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -306,6 +362,46 @@ namespace VyacheslavsMegaWebApp.Migrations
                         });
                 });
 
+            modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.CustomCape", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("TextureHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("CustomCapes");
+                });
+
             modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.DonationCard", b =>
                 {
                     b.Property<int>("Id")
@@ -372,7 +468,8 @@ namespace VyacheslavsMegaWebApp.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
 
                     b.Property<string>("AddresseeId")
                         .IsRequired()
@@ -503,11 +600,23 @@ namespace VyacheslavsMegaWebApp.Migrations
                     b.Property<DateTime?>("EmailConfirmedCodeCreationTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<bool>("HasMinecraftLicense")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("MicrosoftGamertag")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("MicrosoftLicenseLinkedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("MicrosoftUuid")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -516,6 +625,9 @@ namespace VyacheslavsMegaWebApp.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
+
+                    b.Property<string>("OwnedMojangCapesJson")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("longtext");
@@ -552,16 +664,17 @@ namespace VyacheslavsMegaWebApp.Migrations
                         {
                             Id = "d4bc75a9-ca48-45aa-a3f2-2ea5886ce303",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "958cef03-4205-4adb-bc9f-85bf0291c544",
+                            ConcurrencyStamp = "bcb2feb1-69f9-4a5a-afc7-c61889b8f081",
                             Email = "vya4slav4617@gmail.com",
                             EmailConfirmed = true,
+                            HasMinecraftLicense = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "VYA4SLAV4617@GMAIL.COM",
                             NormalizedUserName = "EVRAY",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMkiRESPpwYF/7p1G/0jkJ4+HRuGXhvj4YuDs4QT2590mQ/pZ9wR4a84aOSEIYSyMA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPVnlOW4GZWq+O81hv6RmiM7KXXHSqd4L36/WsZ8b/0XIojIfMrvp05UTAijFR7MPw==",
                             PhoneNumber = "+7 (705) 806 3101",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1e7b369b-4631-4e38-a482-207e18fd7e2b",
+                            SecurityStamp = "afd96aec-53ae-4587-b06f-e54133e5dbf3",
                             TwoFactorEnabled = false,
                             UserName = "Evray"
                         });
@@ -585,15 +698,13 @@ namespace VyacheslavsMegaWebApp.Migrations
 
                     b.Property<byte[]>("SessionKeyHash")
                         .IsRequired()
-                        .HasColumnType("varbinary(3072)");
+                        .HasColumnType("longblob");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SessionKeyHash");
 
                     b.HasIndex("UserId");
 
@@ -840,6 +951,39 @@ namespace VyacheslavsMegaWebApp.Migrations
                         });
                 });
 
+            modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.UserCapeOwnership", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<DateTime>("AcquiredAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("AcquiredVia")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("CapeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CapeId");
+
+                    b.HasIndex("UserId", "CapeId")
+                        .IsUnique();
+
+                    b.ToTable("UserCapeOwnerships");
+                });
+
             modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.UserReport", b =>
                 {
                     b.Property<int>("Id")
@@ -916,6 +1060,23 @@ namespace VyacheslavsMegaWebApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.CapeRedeemCode", b =>
+                {
+                    b.HasOne("VyacheslavsMegaWebApp.Data.Entities.CustomCape", "Cape")
+                        .WithMany("Codes")
+                        .HasForeignKey("CapeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VyacheslavsMegaWebApp.Data.Entities.Identity.VmsIdentityUser", "RedeemedByUser")
+                        .WithMany()
+                        .HasForeignKey("RedeemedByUserId");
+
+                    b.Navigation("Cape");
+
+                    b.Navigation("RedeemedByUser");
+                });
+
             modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.Contact", b =>
                 {
                     b.HasOne("VyacheslavsMegaWebApp.Data.Entities.Identity.VmsIdentityUser", "User")
@@ -988,9 +1149,35 @@ namespace VyacheslavsMegaWebApp.Migrations
                     b.Navigation("Partner");
                 });
 
+            modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.UserCapeOwnership", b =>
+                {
+                    b.HasOne("VyacheslavsMegaWebApp.Data.Entities.CustomCape", "Cape")
+                        .WithMany("Ownerships")
+                        .HasForeignKey("CapeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VyacheslavsMegaWebApp.Data.Entities.Identity.VmsIdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cape");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.Contact", b =>
                 {
                     b.Navigation("Links");
+                });
+
+            modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.CustomCape", b =>
+                {
+                    b.Navigation("Codes");
+
+                    b.Navigation("Ownerships");
                 });
 
             modelBuilder.Entity("VyacheslavsMegaWebApp.Data.Entities.Partner", b =>

@@ -10,13 +10,31 @@
                 </div>
 
                 <input type="hidden" asp-for="Id" readonly />
+                <input type="hidden" asp-for="DownloadUrl" id="hiddenDownloadUrl" />
+                <input type="hidden" asp-for="FileName" id="hiddenFileName" />
+                <input type="hidden" asp-for="RelativePath" id="hiddenRelativePath" />
+                <input type="hidden" asp-for="Sha256" id="hiddenSha256" />
+                <input type="hidden" asp-for="FileSizeBytes" id="hiddenFileSizeBytes" />
+                <input type="hidden" asp-for="IconUrl" id="hiddenIconUrl" />
 
                 <div class="form__body">
 
                     <div class="form__validation-summary" asp-validation-summary="All"></div>
 
                     <div class="form-group">
-                        <label class="form-group__label">Файл (.jar для мода, .zip для шейдеров и ресурспаков) @(Model.Id > 0 ? "(оставьте пустым, если не меняется)" : "*")</label>
+                        <label class="form-group__label" asp-for="SourceType">Источник компонента</label>
+                        <div class="form-group__control">
+                            <div class="field">
+                                <select class="field__input" asp-for="SourceType" id="sourceTypeSelect">
+                                    <option value="Local">Локальный файл (загрузка на сервер VEC)</option>
+                                    <option value="Modrinth">Modrinth API (по ссылке или ID проекта)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="localFileBlock">
+                        <label class="form-group__label">Файл (.jar для мода, .zip для шейдеров и ресурспаков) @(Model.Id > 0 && Model.SourceType == "Local" ? "(оставьте пустым, если не меняется)" : "*")</label>
                         <div class="form-group__control">
                             <div class="field">
                                 <input class="field__input" type="file" name="modFile" accept=".jar,.zip" />
@@ -24,11 +42,24 @@
                         </div>
                     </div>
 
+                    <div class="form-group" id="modrinthBlock" style="display: none;">
+                        <label class="form-group__label" asp-for="ModrinthSlug">Ссылка или ID на Modrinth (например: sodium или ссылка)</label>
+                        <div class="form-group__control">
+                            <div class="field" style="display: flex; gap: 8px;">
+                                <input class="field__input" asp-for="ModrinthSlug" id="modrinthInput" placeholder="sodium или https://modrinth.com/mod/sodium" />
+                                <button type="button" class="mc-button" id="btnFetchModrinth" style="white-space: nowrap; padding: 0 14px;">
+                                    <span class="mc-button__title">Заполнить данные</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="modrinthStatus" style="font-size: 13px; margin-top: 6px; color: #7f8c8d;"></div>
+                    </div>
+
                     <div class="form-group">
-                        <label class="form-group__label" asp-for="DisplayName">Отображаемое название</label>
+                        <label class="form-group__label" asp-for="DisplayName">Отображаемое название (на русском)</label>
                         <div class="form-group__control">
                             <div class="field">
-                                <input class="field__input" asp-for="DisplayName" required />
+                                <input class="field__input" asp-for="DisplayName" id="displayNameInput" required />
                             </div>
                         </div>
                     </div>
@@ -37,7 +68,7 @@
                         <label class="form-group__label" asp-for="Category">Категория</label>
                         <div class="form-group__control">
                             <div class="field">
-                                <select class="field__input" asp-for="Category">
+                                <select class="field__input" asp-for="Category" id="categorySelect">
                                     <option value="Core">Core (Базовые системные моды)</option>
                                     <option value="Optimization">Optimization (Оптимизация и FPS)</option>
                                     <option value="Visual">Visual (Визуальные моды, EMF, ETF)</option>
@@ -50,10 +81,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-group__label" asp-for="Description">Краткое описание</label>
+                        <label class="form-group__label" asp-for="Description">Краткое описание (на русском)</label>
                         <div class="form-group__control">
                             <div class="field">
-                                <input class="field__input" asp-for="Description" />
+                                <input class="field__input" asp-for="Description" id="descriptionInput" />
                             </div>
                         </div>
                     </div>
@@ -81,3 +112,87 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var sourceSelect = document.getElementById("sourceTypeSelect");
+        var localBlock = document.getElementById("localFileBlock");
+        var modrinthBlock = document.getElementById("modrinthBlock");
+        var btnFetch = document.getElementById("btnFetchModrinth");
+        var modrinthInput = document.getElementById("modrinthInput");
+        var statusDiv = document.getElementById("modrinthStatus");
+
+        var dispInput = document.getElementById("displayNameInput");
+        var descInput = document.getElementById("descriptionInput");
+        var catSelect = document.getElementById("categorySelect");
+
+        var hDown = document.getElementById("hiddenDownloadUrl");
+        var hFile = document.getElementById("hiddenFileName");
+        var hRel = document.getElementById("hiddenRelativePath");
+        var hSha = document.getElementById("hiddenSha256");
+        var hSize = document.getElementById("hiddenFileSizeBytes");
+        var hIcon = document.getElementById("hiddenIconUrl");
+
+        function updateSourceVisibility() {
+            var val = sourceSelect.value;
+            if (val === "Modrinth") {
+                localBlock.style.display = "none";
+                modrinthBlock.style.display = "";
+            } else {
+                localBlock.style.display = "";
+                modrinthBlock.style.display = "none";
+            }
+        }
+
+        sourceSelect.addEventListener("change", updateSourceVisibility);
+        updateSourceVisibility();
+
+        btnFetch.addEventListener("click", function () {
+            var query = modrinthInput.value.trim();
+            if (!query) {
+                statusDiv.style.color = "#c0392b";
+                statusDiv.textContent = "Введите ID или ссылку на проект Modrinth.";
+                return;
+            }
+
+            statusDiv.style.color = "#7f8c8d";
+            statusDiv.textContent = "Запрос данных с Modrinth API...";
+
+            var cat = catSelect.value;
+            var url = "/Admin/ClientBuildsEditor/LookupModrinth?query=" + encodeURIComponent(query) + "&category=" + encodeURIComponent(cat);
+
+            fetch(url)
+                .then(function (res) {
+                    if (!res.ok) {
+                        throw new Error("Проект не найден на Modrinth или нет версий для Fabric 1.21.11");
+                    }
+                    return res.json();
+                })
+                .then(function (data) {
+                    if (data.fileName) hFile.value = data.fileName;
+                    if (data.downloadUrl) hDown.value = data.downloadUrl;
+                    if (data.relativePath) hRel.value = data.relativePath;
+                    if (data.sha256) hSha.value = data.sha256;
+                    if (data.fileSizeBytes) hSize.value = data.fileSizeBytes;
+                    if (data.iconUrl) hIcon.value = data.iconUrl;
+
+                    if (!dispInput.value.trim()) {
+                        dispInput.value = data.title || data.slug;
+                    }
+                    if (!descInput.value.trim() && data.description) {
+                        descInput.value = data.description;
+                    }
+                    if (data.category && catSelect.querySelector("option[value='" + data.category + "']")) {
+                        catSelect.value = data.category;
+                    }
+
+                    statusDiv.style.color = "#27ae60";
+                    statusDiv.textContent = "Файл найден: " + data.fileName + " (" + (data.fileSizeBytes / 1024 / 1024).toFixed(2) + " МБ). Теперь введите русское название и описание.";
+                })
+                .catch(function (err) {
+                    statusDiv.style.color = "#c0392b";
+                    statusDiv.textContent = err.message;
+                });
+        });
+    });
+</script>

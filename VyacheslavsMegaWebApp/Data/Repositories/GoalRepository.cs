@@ -3,8 +3,10 @@ using VyacheslavsMegaWebApp.Data.Entities;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class GoalRepository : Base.RepositoryBase
+    public class GoalRepository : Base.DbRepository
     {
+        public GoalRepository(AppDbContext db) : base(db) { }
+
         public async Task<List<Goal>> GetAllGoals()
         {
             return await DB.Goals.ToListAsync();

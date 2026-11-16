@@ -1,4 +1,4 @@
-﻿.cards-container {
+.cards-container {
     display: flex;
     gap: 20px;
     justify-content: left;
@@ -71,13 +71,16 @@
     font-weight: bold;
 }
 
-@media (max-width: 426px) {
+@media (max-width: 768px) {
     .card {
-        width: 250px;
-        min-width: 250px;
-        height: 160px;
-        padding: 10px;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 360px !important;
+        height: auto !important;
+        min-height: 200px !important;
+        padding: 18px 16px !important;
         font-size: 16px;
+        margin: 0 auto;
     }
 
     .card__header {
@@ -85,11 +88,12 @@
     }
 
     .card__number {
-        letter-spacing: 0;
-        word-spacing: -5px;
+        letter-spacing: 1px;
+        word-spacing: 1px;
+        font-size: 15px;
     }
 
     .card__copy-link {
-        font-size: 14px;
+        font-size: 13px;
     }
 }

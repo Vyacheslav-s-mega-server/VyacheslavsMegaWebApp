@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -7,9 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using VyacheslavsMegaWebApp.Data;
 using VyacheslavsMegaWebApp.Data.Entities;
+using VyacheslavsMegaWebApp.Data.Repositories;
+using VyacheslavsMegaWebApp.Service;
 
 namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
 {
@@ -17,19 +18,21 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
     [Authorize(Policy = "AdminAreaPolicy")]
     public class ClientBuildsEditorController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly ClientBuildFilesRepository _repo;
         private readonly IWebHostEnvironment _env;
+        private readonly ModrinthService _modrinth;
 
-        public ClientBuildsEditorController(AppDbContext db, IWebHostEnvironment env)
+        public ClientBuildsEditorController(ClientBuildFilesRepository repo, IWebHostEnvironment env, ModrinthService modrinth)
         {
-            _db = db;
+            _repo = repo;
             _env = env;
+            _modrinth = modrinth;
         }
 
         private string GetBuildsDir(string slug, string folder = "mods")
         {
-            var root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-            var dir = Path.Combine(root, "builds", slug, folder);
+            string root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+            string dir = Path.Combine(root, "builds", slug, folder);
             Directory.CreateDirectory(dir);
             return dir;
         }
@@ -37,13 +40,37 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
         public async Task<IActionResult> Index(string slug = "vec-fabric-1-21-11")
         {
             ViewBag.Slug = slug;
-            var files = await _db.ClientBuildFiles
-                .Where(f => f.BuildSlug == slug)
-                .OrderBy(f => f.Category)
-                .ThenBy(f => f.DisplayName)
-                .ToListAsync();
-
+            List<ClientBuildFile> files = await _repo.GetFilesByBuildSlugOrderedAsync(slug);
             return View(files);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LookupModrinth(string query, string? category)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest(new { error = "Укажите ссылку или ID мода на Modrinth" });
+            }
+
+            ModrinthProjectInfo? info = await _modrinth.FetchModrinthInfoAsync(query, category ?? "Core");
+            if (info == null)
+            {
+                return NotFound(new { error = "Проект не найден на Modrinth или не содержит подходящих файлов для Fabric" });
+            }
+
+            return Ok(new
+            {
+                slug = info.Slug,
+                title = info.Title,
+                description = info.Description,
+                iconUrl = info.IconUrl,
+                category = info.Category,
+                fileName = info.FileName,
+                downloadUrl = info.DownloadUrl,
+                fileSizeBytes = info.FileSizeBytes,
+                sha256 = info.Sha256,
+                relativePath = info.RelativePath
+            });
         }
 
         public async Task<IActionResult> ModDetails(int? id, string slug = "vec-fabric-1-21-11")
@@ -55,14 +82,20 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
                 {
                     BuildSlug = slug,
                     IsRequired = true,
-                    Category = "Optimization"
+                    Category = "Optimization",
+                    SourceType = "Local"
                 });
             }
 
-            var item = await _db.ClientBuildFiles.FindAsync(id.Value);
+            ClientBuildFile? item = await _repo.GetFileByIdAsync(id.Value);
             if (item == null)
             {
                 return NotFound();
+            }
+
+            if (string.IsNullOrEmpty(item.SourceType))
+            {
+                item.SourceType = item.DownloadUrl?.StartsWith("http", StringComparison.OrdinalIgnoreCase) == true ? "Modrinth" : "Local";
             }
 
             return View(item);
@@ -73,18 +106,14 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
         {
             ViewBag.Slug = slug;
 
-            if (model.Id == 0 && (modFile == null || modFile.Length == 0))
-            {
-                ModelState.AddModelError("", "Для добавления компонента необходимо выбрать файл (.jar или .zip).");
-                return View(model);
-            }
+            bool isModrinth = string.Equals(model.SourceType, "Modrinth", StringComparison.OrdinalIgnoreCase);
 
             if (string.IsNullOrWhiteSpace(model.Category))
             {
                 model.Category = "Core";
             }
 
-            var subFolder = "mods";
+            string subFolder = "mods";
             if (string.Equals(model.Category, "Shaders", StringComparison.OrdinalIgnoreCase))
             {
                 subFolder = "shaderpacks";
@@ -94,36 +123,87 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
                 subFolder = "resourcepacks";
             }
 
-            if (modFile != null && modFile.Length > 0)
+            if (isModrinth)
             {
-                var ext = Path.GetExtension(modFile.FileName);
-                if (!string.Equals(ext, ".jar", StringComparison.OrdinalIgnoreCase) && !string.Equals(ext, ".zip", StringComparison.OrdinalIgnoreCase))
+                if (string.IsNullOrWhiteSpace(model.ModrinthSlug) && string.IsNullOrWhiteSpace(model.DownloadUrl))
                 {
-                    ModelState.AddModelError("", "Разрешена загрузка только файлов с расширением .jar или .zip.");
+                    ModelState.AddModelError("", "Для компонента из Modrinth необходимо указать ID или ссылку на проект.");
                     return View(model);
                 }
 
-                var cleanFileName = Path.GetFileName(modFile.FileName);
-                var targetDir = GetBuildsDir(slug, subFolder);
-                var targetPath = Path.Combine(targetDir, cleanFileName);
-
-                using (var fileStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
+                if (!string.IsNullOrWhiteSpace(model.ModrinthSlug) && (string.IsNullOrWhiteSpace(model.DownloadUrl) || model.Id == 0))
                 {
-                    await modFile.CopyToAsync(fileStream);
+                    ModrinthProjectInfo? info = await _modrinth.FetchModrinthInfoAsync(model.ModrinthSlug, model.Category);
+                    if (info == null && string.IsNullOrWhiteSpace(model.DownloadUrl))
+                    {
+                        ModelState.AddModelError("", "Не удалось получить данные с Modrinth API. Проверьте ID/ссылку.");
+                        return View(model);
+                    }
+
+                    if (info != null)
+                    {
+                        model.DownloadUrl = info.DownloadUrl;
+                        model.FileName = info.FileName;
+                        model.RelativePath = info.RelativePath;
+                        model.Sha256 = info.Sha256;
+                        model.FileSizeBytes = info.FileSizeBytes;
+                        if (string.IsNullOrEmpty(model.IconUrl)) model.IconUrl = info.IconUrl;
+                        if (string.IsNullOrWhiteSpace(model.DisplayName)) model.DisplayName = info.Title;
+                        if (string.IsNullOrWhiteSpace(model.Description)) model.Description = info.Description;
+                    }
                 }
 
-                byte[] fileBytes = await System.IO.File.ReadAllBytesAsync(targetPath);
-                string sha256;
-                using (var sha = SHA256.Create())
+                if (string.IsNullOrWhiteSpace(model.FileName))
                 {
-                    sha256 = Convert.ToHexString(sha.ComputeHash(fileBytes)).ToLowerInvariant();
+                    model.FileName = $"{ModrinthService.ExtractSlug(model.ModrinthSlug ?? "component") ?? "component"}.jar";
                 }
 
-                model.FileName = cleanFileName;
-                model.RelativePath = $"{subFolder}/{cleanFileName}";
-                model.Sha256 = sha256;
-                model.FileSizeBytes = fileBytes.LongLength;
-                model.DownloadUrl = $"/api/builds/{slug}/file/{subFolder}/{cleanFileName}";
+                if (string.IsNullOrWhiteSpace(model.RelativePath))
+                {
+                    model.RelativePath = $"{subFolder}/{model.FileName}";
+                }
+            }
+            else
+            {
+                model.SourceType = "Local";
+
+                if (model.Id == 0 && (modFile == null || modFile.Length == 0))
+                {
+                    ModelState.AddModelError("", "Для добавления локального компонента необходимо выбрать файл (.jar или .zip).");
+                    return View(model);
+                }
+
+                if (modFile != null && modFile.Length > 0)
+                {
+                    string ext = Path.GetExtension(modFile.FileName);
+                    if (!string.Equals(ext, ".jar", StringComparison.OrdinalIgnoreCase) && !string.Equals(ext, ".zip", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ModelState.AddModelError("", "Разрешена загрузка только файлов с расширением .jar или .zip.");
+                        return View(model);
+                    }
+
+                    string cleanFileName = Path.GetFileName(modFile.FileName);
+                    string targetDir = GetBuildsDir(slug, subFolder);
+                    string targetPath = Path.Combine(targetDir, cleanFileName);
+
+                    using (FileStream fileStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
+                    {
+                        await modFile.CopyToAsync(fileStream);
+                    }
+
+                    byte[] fileBytes = await System.IO.File.ReadAllBytesAsync(targetPath);
+                    string sha256;
+                    using (SHA256 sha = SHA256.Create())
+                    {
+                        sha256 = Convert.ToHexString(sha.ComputeHash(fileBytes)).ToLowerInvariant();
+                    }
+
+                    model.FileName = cleanFileName;
+                    model.RelativePath = $"{subFolder}/{cleanFileName}";
+                    model.Sha256 = sha256;
+                    model.FileSizeBytes = fileBytes.LongLength;
+                    model.DownloadUrl = $"/api/builds/{slug}/file/{subFolder}/{cleanFileName}";
+                }
             }
 
             model.BuildSlug = slug;
@@ -134,11 +214,11 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
 
             if (model.Id == 0)
             {
-                _db.ClientBuildFiles.Add(model);
+                await _repo.AddFileAsync(model);
             }
             else
             {
-                var existing = await _db.ClientBuildFiles.FindAsync(model.Id);
+                ClientBuildFile? existing = await _repo.GetFileByIdAsync(model.Id);
                 if (existing == null)
                 {
                     return NotFound();
@@ -148,6 +228,9 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
                 existing.Description = model.Description ?? string.Empty;
                 existing.Category = model.Category;
                 existing.IsRequired = model.IsRequired;
+                existing.SourceType = model.SourceType;
+                existing.ModrinthSlug = model.ModrinthSlug;
+                existing.IconUrl = model.IconUrl;
 
                 if (!string.IsNullOrEmpty(model.FileName))
                 {
@@ -157,28 +240,31 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
                     existing.FileSizeBytes = model.FileSizeBytes;
                     existing.DownloadUrl = model.DownloadUrl;
                 }
+
+                await _repo.SaveChangesAsync();
             }
 
-            await _db.SaveChangesAsync();
             TempData["Success"] = $"Компонент «{model.DisplayName}» успешно сохранен.";
             return RedirectToAction(nameof(Index), new { slug });
         }
 
         public async Task<IActionResult> DeleteMod(int id, string slug = "vec-fabric-1-21-11")
         {
-            var item = await _db.ClientBuildFiles.FindAsync(id);
+            ClientBuildFile? item = await _repo.GetFileByIdAsync(id);
             if (item != null)
             {
-                var root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-                var rel = item.RelativePath.Replace('/', Path.DirectorySeparatorChar);
-                var targetPath = Path.Combine(root, "builds", item.BuildSlug, rel);
-                if (System.IO.File.Exists(targetPath))
+                if (item.DownloadUrl == null || !item.DownloadUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
-                    try { System.IO.File.Delete(targetPath); } catch { }
+                    string root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+                    string rel = item.RelativePath.Replace('/', Path.DirectorySeparatorChar);
+                    string targetPath = Path.Combine(root, "builds", item.BuildSlug, rel);
+                    if (System.IO.File.Exists(targetPath))
+                    {
+                        try { System.IO.File.Delete(targetPath); } catch { }
+                    }
                 }
 
-                _db.ClientBuildFiles.Remove(item);
-                await _db.SaveChangesAsync();
+                await _repo.DeleteFileAsync(id);
                 TempData["Success"] = $"Компонент «{item.DisplayName}» удален из сборки.";
             }
 
@@ -187,12 +273,10 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
 
         public async Task<IActionResult> ToggleRequired(int id, string slug = "vec-fabric-1-21-11")
         {
-            var item = await _db.ClientBuildFiles.FindAsync(id);
-            if (item != null)
+            bool? newRequired = await _repo.ToggleRequiredAsync(id);
+            if (newRequired != null)
             {
-                item.IsRequired = !item.IsRequired;
-                await _db.SaveChangesAsync();
-                TempData["Success"] = $"Статус обязательности для «{item.DisplayName}» изменен на: {(item.IsRequired ? "Обязательный" : "Опциональный")}.";
+                TempData["Success"] = $"Статус обязательности для компонента изменен на: {(newRequired.Value ? "Обязательный" : "Опциональный")}.";
             }
 
             return RedirectToAction(nameof(Index), new { slug });

@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VyacheslavsMegaWebApp.Data.Entities;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static VyacheslavsMegaWebApp.Data.Repositories.FundRepository;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class FundRepository : Base.RepositoryBase
+    public class FundRepository : Base.DbRepository
     {
+        public FundRepository(AppDbContext db) : base(db) { }
+
         public enum TransactionState { Added, Removed }
 
         public async Task<decimal> GetFundState()

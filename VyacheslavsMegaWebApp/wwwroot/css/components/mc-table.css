@@ -41,17 +41,200 @@
     object-fit: contain;
 }
 
-@media (max-width: 426px) {
-    .mc-table {
-        padding: 12px;
+/* Колонки по умолчанию на десктопе */
+.col-id { width: 80px; }
+.col-amount { width: 170px; }
+.col-purpose { width: 240px; }
 
-        box-shadow: inset 3px 3px white, inset -3px -3px #565656;
+/* Адаптивная таблица на экранах смартфонов:
+   Сохраняем классическую табличную сетку (как на ПК),
+   но компактно уменьшаем размеры ячеек, отступов и шрифтов,
+   чтобы вся таблица помещалась без горизонтальной прокрутки. */
+@media (max-width: 640px) {
+    .mc-table-container {
+        padding-bottom: 0 !important;
+        overflow-x: hidden !important;
+        width: 100% !important;
+    }
+
+    .mc-table {
+        display: table !important;
+        width: 100% !important;
+        table-layout: fixed !important;
+        box-sizing: border-box !important;
+        padding: 5px !important;
+        border: 2px solid black !important;
+        border-radius: 4px !important;
+        box-shadow: inset 2px 2px white, inset -2px -2px #565656 !important;
+    }
+
+    .mc-table thead {
+        display: table-header-group !important;
+    }
+
+    .mc-table tbody {
+        display: table-row-group !important;
+    }
+
+    .mc-table tr {
+        display: table-row !important;
     }
 
     .mc-table td {
-        padding: 7px 5px;
+        display: table-cell !important;
+        padding: 6px 4px !important;
+        background: #8b8b8b !important;
+        border: 2px solid !important;
+        border-color: #353535 #ffffff #ffffff #353535 !important;
+        font-family: 'minecraft', sans-serif !important;
+        font-size: 11px !important;
+        line-height: 1.3 !important;
+        color: #ffffff !important;
+        text-shadow: 1px 1px #3f3f3f !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        vertical-align: middle !important;
+        box-sizing: border-box !important;
+    }
 
-        border: 3px solid;
-        border-color: #353535 white white #353535;
+    .mc-table__head-row td {
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        padding: 6px 2px !important;
+        text-align: center !important;
+    }
+
+    /* Пропорции 3 колонок (DonationPage) */
+    .col-fund-amount,
+    .mc-table--wide td.mc-td-amount {
+        width: 31% !important;
+        text-align: center !important;
+        font-size: 11px !important;
+    }
+
+    .col-fund-purpose,
+    .mc-table--wide td.mc-td-purpose {
+        width: 34% !important;
+        font-size: 11.5px !important;
+    }
+
+    .col-fund-note,
+    .mc-table--wide td.mc-td-note {
+        width: 35% !important;
+        font-size: 10px !important;
+    }
+
+    /* Пропорции 4 колонок (TransactionsHistory) */
+    .col-id,
+    .mc-table td.mc-td-id {
+        width: 14% !important;
+        text-align: center !important;
+        font-size: 10px !important;
+        padding: 5px 2px !important;
+    }
+
+    .col-amount,
+    .mc-table tbody#transactionsBody td.mc-td-amount {
+        width: 27% !important;
+        text-align: center !important;
+        font-size: 10.5px !important;
+        padding: 5px 2px !important;
+    }
+
+    .col-purpose,
+    .mc-table tbody#transactionsBody td.mc-td-purpose {
+        width: 29% !important;
+        font-size: 10.5px !important;
+        padding: 5px 3px !important;
+    }
+
+    .col-note,
+    .mc-table tbody#transactionsBody td.mc-td-note {
+        width: 30% !important;
+        font-size: 10px !important;
+        padding: 5px 3px !important;
+    }
+
+    /* Подвал таблицы (ссылка / кнопка) */
+    .mc-table__footer-row td,
+    #loadMoreRow td {
+        padding: 8px 4px !important;
+        text-align: center !important;
+    }
+
+    .mc-table__footer-row a,
+    .mc-load-btn {
+        color: #ffffa0 !important;
+        text-decoration: underline !important;
+        text-shadow: 1px 1px #202013cc !important;
+        font-family: 'minecraft', sans-serif !important;
+        font-size: 12px !important;
+        background: transparent !important;
+        border: none !important;
+        cursor: pointer !important;
+        display: inline-block !important;
+    }
+
+    .mc-table__footer-row a:hover,
+    .mc-load-btn:hover {
+        color: #ffffff !important;
+        text-shadow: 1px 1px #3f3f3f !important;
+    }
+}
+
+/* Для самых узких экранов (например ZTE, iPhone SE, экраны <= 360px) */
+@media (max-width: 360px) {
+    .mc-table {
+        padding: 3px !important;
+    }
+
+    .mc-table td {
+        padding: 5px 2px !important;
+        font-size: 10px !important;
+    }
+
+    .mc-table__head-row td {
+        font-size: 10px !important;
+        padding: 5px 1px !important;
+    }
+
+    .col-fund-amount,
+    .mc-table--wide td.mc-td-amount {
+        font-size: 10px !important;
+    }
+
+    .col-fund-purpose,
+    .mc-table--wide td.mc-td-purpose {
+        font-size: 10px !important;
+    }
+
+    .col-fund-note,
+    .mc-table--wide td.mc-td-note {
+        font-size: 9.5px !important;
+    }
+
+    .col-id,
+    .mc-table td.mc-td-id {
+        font-size: 9px !important;
+    }
+
+    .col-amount,
+    .mc-table tbody#transactionsBody td.mc-td-amount {
+        font-size: 9.5px !important;
+    }
+
+    .col-purpose,
+    .mc-table tbody#transactionsBody td.mc-td-purpose {
+        font-size: 9.5px !important;
+    }
+
+    .col-note,
+    .mc-table tbody#transactionsBody td.mc-td-note {
+        font-size: 9px !important;
+    }
+
+    .mc-table__footer-row a,
+    .mc-load-btn {
+        font-size: 11px !important;
     }
 }

@@ -6,8 +6,10 @@ using VyacheslavsMegaWebApp.Data.Repositories.Base;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class ContactsInfoRepository : RepositoryBase
+    public class ContactsInfoRepository : DbRepository
     {
+        public ContactsInfoRepository(AppDbContext db) : base(db) { }
+
         public async Task<List<Contact>> GetAllContacts()
         {
             return await DB.Contacts.Include(c => c.User).Include(c => c.Links).ToListAsync() ?? new List<Contact>();

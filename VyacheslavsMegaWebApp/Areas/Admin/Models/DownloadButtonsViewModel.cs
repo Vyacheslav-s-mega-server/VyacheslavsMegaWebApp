@@ -15,5 +15,12 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Models
         public bool LauncherFileExists { get; set; }
         public long LauncherFileSizeBytes { get; set; }
         public DateTime? LauncherLastModified { get; set; }
+
+        public bool SetupFileExists { get; set; }
+        public long SetupFileSizeBytes { get; set; }
+        public DateTime? SetupLastModified { get; set; }
+
+        public bool ZipFileExists { get; set; }
+        public long ZipFileSizeBytes { get; set; }
     }
 }

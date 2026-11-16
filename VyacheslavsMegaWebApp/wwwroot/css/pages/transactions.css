@@ -157,10 +157,40 @@
     .fund-table-card {
         padding: 18px 14px;
     }
+}
 
-    .mc-table td,
-    .mc-table th {
-        padding: 8px 10px;
-        font-size: 14px;
+@media (max-width: 480px) {
+    .transactions-container {
+        padding: 0 14px;
+    }
+
+    .transactions-info-block {
+        padding: 16px 14px;
+        font-size: 13.5px;
+        line-height: 1.5;
+    }
+
+    .fund-table-card {
+        padding: 14px 10px;
     }
 }
+
+@media (max-width: 360px) {
+    .transactions-container {
+        padding: 0 10px;
+    }
+
+    .transactions-header-block .donation-hero__title {
+        font-size: 23px !important;
+    }
+
+    .transactions-info-block {
+        padding: 12px 10px;
+        font-size: 12.5px;
+    }
+
+    .fund-table-card {
+        padding: 10px 6px;
+    }
+}
+

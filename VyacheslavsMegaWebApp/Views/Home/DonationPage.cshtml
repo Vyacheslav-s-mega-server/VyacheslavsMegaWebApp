@@ -153,15 +153,15 @@
             <h3 class="fund-table-title">Последние транзакции фонда:</h3>
             <div class="mc-table-container">
                 <table class="mc-table mc-table--wide">
-                    <tr class="mc-table--center-aligment">
-                        <td>Сумма</td>
-                        <td>Назначение</td>
-                        <td>Доп. информация</td>
+                    <tr class="mc-table--center-aligment mc-table__head-row">
+                        <td class="col-fund-amount">Сумма</td>
+                        <td class="col-fund-purpose">Назначение</td>
+                        <td class="col-fund-note">Доп. информация</td>
                     </tr>
 
                     @if (Model.LastTransactions.Count == 0)
                     {
-                        <tr class="mc-table--center-aligment">
+                        <tr class="mc-table--center-aligment mc-table__empty-row">
                             <td colspan="3">Транзакций пока не было</td>
                         </tr>
                     }
@@ -169,13 +169,13 @@
                     {
                         foreach (FundTransaction transaction in Model.LastTransactions)
                         {
-                            <tr>
-                                <td class="mc-table--center-aligment">+@transaction.Amount ₸</td>
-                                <td>@transaction.Purpose?.Name</td>
-                                <td>@(string.IsNullOrWhiteSpace(transaction.Note) ? "—" : transaction.Note)</td>
+                            <tr class="mc-table__row">
+                                <td class="mc-table--center-aligment mc-td-amount">@(transaction.Amount > 0 ? "+" : "")@transaction.Amount ₸</td>
+                                <td class="mc-td-purpose">@transaction.Purpose?.Name</td>
+                                <td class="mc-td-note">@(string.IsNullOrWhiteSpace(transaction.Note) ? "—" : transaction.Note)</td>
                             </tr>
                         }
-                        <tr class="mc-table--center-aligment">
+                        <tr class="mc-table--center-aligment mc-table__footer-row">
                             <td colspan="3">
                                 <a asp-controller="Home" asp-action="TransactionsHistory">Остальные транзакции</a>
                             </td>

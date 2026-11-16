@@ -552,24 +552,29 @@
 
 /* Minecraft XP Bar */
 .mc-bar {
-    padding-top: 36px;
-    width: fit-content;
-    position: relative;
-    text-align: center;
+    padding-top: 0 !important;
+    width: 100% !important;
+    max-width: 520px;
     margin: 0 auto;
+    position: relative;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px;
+    box-sizing: border-box;
 }
 
 .mc-bar__text {
-    position: absolute;
-    top: 0;
-    z-index: 2;
-    width: 100%;
+    position: static !important;
+    width: 100% !important;
     color: #7dfc1f !important;
     font-family: 'minecraft', sans-serif !important;
-    font-size: 22px !important;
+    font-size: 18px !important;
     font-weight: 700 !important;
     text-align: center;
-    letter-spacing: 1px;
+    line-height: 1.35;
+    word-break: break-word;
+    margin-bottom: 2px;
     text-shadow:
         -2px 0 #000,
         2px 0 #000,
@@ -582,10 +587,12 @@
 }
 
 .mc-bar__progress {
-    display: grid;
-    grid-template-columns: repeat(20, 1fr);
+    display: grid !important;
+    grid-template-columns: repeat(20, 1fr) !important;
     gap: 1px;
-    width: fit-content;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
     padding: 2px;
     background: #000000;
     border: 2px solid #000000;
@@ -594,8 +601,9 @@
 }
 
 .mc-bar__cell {
-    height: 16px;
-    width: 28px;
+    height: 15px;
+    width: 100% !important;
+    min-width: 0 !important;
     background: #142214;
     border-top: 2px solid #0a120a;
     border-bottom: 2px solid #1c301c;
@@ -720,23 +728,230 @@
     }
 
     .donation-bank-card {
-        width: 100%;
-        min-width: unset;
-        height: auto;
-        min-height: 220px;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 380px !important;
+        height: auto !important;
+        min-height: 220px !important;
+        box-sizing: border-box !important;
+        margin: 0 auto;
     }
 
     .card-number-text {
-        font-size: 17px !important;
-        letter-spacing: 1.5px !important;
+        font-size: 16px !important;
+        letter-spacing: 1.2px !important;
+    }
+
+    .fund-table-card,
+    .fund-progress-card,
+    .fund-stat-card {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .mc-table-container {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .mc-bar__cell {
         height: 12px;
-        width: 16px;
+        width: 100% !important;
+        min-width: 0 !important;
     }
 
     .mc-bar__text {
         font-size: 18px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .donation-hero {
+        padding: 85px 0 35px 0;
+        overflow: hidden;
+    }
+
+    .donation-hero__title {
+        font-size: 26px !important;
+        word-break: break-word;
+    }
+
+    .donation-hero__actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .donation-hero__actions .btn-download,
+    .donation-hero__actions .btn-secondary {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    .donation-char-img {
+        max-height: 260px;
+    }
+
+    .donation-char-aura {
+        width: 240px;
+        height: 240px;
+        max-width: 85vw;
+    }
+
+    .donation-char-chip {
+        position: static;
+        margin-top: 12px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .donation-bank-card {
+        padding: 16px 14px !important;
+        min-height: 200px;
+        border-radius: 14px;
+        max-width: 100% !important;
+    }
+
+    .card-bank-name {
+        font-size: 18px !important;
+    }
+
+    .card-number-text {
+        font-size: 14px !important;
+        letter-spacing: 0.8px !important;
+        word-spacing: 1px;
+    }
+
+    .card-copy-pill {
+        padding: 6px 10px;
+        font-size: 12px !important;
+    }
+
+    .card-holder-name {
+        font-size: 12px !important;
+    }
+
+    .fund-progress-card {
+        padding: 22px 14px;
+    }
+
+    .fund-progress-title {
+        font-size: 16px !important;
+        margin-bottom: 14px;
+    }
+
+    .mc-bar__text {
+        font-size: 14.5px !important;
+    }
+
+    .mc-bar__cell {
+        height: 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .donation-hero {
+        padding: 78px 0 28px 0;
+    }
+
+    .donation-hero__title {
+        font-size: 21px !important;
+        line-height: 1.25 !important;
+    }
+
+    .donation-section-title {
+        font-size: 22px !important;
+    }
+
+    .donation-char-aura {
+        width: 180px;
+        height: 180px;
+    }
+
+    .donation-char-img {
+        max-height: 210px;
+    }
+
+    .donation-bank-card {
+        padding: 14px 10px !important;
+        min-height: 180px;
+        border-radius: 12px;
+    }
+
+    .card-bank-name {
+        font-size: 15px !important;
+    }
+
+    .card-number-text {
+        font-size: 12px !important;
+        letter-spacing: 0.4px !important;
+        word-spacing: 0;
+    }
+
+    .card-copy-pill {
+        padding: 5px 8px;
+        font-size: 11px !important;
+    }
+
+    .card-holder-name {
+        font-size: 11px !important;
+    }
+
+    .fund-stat-card {
+        padding: 14px 12px;
+        gap: 10px;
+    }
+
+    .fund-stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .fund-stat-label {
+        font-size: 11px !important;
+    }
+
+    .fund-stat-val {
+        font-size: 15px !important;
+    }
+
+    .fund-progress-card {
+        padding: 16px 8px;
+        border-radius: 12px;
+    }
+
+    .fund-progress-title {
+        font-size: 14px !important;
+        margin-bottom: 10px;
+    }
+
+    .mc-bar__text {
+        font-size: 12.5px !important;
+    }
+
+    .mc-bar__cell {
+        height: 8px;
+    }
+
+    .fund-table-card {
+        padding: 16px 8px;
+        border-radius: 12px;
+    }
+
+    .fund-table-title {
+        font-size: 14px !important;
+        margin-bottom: 12px;
+    }
+
+    .mc-table {
+        padding: 6px;
     }
 }

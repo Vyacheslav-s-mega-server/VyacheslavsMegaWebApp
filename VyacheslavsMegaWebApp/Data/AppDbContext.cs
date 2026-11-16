@@ -33,6 +33,9 @@ namespace VyacheslavsMegaWebApp.Data
         public DbSet<LauncherSession> LauncherSessions { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<ClientBuildFile> ClientBuildFiles { get; set; }
+        public DbSet<CustomCape> CustomCapes { get; set; }
+        public DbSet<CapeRedeemCode> CapeRedeemCodes { get; set; }
+        public DbSet<UserCapeOwnership> UserCapeOwnerships { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -150,8 +153,17 @@ namespace VyacheslavsMegaWebApp.Data
                 .HasForeignKey(f => f.AddresseeId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<LauncherSession>()
-                .HasIndex(s => s.SessionKeyHash);
+            modelBuilder.Entity<CustomCape>()
+                .HasIndex(c => c.Slug)
+                .IsUnique();
+
+            modelBuilder.Entity<CapeRedeemCode>()
+                .HasIndex(r => r.Code)
+                .IsUnique();
+
+            modelBuilder.Entity<UserCapeOwnership>()
+                .HasIndex(o => new { o.UserId, o.CapeId })
+                .IsUnique();
         }
     }
 }

@@ -44,18 +44,18 @@
             <div class="mc-table-container">
                 <table class="mc-table mc-table--wide">
                     <thead>
-                        <tr class="mc-table--center-aligment">
-                            <td style="width: 80px;">ID</td>
-                            <td style="width: 170px;">Сумма</td>
-                            <td style="width: 240px;">Назначение</td>
-                            <td>Доп. информация</td>
+                        <tr class="mc-table--center-aligment mc-table__head-row">
+                            <td class="col-id">ID</td>
+                            <td class="col-amount">Сумма</td>
+                            <td class="col-purpose">Назначение</td>
+                            <td class="col-note">Доп. информация</td>
                         </tr>
                     </thead>
 
                     <tbody id="transactionsBody">
                         @if (Model.TransactionsList.Count == 0)
                         {
-                            <tr class="mc-table--center-aligment">
+                            <tr class="mc-table--center-aligment mc-table__empty-row">
                                 <td colspan="4">Транзакций пока не было</td>
                             </tr>
                         }
@@ -63,11 +63,11 @@
                         {
                             foreach (FundTransaction transaction in Model.TransactionsList)
                             {
-                                <tr>
-                                    <td class="mc-table--center-aligment">@transaction.Id</td>
-                                    <td class="mc-table--center-aligment">@transaction.Amount.ToString("N0") ₸</td>
-                                    <td>@transaction.Purpose?.Name</td>
-                                    <td>@(string.IsNullOrWhiteSpace(transaction.Note) ? "—" : transaction.Note)</td>
+                                <tr class="mc-table__row">
+                                    <td class="mc-table--center-aligment mc-td-id">#@transaction.Id</td>
+                                    <td class="mc-table--center-aligment mc-td-amount">@transaction.Amount.ToString("N0") ₸</td>
+                                    <td class="mc-td-purpose">@transaction.Purpose?.Name</td>
+                                    <td class="mc-td-note">@(string.IsNullOrWhiteSpace(transaction.Note) ? "—" : transaction.Note)</td>
                                 </tr>
                             }
                         }
@@ -75,7 +75,7 @@
 
                     @if (Model.TransactionsList.Count > 0)
                     {
-                        <tr class="mc-table--center-aligment" id="loadMoreRow">
+                        <tr class="mc-table--center-aligment mc-table__footer-row" id="loadMoreRow">
                             <td colspan="4" class="mc-table-load-more-cell">
                                 <button type="button" id="loadMoreBtn" class="mc-load-btn">
                                     <span>Ещё</span>
@@ -124,16 +124,17 @@
 
             data.forEach(t => {
                 const row = document.createElement("tr");
+                row.className = "mc-table__row";
 
                 const amountVal = Number(t.amount || 0).toLocaleString('ru-RU');
                 const purposeName = t.purpose && t.purpose.name ? t.purpose.name : '—';
                 const noteText = t.note && t.note.trim() ? t.note : '—';
 
                 row.innerHTML = `
-                    <td class="mc-table--center-aligment">${t.id}</td>
-                    <td class="mc-table--center-aligment">${amountVal} ₸</td>
-                    <td>${purposeName}</td>
-                    <td>${noteText}</td>
+                    <td class="mc-table--center-aligment mc-td-id">#${t.id}</td>
+                    <td class="mc-table--center-aligment mc-td-amount">${amountVal} ₸</td>
+                    <td class="mc-td-purpose">${purposeName}</td>
+                    <td class="mc-td-note">${noteText}</td>
                 `;
 
                 tbody.appendChild(row);

@@ -3,5 +3,7 @@
     public class SecuritySettings
     {
         public static bool EnforceLauncherTicket { get; set; }
+
+        public static int SessionLifetimeDays { get; set; }
     }
 }

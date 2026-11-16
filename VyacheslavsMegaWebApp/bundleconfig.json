@@ -7,9 +7,9 @@
       "wwwroot/css/base/fonts.css",
       "wwwroot/css/base/layout.css",
 
-      "wwwroot/css/components/*",
+      "wwwroot/css/pages/*",
       "wwwroot/css/components/form/*",
-      "wwwroot/css/pages/*"
+      "wwwroot/css/components/*"
     ],
     "minify": {
       "enabled": true,

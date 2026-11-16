@@ -5,8 +5,10 @@ using VyacheslavsMegaWebApp.Data.Repositories.Base;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class PartnersInfoRepository : RepositoryBase
+    public class PartnersInfoRepository : DbRepository
     {
+        public PartnersInfoRepository(AppDbContext db) : base(db) { }
+
         public async Task<List<Partner>> GetAllPartners()
         {
             return await DB.Partners.ToListAsync() ?? new List<Partner>();

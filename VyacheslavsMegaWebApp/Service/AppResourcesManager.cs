@@ -3,6 +3,7 @@ using System.Resources;
 
 namespace VyacheslavsMegaWebApp.Service
 {
+    // TODO: Make separate file repositories for images and resx
     public class AppResourcesManager
     {
         public AppResourcesManager()
@@ -19,15 +20,6 @@ namespace VyacheslavsMegaWebApp.Service
 
         #endregion
 
-        #region EmailTemplates
-
-        public enum EmailMessageFormat { Html, Text }
-
-        public const string EmailConfirmation = "EmailConfirmation";
-        public const string PasswordReset = "PasswordReset";
-
-        #endregion
-
         #region Images
 
         public const string EmailLogo = "logoEmail.png";
@@ -41,13 +33,6 @@ namespace VyacheslavsMegaWebApp.Service
             return Path.Combine(AppResourcesFolder, "Images", imageName);
         }
 
-        public async Task<string> GetEmailTemplate(string templateName, EmailMessageFormat format)
-        {
-            return await File.ReadAllTextAsync(Path.Combine(
-                AppResourcesFolder,
-                "EmailTemplates",
-                templateName,
-                string.Concat("Template", format == EmailMessageFormat.Html ? ".html" : ".txt")));
-        }
+       
     }
 }

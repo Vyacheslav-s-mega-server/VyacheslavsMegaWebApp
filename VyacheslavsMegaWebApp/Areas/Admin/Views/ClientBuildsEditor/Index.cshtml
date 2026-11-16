@@ -23,6 +23,7 @@
                     <tr class="mc-table--center-aligment">
                         <td>Название</td>
                         <td>Категория</td>
+                        <td>Источник</td>
                         <td>Файл (.jar / .zip)</td>
                         <td>Размер</td>
                         <td>SHA-256</td>
@@ -34,6 +35,7 @@
                         <tr>
                             <td>@mod.DisplayName</td>
                             <td>@mod.Category</td>
+                            <td>@(mod.SourceType == "Modrinth" || mod.DownloadUrl?.StartsWith("http") == true ? "Modrinth" : "Локально")</td>
                             <td>@mod.FileName</td>
                             <td>@(mod.FileSizeBytes > 0 ? $"{(mod.FileSizeBytes / 1024.0 / 1024.0):F2} МБ" : "—")</td>
                             <td>@(string.IsNullOrEmpty(mod.Sha256) ? "—" : mod.Sha256[..Math.Min(12, mod.Sha256.Length)] + "...")</td>
@@ -57,7 +59,7 @@
                         </tr>
                     }
                     <tr class="mc-table--center-aligment">
-                        <td colspan="9"><a asp-action="ModDetails">Загрузить новый компонент (Мод / Шейдер / Ресурспак)</a></td>
+                        <td colspan="10"><a asp-action="ModDetails">Добавить новый компонент (Мод / Шейдер / Ресурспак)</a></td>
                     </tr>
                 </table>
             </div>

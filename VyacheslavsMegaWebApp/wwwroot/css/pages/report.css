@@ -4,15 +4,15 @@
 }
 
 .report-page {
-    min-height: 85vh;
+    min-height: 100vh;
     padding: 125px 0 90px 0;
     background-color: #08090d;
     background-image: 
         radial-gradient(circle 750px at 50% 10%, rgba(245, 158, 11, 0.08), transparent 70%),
-        radial-gradient(circle 600px at 85% 60%, rgba(59, 130, 246, 0.05), transparent 70%),
+        linear-gradient(180deg, rgba(8, 9, 13, 0.72) 0%, rgba(8, 9, 13, 0.88) 100%),
         url('../../img/backgrounds/report-form/report_form.webp');
-    background-size: cover, cover, auto 60%;
-    background-position: center, center, right -80px bottom -40px;
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
     position: relative;
     overflow-x: clip;
@@ -230,8 +230,18 @@
 
 @media (max-width: 768px) {
     .report-page {
-        padding: 105px 0 60px 0;
+        min-height: 100vh;
+        padding: 95px 0 50px 0;
         background-position: center;
+        background-size: cover;
+    }
+
+    .report-container {
+        padding: 0 16px;
+    }
+
+    .report-header {
+        margin-bottom: 24px;
     }
 
     .report-header .donation-hero__title {
@@ -240,5 +250,28 @@
 
     .report-card {
         padding: 24px 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .report-page {
+        padding: 85px 0 35px 0;
+    }
+
+    .report-container {
+        padding: 0 12px;
+    }
+
+    .report-header .donation-hero__title {
+        font-size: 22px !important;
+    }
+
+    .report-header .donation-hero__desc {
+        font-size: 14px !important;
+    }
+
+    .report-card {
+        padding: 20px 14px;
+        border-radius: 12px;
     }
 }

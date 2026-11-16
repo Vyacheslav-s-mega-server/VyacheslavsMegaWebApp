@@ -4,8 +4,10 @@ using VyacheslavsMegaWebApp.Data.Repositories.Base;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class DonationCardsRepository : RepositoryBase
+    public class DonationCardsRepository : DbRepository
     {
+        public DonationCardsRepository(AppDbContext db) : base(db) { }
+
         public async Task<List<DonationCard>> GetAllCards()
         {
             return await DB.DonationCards.ToListAsync();

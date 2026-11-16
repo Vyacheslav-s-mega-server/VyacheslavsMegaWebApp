@@ -1,14 +1,10 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VyacheslavsMegaWebApp.Areas.Admin.Models;
-using VyacheslavsMegaWebApp.Data;
+using VyacheslavsMegaWebApp.Data.Entities;
 using VyacheslavsMegaWebApp.Data.Entities.Identity;
+using VyacheslavsMegaWebApp.Data.Repositories;
 using VyacheslavsMegaWebApp.Service;
 
 namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
@@ -18,20 +14,20 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
     {
         private readonly UserManager<VmsIdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly AppDbContext _db;
+        private readonly LauncherSessionRepository _sessionRepository;
         private readonly SkinStorageService _skinStorage;
         private readonly IWebHostEnvironment _env;
 
         public UserManagementController(
             UserManager<VmsIdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            AppDbContext db,
+            LauncherSessionRepository sessionRepository,
             SkinStorageService skinStorage,
             IWebHostEnvironment env)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _db = db;
+            _sessionRepository = sessionRepository;
             _skinStorage = skinStorage;
             _env = env;
         }
@@ -60,10 +56,7 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var isLocked = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
 
-            var lastSession = await _db.LauncherSessions
-                .Where(s => s.UserId == user.Id)
-                .OrderByDescending(s => s.ExpiresAt)
-                .FirstOrDefaultAsync();
+            LauncherSession? lastSession = await _sessionRepository.GetLastSessionForUser(user.Id);
 
             var username = user.UserName ?? string.Empty;
             var skinModel = _skinStorage.GetSkinModel(username);
@@ -144,17 +137,8 @@ namespace VyacheslavsMegaWebApp.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var sessions = await _db.LauncherSessions.Where(s => s.UserId == id).ToListAsync();
-            if (sessions.Any())
-            {
-                _db.LauncherSessions.RemoveRange(sessions);
-                await _db.SaveChangesAsync();
-                TempData["Success"] = "Привязка HWID и активные сессии лаунчера успешно сброшены.";
-            }
-            else
-            {
-                TempData["Success"] = "У пользователя не было активных сессий лаунчера.";
-            }
+            await _sessionRepository.RemoveSessions(id);
+            TempData["Success"] = "Привязка HWID и активные сессии лаунчера успешно сброшены.";
 
             return RedirectToAction(nameof(UserDetails), new { linkId = id });
         }

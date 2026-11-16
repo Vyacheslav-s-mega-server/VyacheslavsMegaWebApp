@@ -4,8 +4,10 @@ using VyacheslavsMegaWebApp.Data.Repositories.Base;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class UserReportsRepository : RepositoryBase
+    public class UserReportsRepository : DbRepository
     {
+        public UserReportsRepository(AppDbContext db) : base(db) { }
+
         public async Task SaveReportAsync(UserReport report)
         {
             DB.UserReports.Add(report);

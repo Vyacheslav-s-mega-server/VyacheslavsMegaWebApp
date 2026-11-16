@@ -1,4 +1,5 @@
-﻿using VyacheslavsMegaWebApp.Data.JSON.Configuration.EmailService;
+using System.Collections.Generic;
+using VyacheslavsMegaWebApp.Data.JSON.Configuration.EmailService;
 using VyacheslavsMegaWebApp.Data.JSON.Configuration.MinecraftServer;
 using VyacheslavsMegaWebApp.Data.JSON.Configuration.Security;
 

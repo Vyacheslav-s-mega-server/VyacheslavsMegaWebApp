@@ -1,0 +1,165 @@
+@model VyacheslavsMegaWebApp.Data.Entities.CustomCape
+@{
+    var usersMap = ViewBag.UsersMap as Dictionary<string, string> ?? new();
+    var freeCodes = Model.Codes.Where(c => !c.IsUsed).ToList();
+    var usedCodes = Model.Codes.Where(c => c.IsUsed).ToList();
+}
+
+<div class="block block--first">
+    <div class="container">
+        <div class="section">
+            <h2 class="section__title section__title--main">Промокоды плаща: @Model.Name</h2>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="mc-table-container" style="color: #27ae60; font-weight: bold; margin-bottom: 10px;">
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="mc-table-container" style="color: #c0392b; font-weight: bold; margin-bottom: 10px;">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="form-container" style="margin-bottom: 25px;">
+                <form class="form" asp-action="GenerateCodes" method="post" style="max-width: 900px; width: 100%;">
+                    <input type="hidden" name="capeId" value="@Model.Id" />
+
+                    <div class="form__header">
+                        <h3 class="form__title">Генератор промокодов</h3>
+                    </div>
+
+                    <div class="form__body">
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-group__label">Количество кодов (1-500):</label>
+                                <div class="form-group__control">
+                                    <div class="field">
+                                        <input class="field__input" type="number" name="count" value="10" min="1" max="500" style="width: 140px;" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-group__label">Префикс кодов:</label>
+                                <div class="form-group__control">
+                                    <div class="field">
+                                        <input class="field__input" type="text" name="prefix" value="VEC" style="width: 140px;" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 0;">
+                                <button type="submit" class="mc-button">
+                                    <span class="mc-button__title">Сгенерировать коды</span>
+                                </button>
+                            </div>
+
+                            @if (freeCodes.Count > 0)
+                            {
+                                <div style="margin-bottom: 0; margin-left: auto;">
+                                    <button type="button" class="mc-button" id="btnCopyFree" onclick="copyAllFreeCodes()">
+                                        <span class="mc-button__title" id="btnCopyFreeText">Скопировать свободные (@freeCodes.Count)</span>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="mc-table-container">
+                <table class="mc-table mc-table--wide">
+                    <tr class="mc-table--center-aligment">
+                        <td>Промокод</td>
+                        <td>Статус</td>
+                        <td>Кем активирован</td>
+                        <td>Дата активации</td>
+                        <td style="width: 80px;">Действие</td>
+                    </tr>
+                    @if (Model.Codes.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #7f8c8d; padding: 20px;">
+                                Промокодов пока нет. Сгенерируйте их в форме выше.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var code in Model.Codes.OrderBy(c => c.IsUsed ? 1 : 0).ThenByDescending(c => c.CreatedAt))
+                    {
+                        var redeemedUser = code.RedeemedByUserId != null && usersMap.TryGetValue(code.RedeemedByUserId, out var uname) ? uname : code.RedeemedByUserId;
+
+                        <tr>
+                            <td>
+                                <code style="font-family: monospace; font-size: 14px; letter-spacing: 1px;">@code.Code</code>
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                @if (code.IsUsed)
+                                {
+                                    <span style="color: #7f8c8d;">Использован</span>
+                                }
+                                else
+                                {
+                                    <span style="color: #27ae60; font-weight: bold;">Свободен</span>
+                                }
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                @(string.IsNullOrEmpty(redeemedUser) ? "—" : redeemedUser)
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                @(code.RedeemedAt?.ToString("dd.MM.yyyy HH:mm") ?? "—")
+                            </td>
+                            <td class="mc-table--center-aligment">
+                                <form asp-action="DeleteCode" method="post" onsubmit="return confirm('Удалить промокод @code.Code?');">
+                                    <input type="hidden" name="id" value="@code.Id" />
+                                    <input type="hidden" name="capeId" value="@Model.Id" />
+                                    <button type="submit" style="background: none; border: none; color: #c0392b; cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; font-size: inherit;">
+                                        Удалить
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+
+            <div class="button-container" style="margin-top: 20px;">
+                <a asp-action="Index">
+                    <button class="mc-button">
+                        <span class="mc-button__title">Назад к списку плащей</span>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyAllFreeCodes() {
+        const freeCodes = [
+            @foreach (var c in freeCodes)
+            {
+                @: '@c.Code',
+            }
+        ];
+
+        if (!freeCodes || freeCodes.length === 0) {
+            alert('Нет свободных промокодов для копирования.');
+            return;
+        }
+
+        const text = freeCodes.join('\n');
+        navigator.clipboard.writeText(text).then(function () {
+            const btnText = document.getElementById('btnCopyFreeText');
+            if (btnText) {
+                const old = btnText.textContent;
+                btnText.textContent = 'Скопировано в буфер!';
+                setTimeout(() => { btnText.textContent = old; }, 2000);
+            }
+        }).catch(function () {
+            prompt('Скопируйте промокоды вручную:', text);
+        });
+    }
+</script>

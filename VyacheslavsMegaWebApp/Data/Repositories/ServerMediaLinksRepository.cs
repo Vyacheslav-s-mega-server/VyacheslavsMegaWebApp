@@ -4,8 +4,10 @@ using VyacheslavsMegaWebApp.Data.Repositories.Base;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class ServerMediaLinksRepository : RepositoryBase
+    public class ServerMediaLinksRepository : DbRepository
     {
+        public ServerMediaLinksRepository(AppDbContext db) : base(db) { }
+
         public async Task<List<ServerMediaLink>> GetAllLinks()
         {
             return await DB.ServerMediaLinks.ToListAsync();

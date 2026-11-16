@@ -3,32 +3,14 @@ using System.Collections.Generic;
 
 namespace VyacheslavsMegaWebApp.Models
 {
-    public class CapeItemViewModel
-    {
-        public string Id { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string PreviewUrl { get; set; } = string.Empty;
-        public string DownloadUrl { get; set; } = string.Empty;
-        public bool IsEquipped { get; set; }
-        public bool IsOfficial { get; set; }
-    }
-
-    public class LauncherSessionInfo
-    {
-        public string SessionKey { get; set; } = string.Empty;
-        public DateTime ExpiresAt { get; set; }
-        public bool IsActive => ExpiresAt > DateTime.UtcNow;
-    }
-
     public class ProfileViewModel
     {
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public bool EmailConfirmed { get; set; }
         public string UserId { get; set; } = string.Empty;
-        public string DisplayId => string.IsNullOrEmpty(UserId) ? "" : $"#VEC-{UserId.Replace("-", "").Substring(0, Math.Min(6, UserId.Replace("-", "").Length)).ToUpper()}";
-        public string RoleBadge { get; set; } = "Игрок VEC";
+        public string DisplayId => string.IsNullOrEmpty(UserId) ? "" : $"#VMS-{UserId.Replace("-", "").Substring(0, Math.Min(6, UserId.Replace("-", "").Length)).ToUpper()}";
+        public string RoleBadge { get; set; } = "Игрок VMS";
 
         public string SkinUrl { get; set; } = string.Empty;
         public string SkinModel { get; set; } = "classic";
@@ -52,6 +34,12 @@ namespace VyacheslavsMegaWebApp.Models
         public List<FriendItemViewModel> Friends { get; set; } = new();
         public List<FriendItemViewModel> IncomingRequests { get; set; } = new();
         public List<FriendItemViewModel> OutgoingRequests { get; set; } = new();
+
+        public bool HasMinecraftLicense { get; set; }
+        public string? MicrosoftGamertag { get; set; }
+        public string? MicrosoftUuid { get; set; }
+        public DateTime? MicrosoftLicenseLinkedAt { get; set; }
+        public List<MojangCapeInfo> MojangCapes { get; set; } = new();
 
         public ChangePasswordViewModel ChangePassword { get; set; } = new();
     }

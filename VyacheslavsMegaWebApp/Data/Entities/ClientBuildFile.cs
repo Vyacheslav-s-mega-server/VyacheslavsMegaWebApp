@@ -1,8 +1,7 @@
 namespace VyacheslavsMegaWebApp.Data.Entities
 {
-    public class ClientBuildFile
+    public class ClientBuildFile : Base.EntityBase
     {
-        public int Id { get; set; }
         public string BuildSlug { get; set; } = "vec-fabric-1-21-11";
         public string RelativePath { get; set; } = string.Empty;
         public string FileName { get; set; } = string.Empty;
@@ -13,5 +12,9 @@ namespace VyacheslavsMegaWebApp.Data.Entities
         public string? Category { get; set; }
         public string? DisplayName { get; set; }
         public string? Description { get; set; }
+        public string? IconUrl { get; set; }
+        public string? BannerUrl { get; set; }
+        public string? SourceType { get; set; } = "Local";
+        public string? ModrinthSlug { get; set; }
     }
 }

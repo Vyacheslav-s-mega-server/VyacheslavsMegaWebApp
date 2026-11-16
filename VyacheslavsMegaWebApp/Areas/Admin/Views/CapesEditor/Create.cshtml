@@ -1,0 +1,81 @@
+<div class="block block--first">
+    <div class="container">
+        <div class="form-container">
+            <form class="form" asp-area="Admin" asp-controller="CapesEditor" asp-action="Create" method="post" enctype="multipart/form-data">
+                <div class="form__header">
+                    <h2 class="form__title form__title--main">Добавление нового плаща</h2>
+                </div>
+
+                @if (TempData["Error"] != null)
+                {
+                    <div style="color: #c0392b; font-weight: bold; margin-bottom: 15px; font-size: 14px;">
+                        @TempData["Error"]
+                    </div>
+                }
+
+                <div class="form__body">
+                    <div class="form-group">
+                        <label class="form-group__label">Название плаща *</label>
+                        <div class="form-group__control">
+                            <div class="field">
+                                <input class="field__input" type="text" name="name" required placeholder="Например: Юбилейный плащ VEC" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-group__label">Идентификатор (Slug) <small style="color: #7f8c8d;">(латиница, необязательно)</small></label>
+                        <div class="form-group__control">
+                            <div class="field">
+                                <input class="field__input" type="text" name="slug" placeholder="vec_anniversary" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-group__label">Описание плаща</label>
+                        <div class="form-group__control">
+                            <div class="field">
+                                <input class="field__input" type="text" name="description" placeholder="Особая награда за участие в событии" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-group__label">Файл текстуры плаща (.png, 64x32 или 64x64) *</label>
+                        <div class="form-group__control">
+                            <div class="field">
+                                <input class="field__input" type="file" name="capeImage" accept=".png" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-group__label">Доступ к плащу</label>
+                        <div class="form-group__control">
+                            <label class="mc-checkbox" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input class="mc-checkbox__input" type="checkbox" name="isPublic" value="true" />
+                                <span class="mc-checkbox__box"></span>
+                                <span style="color: #ffffff; font-size: 14px;">Публичный плащ (доступен всем игрокам в гардеробе без промокода)</span>
+                            </label>
+                            <div style="font-size: 12px; color: #7f8c8d; margin-top: 6px;">
+                                Если галочка снята, плащ считается эксклюзивным и выдаётся только по промокодам.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-container" style="margin-top: 25px;">
+                        <button type="submit" class="mc-button">
+                            <span class="mc-button__title">Создать плащ</span>
+                        </button>
+                        <a asp-action="Index">
+                            <button type="button" class="mc-button">
+                                <span class="mc-button__title">Назад к списку</span>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

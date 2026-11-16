@@ -1,16 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using VyacheslavsMegaWebApp.Api.Models;
-using VyacheslavsMegaWebApp.Data;
 using VyacheslavsMegaWebApp.Data.Entities;
 using VyacheslavsMegaWebApp.Data.Entities.Identity;
 using VyacheslavsMegaWebApp.Data.Repositories;
@@ -39,13 +30,6 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             _buildsRepository = buildsRepository;
             _userManager = userManager;
             _env = env;
-        }
-
-        public class RequestTicketModel
-        {
-            public string Username { get; set; } = string.Empty;
-            public string SessionKey { get; set; } = string.Empty;
-            public string Hwid { get; set; } = string.Empty;
         }
 
         [HttpPost("api/launch/request-ticket")]
@@ -130,6 +114,43 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             return Ok(new { build = cleanSlug, files = files, mods = mods });
         }
 
+        [HttpGet("api/builds/{slug}/file/{**filePath}")]
+        public IActionResult GetBuildFile(string slug, string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(slug) || string.IsNullOrWhiteSpace(filePath))
+                return BadRequest();
+
+            var cleanSlug = Path.GetFileName(slug).ToLowerInvariant();
+            var cleanPath = filePath.Replace('\\', '/').TrimStart('/');
+
+            var root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+            var fullPath = Path.GetFullPath(Path.Combine(root, "builds", cleanSlug, cleanPath));
+
+            var expectedBase = Path.GetFullPath(Path.Combine(root, "builds", cleanSlug));
+            if (!fullPath.StartsWith(expectedBase, StringComparison.OrdinalIgnoreCase))
+                return Forbid();
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound(new { error = "Build file not found on server." });
+
+            var fileName = Path.GetFileName(fullPath);
+            return PhysicalFile(fullPath, "application/octet-stream", fileName);
+        }
+
+        [HttpGet("api/launcher/download")]
+        public IActionResult DownloadLauncher()
+        {
+            var root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+            var path = Path.Combine(root, "downloads", "VECLauncher.exe");
+            if (!System.IO.File.Exists(path))
+            {
+                return NotFound(new { error = "Launcher binary not found on server." });
+            }
+            return PhysicalFile(path, "application/vnd.microsoft.portable-executable", "VECLauncher.exe");
+        }
+
+        #region private methods
+
         private async Task<List<ManifestFileEntry>> GetManifestDataAsync(string cleanSlug)
         {
             List<ClientBuildFile> dbFiles = await _buildsRepository.GetBuildFilesBySlug(cleanSlug);
@@ -187,39 +208,6 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             return result;
         }
 
-        [HttpGet("api/builds/{slug}/file/{**filePath}")]
-        public IActionResult GetBuildFile(string slug, string filePath)
-        {
-            if (string.IsNullOrWhiteSpace(slug) || string.IsNullOrWhiteSpace(filePath))
-                return BadRequest();
-
-            var cleanSlug = Path.GetFileName(slug).ToLowerInvariant();
-            var cleanPath = filePath.Replace('\\', '/').TrimStart('/');
-
-            var root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-            var fullPath = Path.GetFullPath(Path.Combine(root, "builds", cleanSlug, cleanPath));
-
-            var expectedBase = Path.GetFullPath(Path.Combine(root, "builds", cleanSlug));
-            if (!fullPath.StartsWith(expectedBase, StringComparison.OrdinalIgnoreCase))
-                return Forbid();
-
-            if (!System.IO.File.Exists(fullPath))
-                return NotFound(new { error = "Build file not found on server." });
-
-            var fileName = Path.GetFileName(fullPath);
-            return PhysicalFile(fullPath, "application/octet-stream", fileName);
-        }
-
-        [HttpGet("api/launcher/download")]
-        public IActionResult DownloadLauncher()
-        {
-            var root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-            var path = Path.Combine(root, "downloads", "VECLauncher.exe");
-            if (!System.IO.File.Exists(path))
-            {
-                return NotFound(new { error = "Launcher binary not found on server." });
-            }
-            return PhysicalFile(path, "application/vnd.microsoft.portable-executable", "VECLauncher.exe");
-        }
+        #endregion
     }
 }

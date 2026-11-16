@@ -9,9 +9,9 @@ namespace VyacheslavsMegaWebApp.Models
         public string Email { get; set; } = string.Empty;
         public bool EmailConfirmed { get; set; }
         public string UserId { get; set; } = string.Empty;
-        public string RoleBadge { get; set; } = "Игрок VEC";
+        public string RoleBadge { get; set; } = "Игрок VMS";
 
-        public ChangePasswordViewModel ChangePassword { get; set; } = new();
-        public List<LauncherSessionInfo> LauncherSessions { get; set; } = new();
+        public ChangePasswordViewModel ChangePasswordModel { get; set; } = new();
+        public ChangeEmailViewModel ChangeEmailModel { get; set; } = new();
     }
 }

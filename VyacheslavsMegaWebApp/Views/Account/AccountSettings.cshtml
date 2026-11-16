@@ -4,7 +4,6 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/pages/account.css" asp-append-version="true" />
     <style>
         .settings-page {
             padding: 120px 0 80px;
@@ -163,7 +162,7 @@
             color: #fff;
             background: #78350f;
         }
-
+/*
         .mc-status-bar {
             padding: 12px 18px;
             margin-bottom: 20px;
@@ -183,7 +182,7 @@
             border: 1px solid #dc2626;
             color: #fecaca;
         }
-
+        */
         .settings-field-label {
             display: block;
             font-size: 14px;
@@ -265,7 +264,7 @@
                         }
                         else
                         {
-                            <a asp-action="SendEmailConfirmationToken" class="status-badge status-badge--warn" title="Отправить письмо повторно">
+                            <a asp-controller="Account" asp-action="SendEmailConfirmationToken" class="status-badge status-badge--warn" title="Отправить письмо повторно">
                                 Не подтвержден
                             </a>
                         }
@@ -273,7 +272,7 @@
                 </div>
 
                 <div class="settings-info-row">
-                    <span class="settings-info-row__label">Идентификатор VEC ID</span>
+                    <span class="settings-info-row__label">Идентификатор VMS ID</span>
                     <div class="settings-info-row__value">
                         <code style="color: #f59e0b; background: transparent; padding: 0; font-size: 14px;">@Model.UserId</code>
                     </div>
@@ -286,28 +285,9 @@
                 <h2 class="settings-card__title">Смена пароля</h2>
             </div>
 
-            <form class="form account-form" asp-action="ChangePassword" method="post" style="max-width: 520px;">
-                <div class="form-group" style="margin-bottom: 18px;">
-                    <label class="settings-field-label">Текущий пароль</label>
-                    <input class="field__input" asp-for="ChangePassword.OldPassword" type="password" required autocomplete="current-password" placeholder="Введите старый пароль" />
-                </div>
-
-                <div class="form-group" style="margin-bottom: 18px;">
-                    <label class="settings-field-label">Новый пароль</label>
-                    <input class="field__input" asp-for="ChangePassword.NewPassword" type="password" required autocomplete="new-password" placeholder="Минимум 6 символов" />
-                </div>
-
-                <div class="form-group" style="margin-bottom: 22px;">
-                    <label class="settings-field-label">Подтверждение нового пароля</label>
-                    <input class="field__input" asp-for="ChangePassword.ConfirmPassword" type="password" required autocomplete="new-password" placeholder="Повторите новый пароль" />
-                </div>
-
-                <div>
-                    <button class="btn-download-auth" type="submit" style="width: auto; padding: 12px 28px;">
-                        <span>Обновить пароль</span>
-                    </button>
-                </div>
-            </form>
+            <div id="changePasswordContainer">
+                @await Html.PartialAsync("_ChangePasswordPartial", Model.ChangePasswordModel)
+            </div>
         </div>
 
         <div class="settings-card">
@@ -319,44 +299,9 @@
                 Для смены почты укажите новый адрес и запросите код подтверждения.
             </div>
 
-            @if (TempData["EmailSuccess"] != null)
-            {
-                <div class="mc-status-bar mc-status-bar--success">
-                    <span>@TempData["EmailSuccess"]</span>
-                </div>
-            }
-            @if (TempData["EmailError"] != null)
-            {
-                <div class="mc-status-bar mc-status-bar--danger">
-                    <span>@TempData["EmailError"]</span>
-                </div>
-            }
-
-            <form class="form account-form" asp-action="ConfirmEmailChange" method="post" style="max-width: 520px;">
-                <div class="form-group" style="margin-bottom: 18px;">
-                    <label class="settings-field-label">Новая электронная почта</label>
-                    <input class="field__input" id="newEmailInput" name="newEmail" type="email" required placeholder="name@example.com" />
-                    <div style="margin-top: 12px;">
-                        <button type="button" id="sendEmailCodeBtn" class="btn-download-auth" style="width: auto; padding: 10px 22px; font-size: 15px;" onclick="requestEmailChangeCode()">
-                            Получить код
-                        </button>
-                    </div>
-                    <div id="emailCodeFeedback" style="font-size: 14px; margin-top: 10px; display: none; font-family: 'minecraft', sans-serif;"></div>
-                </div>
-
-                <div id="emailCodeStep2" style="display: @(TempData["EmailError"] != null ? "block" : "none"); margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-                    <div class="form-group" style="margin-bottom: 18px;">
-                        <label class="settings-field-label">Код подтверждения из письма</label>
-                        <input class="field__input" name="code" type="text" maxlength="6" placeholder="6-значный код" style="max-width: 240px; letter-spacing: 2px;" />
-                    </div>
-
-                    <div>
-                        <button class="btn-download-auth" type="submit" style="width: auto; padding: 12px 28px;">
-                            <span>Подтвердить смену почты</span>
-                        </button>
-                    </div>
-                </div>
-            </form>
+            <div id="changeEmailContainer">
+                @await Html.PartialAsync("_ChangeEmailPartial", Model.ChangeEmailModel)
+            </div>
         </div>
 
     </div>
@@ -364,6 +309,43 @@
 
 @section Scripts {
     <script>
+        function handleFormSubmit(formId, containerId) {
+            document.addEventListener("submit", async function (e) {
+                const form = e.target;
+                if (form.id !== formId) return;
+
+                e.preventDefault();
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const contentType = response.headers.get("content-type");
+
+                    if (contentType && contentType.includes("application/json")) {
+                        const data = await response.json();
+                        if (data.redirectUrl) {
+                            window.location.href = data.redirectUrl;
+                        }
+                    } else {
+                        const html = await response.text();
+                        document.getElementById(containerId).innerHTML = html;
+                        $.validator.unobtrusive.parse("#" + containerId);
+                    }
+
+                } catch (error) {
+                    console.error('Ошибка отправки:', error);
+                }
+            });
+        }
+
+        handleFormSubmit("changeEmailForm", "changeEmailContainer");
+        handleFormSubmit("changePasswordForm", "changePasswordContainer");
+
+
         async function requestEmailChangeCode() {
             const emailInput = document.getElementById('newEmailInput');
             const feedback = document.getElementById('emailCodeFeedback');

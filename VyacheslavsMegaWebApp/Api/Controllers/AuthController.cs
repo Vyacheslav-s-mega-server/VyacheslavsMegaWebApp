@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -104,7 +106,7 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
                 return Unauthorized(new { succeeded = false, error = "Invalid token" });
             }
 
-            var isValid = await _sessionRepository.ValidateSession(request.AccessToken);
+            bool isValid = await _sessionRepository.ValidateSession(request.AccessToken);
             if (!isValid)
             {
                 return Unauthorized(new { succeeded = false, error = "Session expired or invalid" });
@@ -114,10 +116,10 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
             if (session is null || session.User is null)
                 return Unauthorized(new { succeeded = false, error = "User not found" });       
 
-            var cleanId = session.User.Id.Replace("-", "");
-            var model = _skinStorage.GetSkinModel(session.User.UserName!);
-            var skinUrl = $"{BaseUrl}/api/skin/{Uri.EscapeDataString(session.User.UserName!)}.png";
-            var capeUrl = _skinStorage.HasCape(session.User.UserName!) ? $"{BaseUrl}/api/cape/{Uri.EscapeDataString(session.User.UserName!)}.png" : null;
+            string cleanId = session.User.Id.Replace("-", "");
+            string model = _skinStorage.GetSkinModel(session.User.UserName!);
+            string skinUrl = $"{BaseUrl}/api/skin/{Uri.EscapeDataString(session.User.UserName!)}.png";
+            string? capeUrl = _skinStorage.HasCape(session.User.UserName!) ? $"{BaseUrl}/api/cape/{Uri.EscapeDataString(session.User.UserName!)}.png" : null;
 
             return Ok(new
             {
@@ -129,8 +131,8 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
         [HttpPost(nameof(LoginWithSessionKey))]
         public async Task<IActionResult> LoginWithSessionKey(LoginWithSessionKeyRequest request)
         {
-            var isValid = await _sessionRepository.ValidateSession(request.SessionKey);
-            if (!isValid) return Unauthorized();
+            if (!await _sessionRepository.ValidateSession(request.SessionKey))
+                return Unauthorized();
             return Ok();
         }
     }

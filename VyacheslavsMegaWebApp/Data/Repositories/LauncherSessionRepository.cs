@@ -6,8 +6,10 @@ using System.Text;
 
 namespace VyacheslavsMegaWebApp.Data.Repositories
 {
-    public class LauncherSessionRepository : Base.RepositoryBase
+    public class LauncherSessionRepository : Base.DbRepository
     {
+        public LauncherSessionRepository(AppDbContext db) : base(db) { }
+
         public async Task<string> CreateSessionKey(VmsIdentityUser user, string? clientToken = null)
         {
             string sessionKey = GenerateSessionKey();
@@ -16,6 +18,7 @@ namespace VyacheslavsMegaWebApp.Data.Repositories
                 SessionKeyHash = HashSessionKey(sessionKey),
                 UserId = user.Id,
                 ClientToken = clientToken ?? Guid.NewGuid().ToString("N"),
+                //TODO: get session lifetime from config
                 ExpiresAt = DateTime.UtcNow + TimeSpan.FromDays(30)
             });
             await DB.SaveChangesAsync();
@@ -60,7 +63,54 @@ namespace VyacheslavsMegaWebApp.Data.Repositories
             return session?.User;
         }
 
-        public async Task<string> RefreshSession(string sessionKey, string? clientToken)
+        public async Task<List<string>> GetActiveSessionUserIds()
+        {
+            return await DB.LauncherSessions
+                .Where(s => s.ExpiresAt > DateTime.UtcNow)
+                .Select(s => s.UserId)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        /*
+        public async Task<LauncherSession?> FindValidSessionAsync(string sessionKey, string userId)
+        {
+            byte[] keyHash = HashSessionKey(sessionKey);
+            LauncherSession? session = await DB.LauncherSessions
+                .FirstOrDefaultAsync(s => (s.SessionKeyHash == keyHash) && s.UserId == userId);
+
+            if (session == null || session.ExpiresAt < DateTime.UtcNow)
+                return null;
+
+            return session;
+        }
+        
+        
+        
+        public async Task<List<LauncherSession>> GetSessionsForUserAsync(string userId)
+        {
+            return await DB.LauncherSessions
+                .Where(s => s.UserId == userId)
+                .OrderByDescending(s => s.ExpiresAt)
+                .ToListAsync();
+        }
+
+        
+
+        public async Task DeleteSessionsForUserAsync(string userId)
+        {
+            List<LauncherSession> sessions = await DB.LauncherSessions
+                .Where(s => s.UserId == userId)
+                .ToListAsync();
+            if (sessions.Count > 0)
+            {
+                DB.LauncherSessions.RemoveRange(sessions);
+                await DB.SaveChangesAsync();
+            }
+        }
+        */
+
+        public async Task<string?> RefreshSession(string sessionKey, string? clientToken)
         {
             byte[] sessionKeyHash = HashSessionKey(sessionKey);
             var session = await DB.LauncherSessions
@@ -75,6 +125,7 @@ namespace VyacheslavsMegaWebApp.Data.Repositories
 
             string newSessionKey = GenerateSessionKey();
             session.SessionKeyHash = HashSessionKey(newSessionKey);
+            //TODO: get session lifetime from config
             session.ExpiresAt = DateTime.UtcNow + TimeSpan.FromDays(30);
             await DB.SaveChangesAsync();
             return newSessionKey;
@@ -82,17 +133,25 @@ namespace VyacheslavsMegaWebApp.Data.Repositories
 
         public async Task InvalidateSession(string sessionKey)
         {
+            
             byte[] sessionKeyHash = HashSessionKey(sessionKey);
             LauncherSession? session = await DB.LauncherSessions.FirstOrDefaultAsync(s => s.SessionKeyHash == sessionKeyHash);
             if (session is null)
                 return;
-            DB.LauncherSessions.Remove(session);
-            await DB.SaveChangesAsync();
+            await RemoveSessions(session.UserId);
         }
 
-        public async Task RemoveSessionKeys(VmsIdentityUser user)
+        public async Task<LauncherSession?> GetLastSessionForUser(string userId)
         {
-            List<LauncherSession> existingSessions = DB.LauncherSessions.Where(s => s.UserId == user.Id).ToList();
+            return await DB.LauncherSessions
+                .Where(s => s.UserId == userId)
+                .OrderByDescending(s => s.ExpiresAt)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task RemoveSessions(string userId)
+        {
+            List<LauncherSession> existingSessions = DB.LauncherSessions.Where(s => s.UserId == userId).ToList();
             foreach (LauncherSession session in existingSessions)
                 DB.Entry(session).State = EntityState.Deleted;
             await DB.SaveChangesAsync();

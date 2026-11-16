@@ -27,15 +27,38 @@
                         <div class="mc-table-container">
                             <table class="mc-table mc-table--wide">
                                 <tr>
-                                    <td style="width: 250px;">Статус на сервере:</td>
+                                    <td style="width: 270px;">Установщик (VEC_Setup.exe):</td>
+                                    <td>
+                                        @if (Model.SetupFileExists)
+                                        {
+                                            <span style="color: #27ae60; font-weight: bold;">Готов к раздаче игрокам</span>
+                                            <span>(@($"{(Model.SetupFileSizeBytes / 1024.0 / 1024.0):F2} МБ"), обновлен: @(Model.SetupLastModified?.ToString("dd.MM.yyyy HH:mm") ?? "—"))</span>
+                                            <span style="margin-left: 10px;">
+                                                <a href="/downloads/VEC_Setup.exe" download style="text-decoration: underline;">Скачать для проверки</a>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: #c0392b; font-weight: bold;">Файл отсутствует в wwwroot/downloads/</span>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 270px;">Пакет клиента (VECLauncher.exe / .zip):</td>
                                     <td>
                                         @if (Model.LauncherFileExists)
                                         {
-                                            <span style="color: #27ae60; font-weight: bold;">Готов к скачиванию</span>
-                                            <span>(@($"{(Model.LauncherFileSizeBytes / 1024.0 / 1024.0):F2} МБ"), обновлен: @(Model.LauncherLastModified?.ToString("dd.MM.yyyy HH:mm") ?? "—"))</span>
+                                            <span style="color: #27ae60; font-weight: bold;">Готов к установке через установщик</span>
+                                            <span>(EXE: @($"{(Model.LauncherFileSizeBytes / 1024.0 / 1024.0):F2} МБ")@(Model.ZipFileExists ? $", ZIP: {(Model.ZipFileSizeBytes / 1024.0 / 1024.0):F2} МБ" : ""), обновлен: @(Model.LauncherLastModified?.ToString("dd.MM.yyyy HH:mm") ?? "—"))</span>
                                             <span style="margin-left: 10px;">
-                                                <a href="/downloads/VECLauncher.exe" download style="text-decoration: underline;">Скачать для проверки</a>
+                                                <a href="/downloads/VECLauncher.exe" download style="text-decoration: underline;">Скачать EXE</a>
                                             </span>
+                                            @if (Model.ZipFileExists)
+                                            {
+                                                <span style="margin-left: 6px;">
+                                                    <a href="/downloads/VECLauncher-win-x64.zip" download style="text-decoration: underline;">Скачать ZIP</a>
+                                                </span>
+                                            }
                                         }
                                         else
                                         {
@@ -54,7 +77,7 @@
                                 </div>
                             </div>
                             <div class="form-group__hint">
-                                При загрузке файл автоматически перезапишет VECLauncher.exe на сервере, и кнопка на сайте сразу начнёт раздавать новую версию.
+                                При загрузке файл (VEC_Setup.exe или VECLauncher.exe) автоматически обновится на сервере для скачивания игроками.
                             </div>
                         </div>
                     </div>

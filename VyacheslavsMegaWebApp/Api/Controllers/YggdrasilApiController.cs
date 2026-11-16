@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using VyacheslavsMegaWebApp.Api.Models;
 using VyacheslavsMegaWebApp.Data.Entities;
 using VyacheslavsMegaWebApp.Data.Entities.Identity;
@@ -51,7 +50,7 @@ namespace VyacheslavsMegaWebApp.Api.Controllers
         {
             string[] skinDomains = MinecraftServerData.SkinDomains.ToArray();
 
-            var meta = new
+            object meta = new
             {
                 serverName = "VEC Ecosystem",
                 implementationName = "VyacheslavsMegaWebApp",
