@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const dropdowns = document.querySelectorAll('.header-capsule .dropdown');
+    const dropdowns = document.querySelectorAll(' .dropdown');
 
     dropdowns.forEach(dropdown => {
         const toggleBtn = dropdown.querySelector('.dropdown__content');
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Close when clicking outside
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.header-capsule .dropdown')) {
+        if (!e.target.closest(' .dropdown')) {
             dropdowns.forEach(d => d.classList.remove('is-active'));
         }
     });

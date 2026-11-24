@@ -2,30 +2,38 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 5px;
-    width: fit-content;
+    gap: 12px;
 
+    background: none;
+    color: #FFFFFF;
     text-shadow: none;
 }
 
 .logo__image {
-    height: 80px;
+    height: 52px;
+    width: 52px;
+    object-fit: contain;
 }
 
 .logo__text {
-    font-family: 'minecraft-title';
-    font-size: 16px;
-    line-height: 1.4;
-    text-wrap-mode: nowrap;
-
-    background: linear-gradient(37deg, rgba(150, 115, 11, 1) 0%, rgba(255, 233, 69, 1) 50%, rgba(198, 158, 70, 1) 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    -webkit-text-fill-color: initial;
 }
 
-@media (max-width: 426px){
-    .logo__text{
-        display: none;
+@media (max-width: 992px) {
+    .logo {
+        gap: 8px;
+    }
+
+    .logo__image {
+        height: 38px;
+        width: 38px;
+    }
+
+    .logo__text {
+        font-size: 18px;
     }
 }

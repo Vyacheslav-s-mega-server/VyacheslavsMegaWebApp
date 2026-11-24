@@ -46,17 +46,17 @@ body {
     overflow-x: clip;
     position: relative;
 
-    font-family: minecraft;
+    font-family: minecraft, sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
-    font-size: var(--normal-font-size);
+    font-size: var(--text-standart-font-size);
     letter-spacing: var(--standart-letter-spacing);
     word-spacing: var(--standart-word-spacing);
     line-height: var(--standart-line-height);
 
     color: var(--text-color);
-    text-shadow: var(--text-shadow);
-    background-color: #222;
+    text-shadow: none;
+    background-color: #111111;
 }
 
 main {
@@ -112,21 +112,23 @@ body.lock {
 }
 
 .section {
-    height: 100%;
+    padding: 90px 0 100px 0;
+    background: #06070a;
+    position: relative;
 }
 
 .section--centered {
     text-align: center;
 }
 
-.section__title {
+.section-hero__title {
     width: 100%;
 
-    font-size: var(--section-header-font-size);
+    font-size: var(--title-h2-font-size);
     line-height: var(--standart-line-height);
     text-align: center;
 }
-
+/*
 .section__title::after {
     display: block;
     width: var(--section-header-after-width);
@@ -145,7 +147,7 @@ body.lock {
     color: var(--title-text-color);
     text-shadow: var(--main-title-shadow);
 }
-
+    */
 .iconed-link__icon {
     height: 30px;
     margin-right: 10px;

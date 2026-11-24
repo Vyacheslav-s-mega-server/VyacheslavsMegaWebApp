@@ -1,0 +1,37 @@
+﻿:root {
+    /* Sizes */
+    --suptitle-font-size: 13px;
+    --text-big-font-size: 18px;
+    --text-standart-font-size: 15px;
+    --text-small-font-size: 13px;
+
+    --title-h1-font-size: 32px;
+    --title-h2-font-size: 24px;
+    --title-h3-font-size: 20px;
+    --title-h4-font-size: 16px;
+
+    --button-font-size: 18px;
+    --button-small-font-size: 14px;
+    --button-letter-spacing: 0.8px;
+
+    /* Line parameters */
+    --standart-line-height: 1.6;
+    --standart-letter-spacing: 0.5px;
+    --standart-word-spacing: 3px;
+}
+
+@media (max-width: 768px) {
+    :root {
+        /* TEXT */
+        --title-font-size: 22px;
+        --normal-font-size: 14px;
+        --small-font-size: 12px;
+        --standart-line-height: 1.4;
+        --standart-letter-spacing: 0.5px;
+        --standart-word-spacing: 3px;
+
+        /* SECTIONS */
+        --section-header-font-size: 18px;
+        --section-header-after-width: 200px;
+    }
+}

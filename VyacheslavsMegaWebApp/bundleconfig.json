@@ -3,12 +3,13 @@
     "outputFileName": "wwwroot/css/style.min.css",
     "inputFiles": [
       "wwwroot/css/base/normalize.css",
-      "wwwroot/css/base/variables.css",
+      "wwwroot/css/base/variables/*",
       "wwwroot/css/base/fonts.css",
       "wwwroot/css/base/layout.css",
 
       "wwwroot/css/pages/*",
       "wwwroot/css/components/form/*",
+      "wwwroot/css/components/header/*",
       "wwwroot/css/components/*"
     ],
     "minify": {

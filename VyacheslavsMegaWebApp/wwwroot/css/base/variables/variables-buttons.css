@@ -1,0 +1,10 @@
+﻿:root {
+    --button-primary-background: #F59E0B;
+    --button-secondary-background: rgba(255, 255, 255, 0.06);
+
+    --button-primary-text-color: #08090D;
+    --button-secondary-text-color: #FFFFFF;
+
+    --button-primary-border: 1px solid #FBBF24;
+    --button-secondary-border: 1px solid rgba(255, 255, 255, 0.16);
+}

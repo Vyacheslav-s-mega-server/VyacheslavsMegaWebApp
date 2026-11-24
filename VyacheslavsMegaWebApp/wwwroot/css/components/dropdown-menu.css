@@ -1,5 +1,0 @@
-/* Legacy dropdown-menu.css cleared to prevent conflict with .header-capsule dropdown */
-.dropdown__content::after {
-    display: none !important;
-    content: none !important;
-}
