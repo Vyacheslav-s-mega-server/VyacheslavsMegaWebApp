@@ -1,9 +1,0 @@
-﻿ .header__auth-btn:hover {
-    background: #fbbf24;
-    color: #08090d !important;
-    transform: translateY(-1px);
-}
-
- .header__auth-btn:active {
-    transform: translateY(1px);
-}

@@ -6,38 +6,38 @@
     .header__burger {
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
         gap: 5px;
         width: 40px;
         height: 40px;
-        cursor: pointer;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        transition: all 0.2s ease;
-        padding: 0;
         margin-left: 8px;
-        flex-shrink: 0;
+        padding: 0;
+
+        background: var(--bg-glass-base);
+        border: 1px solid var(--border-color-light);
+        border-radius: var(--radius-md);
+
+        cursor: pointer;
+        transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
     }
 
-    .header__burger:hover {
-        background: rgba(255, 255, 255, 0.14);
-        border-color: rgba(255, 255, 255, 0.3);
+    .header__burger:hover,
+    .header__burger.active {
+        background: var(--bg-glass-active);
+        border-color: var(--border-color-strong);
     }
 
     .header__burger span {
         display: block;
         width: 20px;
         height: 2px;
-        background: #FFFFFF;
-        border-radius: 2px;
-        transition: transform 0.25s ease, opacity 0.25s ease;
-    }
 
-    .header__burger.active {
-        background: rgba(255, 255, 255, 0.14);
-        border-color: rgba(255, 255, 255, 0.35);
+        background: var(--text-accent-secondary);
+        border-radius: 2px;
+
+        transition: transform var(--transition-burger), opacity var(--transition-burger);
     }
 
     .header__burger.active span:nth-child(1) {
