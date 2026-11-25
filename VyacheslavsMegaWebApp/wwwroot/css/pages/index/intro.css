@@ -1,0 +1,257 @@
+﻿.intro {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    min-height: 88vh;
+    padding: 130px 0 70px 0;
+
+    background-color: var(--color-accent-contrast);
+    background-image:
+        radial-gradient(circle 500px at 75% 40%, rgba(245, 158, 11, 0.12), transparent 70%),
+        linear-gradient(90deg, var(--color-accent-contrast) 0%, var(--color-accent-contrast) 36%, rgba(8, 9, 13, 0.75) 65%, rgba(8, 9, 13, 0.1) 100%),
+        url('../../../img/hero-art.png');
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: cover;
+}
+
+.intro__container {
+    width: 100%;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 700px;
+}
+
+.hero__title {
+    margin: 0 0 18px 0;
+
+    font-family: 'minecraft-title', 'minecraft', sans-serif;
+    font-size: var(--title-h1-font-size);
+    font-weight: var(--title-font-weight);
+    line-height: var(--title-line-height);
+    letter-spacing: var(--title-letter-spacing);
+    color: var(--title-text-color);
+    text-transform: uppercase;
+}
+
+.hero__title--accent {
+    display: inline-block;
+
+    color: transparent;
+
+    background: var(--title-accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero__subtitle {
+    max-width: 580px;
+    margin: 0 0 32px 0;
+
+    font-size: var(--text-big-font-size);
+    color: var(--text-soft-color);
+
+    filter: none;
+}
+
+.hero__subtitle--bold {
+    font-weight: bold;
+    color: var(--text-accent-secondary);
+}
+
+.hero__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+}
+
+.ip-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 100%;
+    padding: 13px 18px;
+
+    font-size: var(--button-font-size);
+    letter-spacing: var(--button-letter-spacing);
+    color: var(--button-secondary-text-color);
+    text-decoration: none;
+
+    background: var(--button-secondary-background);
+    border: var(--button-secondary-border);
+    border-radius: var(--radius-md);
+
+    cursor: pointer;
+    user-select: none;
+    transition: background-color var(--transition-base), border-color var(--transition-base), color var(--transition-base), transform var(--transition-base);
+}
+
+.ip-pill:hover {
+    background: var(--bg-glass-hover);
+    border-color: var(--border-color-strong);
+}
+
+.ip-pill__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.ip-pill__copy {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0;
+
+    color: var(--text-color);
+
+    background: transparent;
+    border: none;
+
+    transition: color var(--transition-base);
+}
+
+.ip-pill:hover .ip-pill__copy {
+    color: var(--text-accent-secondary);
+}
+
+.ip-pill__players {
+    flex-shrink: 0;
+    padding-left: 12px;
+
+    font-size: var(--title-h4-font-size);
+    font-weight: 600;
+    color: var(--text-color);
+    white-space: nowrap;
+
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 1024px) {
+    .hero-title {
+        font-size: 42px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .intro {
+        min-height: auto;
+        padding: 100px 0 45px 0;
+        background-position: 80% center;
+    }
+
+    .intro__container {
+        padding: 0 16px;
+    }
+
+    .hero__title {
+        margin-bottom: 14px;
+        font-size: var(--title-h1-font-size);
+        line-height: 1.25 !important;
+    }
+
+    .hero__subtitle {
+        margin-bottom: 22px;
+        font-size: var(--text-standart-font-size);
+        line-height: 1.55;
+    }
+}
+
+@media (max-width: 480px) {
+    .intro {
+        padding: 85px 0 35px 0;
+        overflow: hidden;
+    }
+
+    .hero__title {
+        font-size: var(--title-card-font-size);
+        letter-spacing: var(--button-letter-spacing);
+        word-break: break-word;
+    }
+
+    .hero__row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .hero__button {
+        width: 100%;
+    }
+
+    .ip-pill {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        padding: 10px 14px;
+    }
+
+    .ip-pill__text {
+        overflow: hidden;
+        font-size: var(--text-small-font-size);
+        letter-spacing: 0.2px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .ip-pill__copy {
+        flex-shrink: 0;
+    }
+
+    .ip-pill__players {
+        flex-shrink: 0;
+        padding-left: 8px;
+        font-size: var(--text-small-font-size);
+        white-space: nowrap;
+        border-left: 1px solid var(--border-color-light);
+    }
+}
+
+@media (max-width: 360px) {
+    .intro__container {
+        padding: 0 10px;
+    }
+
+    .hero__title {
+        font-size: var(--title-h3-font-size);
+        line-height: 1.25;
+        letter-spacing: 0.3px;
+    }
+
+    .hero__subtitle {
+        margin-bottom: 18px;
+        font-size: var(--text-small-font-size);
+        line-height: 1.45;
+    }
+
+    .ip-pill {
+        gap: 6px;
+        padding: 8px 10px;
+    }
+
+    .ip-pill__text,
+    .ip-pill__players {
+        font-size: var(--text-xxs-font-size);
+    }
+
+    .ip-pill__players {
+        padding-left: 6px;
+    }
+}

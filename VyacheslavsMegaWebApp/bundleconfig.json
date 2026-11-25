@@ -10,7 +10,8 @@
       "wwwroot/css/components/*",
       "wwwroot/css/components/form/*",
       "wwwroot/css/components/header/*",
-      "wwwroot/css/pages/*"
+      "wwwroot/css/pages/*",
+      "wwwroot/css/pages/index/*"
     ],
     "minify": {
       "enabled": true,

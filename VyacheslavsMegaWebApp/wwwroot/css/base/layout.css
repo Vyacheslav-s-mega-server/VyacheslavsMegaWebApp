@@ -32,16 +32,12 @@ h6 {
 
 html {
     scroll-behavior: smooth;
-    width: 100%;
-    max-width: 100%;
     overflow-x: hidden;
     overflow-x: clip;
 }
 
 body {
     margin: 0;
-    width: 100%;
-    max-width: 100%;
     overflow-x: hidden;
     overflow-x: clip;
     position: relative;
@@ -60,18 +56,15 @@ body {
 }
 
 main {
-    width: 100%;
-    max-width: 100%;
     overflow-x: clip;
 }
 
 body.lock {
-    overflow: hidden !important;
+    overflow: hidden;
 }
 
 .container {
     width: 100%;
-    height: 100%;
     max-width: 1360px;
     margin: 0 auto;
     padding: 0 20px;
@@ -89,7 +82,7 @@ body.lock {
         padding: 0 10px;
     }
 }
-
+/*
 .block-stripe {
     display: flex;
     gap: 20px 40px;
@@ -110,15 +103,11 @@ body.lock {
 .block--first {
     padding-top: var(--first-block-desktop-padding);
 }
-
+*/
 .section {
     padding: 90px 0 100px 0;
     background: #06070a;
     position: relative;
-}
-
-.section--centered {
-    text-align: center;
 }
 
 .section-hero__title {
@@ -128,7 +117,14 @@ body.lock {
     line-height: var(--standart-line-height);
     text-align: center;
 }
+
 /*
+.section--centered {
+    text-align: center;
+}
+
+
+
 .section__title::after {
     display: block;
     width: var(--section-header-after-width);

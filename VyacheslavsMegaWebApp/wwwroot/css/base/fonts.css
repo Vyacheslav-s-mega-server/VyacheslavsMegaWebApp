@@ -1,11 +1,11 @@
 @font-face {
     font-family: 'minecraft-title';
-    src: url(../../fonts/minecraft_title.ttf);
+    src: url(../../fonts/minecraft_title.ttf) format('truetype');
 }
 
 @font-face {
     font-family: 'minecraft';
-    src: url(../../fonts/minecraft.ttf);
+    src: url(../../fonts/minecraft.ttf) format('truetype');
 }
 
 @font-face {

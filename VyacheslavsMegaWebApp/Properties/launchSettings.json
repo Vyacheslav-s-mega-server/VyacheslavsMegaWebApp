@@ -3,7 +3,6 @@
     "http": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "account/accountsettings",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Staging"
       },
