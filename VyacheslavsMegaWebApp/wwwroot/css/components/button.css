@@ -32,7 +32,7 @@
 
 .button--primary:hover {
     color: var(--color-accent-contrast);
-    background: var(--color-accent-bright);
+    background: var(--color-accent);
 }
 
 .button--secondary {
@@ -42,7 +42,7 @@
 }
 
 .button--secondary:hover {
-    color: var(--title-accent);
+    /*color: var(--title-accent);*/
     background: var(--bg-glass-hover);
     border-color: var(--border-color-strong);
 }

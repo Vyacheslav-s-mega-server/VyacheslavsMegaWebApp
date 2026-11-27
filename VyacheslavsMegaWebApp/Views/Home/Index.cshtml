@@ -26,7 +26,7 @@
                     {
                         var btnUrl = btn.IsResourceLocal && !btn.Url.StartsWith("/") && !btn.Url.StartsWith("http") ? "/" + btn.Url : btn.Url;
                         var isDownloadFile = btn.IsResourceLocal || btn.Url.EndsWith(".exe") || btn.Url.EndsWith(".zip") || btn.Url.EndsWith(".jar");
-                        <a href="@btnUrl" class="button button--primary" @(isDownloadFile ? "download" : "") @(!btn.IsResourceLocal ? "target=\"_blank\" rel=\"noopener\"" : "")>
+                        <a href="@btnUrl" class="button button--primary hero__button" @(isDownloadFile ? "download" : "") @(!btn.IsResourceLocal ? "target=\"_blank\" rel=\"noopener\"" : "")>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                             <span>@(string.IsNullOrWhiteSpace(btn.Title) ? "Скачать лаунчер" : btn.Title)</span>
                         </a>
@@ -60,100 +60,98 @@
     </div>
 </section>
 
-<section class="section-dossier" id="about">
+<section class="section" id="about">
     <div class="container">
         <div class="dossier-grid">
-            <div class="dossier-brochure">
-                <div class="brochure-header">
-                    <span class="brochure-tag">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.AboutTag) ? "О ПРОЕКТЕ VEC" : Model.MainPageData.AboutTag)</span>
-                    <h2 class="brochure-title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.AboutTitle) ? "Сервер, сделанный для людей" : Model.MainPageData.AboutTitle)</h2>
+            <div class="dossier-brochure dossier-brochure--project">
+                <div class="dossier-brochure__header">
+                    <span class="dossier-brochure__tag">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.AboutTag) ? "О ПРОЕКТЕ VEC" : Model.MainPageData.AboutTag)</span>
+                    <h2 class="dossier-brochure__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.AboutTitle) ? "Сервер, сделанный для людей" : Model.MainPageData.AboutTitle)</h2>
                 </div>
+                
+                <p class="dossier-brochure__intro">
+                    @if (string.IsNullOrWhiteSpace(Model.MainPageData.AboutText))
+                    {
+                        <strong>Vyacheslav's Mega Server</strong> @:— Minecraft сервер организации «Vyacheslav's Engineering Company» (VEC), созданный на платформе <a class="brochure-link" href="https://kpvk.edu.kz/" target="_blank" rel="noopener">Костанайского высшего политехнического колледжа</a> самим Вячеславом.
+                    }
+                    else
+                    {
+                        @Html.Raw(Model.MainPageData.AboutText)
+                    }
+                </p>
 
-                <div class="brochure-intro">
-                    <p>
-                        @if (string.IsNullOrWhiteSpace(Model.MainPageData.AboutText))
-                        {
-                            <strong>Vyacheslav's Mega Server</strong> @:— Minecraft сервер организации «Vyacheslav's Engineering Company» (VEC), созданный на платформе <a class="brochure-link" href="https://kpvk.edu.kz/" target="_blank" rel="noopener">Костанайского высшего политехнического колледжа</a> самим Вячеславом.
-                        }
-                        else
-                        {
-                            @Html.Raw(Model.MainPageData.AboutText)
-                        }
-                    </p>
-                </div>
-
-                <div class="brochure-points">
-                    <div class="brochure-item">
-                        <div class="brochure-item__content">
-                            <h4 class="brochure-item__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature1Title) ? "Собственный лаунчер VEC" : Model.MainPageData.Feature1Title)</h4>
-                            <p class="brochure-item__desc">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature1Desc) ? "Мгновенный вход в игру, автоматическая синхронизация модов и полная оптимизация клиента под любой компьютер." : Model.MainPageData.Feature1Desc)</p>
+                <div class="dossier-brochure__points">
+                    <div class="dossier-brochure-item">
+                        <div class="dossier-brochure-item__content">
+                            <h4 class="dossier-brochure-item__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature1Title) ? "Собственный лаунчер VEC" : Model.MainPageData.Feature1Title)</h4>
+                            <p class="dossier-brochure-item__desc">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature1Desc) ? "Мгновенный вход в игру, автоматическая синхронизация модов и полная оптимизация клиента под любой компьютер." : Model.MainPageData.Feature1Desc)</p>
                         </div>
                     </div>
 
-                    <div class="brochure-item">
-                        <div class="brochure-item__content">
-                            <h4 class="brochure-item__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature2Title) ? "Честная игра без донат-мусора" : Model.MainPageData.Feature2Title)</h4>
-                            <p class="brochure-item__desc">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature2Desc) ? "Никаких платных админок, креатива или ломающих баланс команд. Все игроки равны перед законами мира." : Model.MainPageData.Feature2Desc)</p>
+                    <div class="dossier-brochure-item">
+                        <div class="dossier-brochure-item__content">
+                            <h4 class="dossier-brochure-item__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature2Title) ? "Честная игра без донат-мусора" : Model.MainPageData.Feature2Title)</h4>
+                            <p class="dossier-brochure-item__desc">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature2Desc) ? "Никаких платных админок, креатива или ломающих баланс команд. Все игроки равны перед законами мира." : Model.MainPageData.Feature2Desc)</p>
                         </div>
                     </div>
 
-                    <div class="brochure-item">
-                        <div class="brochure-item__content">
-                            <h4 class="brochure-item__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature3Title) ? "Стабильность и защита" : Model.MainPageData.Feature3Title)</h4>
-                            <p class="brochure-item__desc">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature3Desc) ? "Выделенный сервер с постоянным TPS 20.0, регулярными резервными копиями мира и защитой от вредителей." : Model.MainPageData.Feature3Desc)</p>
+                    <div class="dossier-brochure-item">
+                        <div class="dossier-brochure-item__content">
+                            <h4 class="dossier-brochure-item__title">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature3Title) ? "Стабильность и защита" : Model.MainPageData.Feature3Title)</h4>
+                            <p class="dossier-brochure-item__desc">@Html.Raw(string.IsNullOrWhiteSpace(Model.MainPageData.Feature3Desc) ? "Выделенный сервер с постоянным TPS 20.0, регулярными резервными копиями мира и защитой от вредителей." : Model.MainPageData.Feature3Desc)</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="dossier-founder-card">
-                <div class="founder-chair-stage">
-                    <img class="founder-chair-img" src="~/img/vyacheslav-chair.png" alt="Вячеслав на кресле с ноутом" />
+            <div class="dossier-brochure dossier-brochure--founder">
+                <div class="dossier-brochure__portrait">
+                    <img class="dossier-brochure__portrait-img" src="~/img/vyacheslav-chair.png" alt="Вячеслав на кресле с ноутом" />
                 </div>
 
-                <div class="founder-info-block">
-                    <div class="founder-title-row">
+                <div class="founder-info">
+                    <div class="founder-info__title-row">
                         <div>
-                            <h3 class="founder-title-name">Вячеслав <span class="founder-title-handle">[Evray]</span></h3>
-                            <span class="founder-title-role">Создатель и архитектор VEC</span>
+                            <h3 class="founder-info__title-name">Вячеслав <span class="founder-info__title-name--accent">[Evray]</span></h3>
+                            <span class="founder-info__title-role">Создатель и архитектор VEC</span>
                         </div>
                     </div>
 
-                    <p class="founder-quote-text">
+                    <p class="founder-info__quote">
                         «@(Model.Creator != null && !string.IsNullOrWhiteSpace(Model.Creator.DescriptionLarge) ? Model.Creator.DescriptionLarge : "Проект является полностью некоммерческим — прибыли я от него не получаю. Всё, что мы делаем, идёт исключительно на развитие сервера, хостинга и нашего комьюнити.")»
                     </p>
 
-                    <div class="founder-links-row">
+                    <div class="founder-info__links">
                         @if (Model.Creator != null && Model.Creator.Links != null)
                         {
                             @foreach (ContactLink link in Model.Creator.Links)
                             {
                                 var desc = (link.Description ?? "").ToLower();
                                 string iconClass = "bx bx-link-external";
-                                string brandClass = "pill--default";
+                                string brandClass = "contact-pill--default";
                                 if (desc.Contains("телеграм") || desc.Contains("telegram") || desc.Contains("тг"))
                                 {
                                     iconClass = "bx bxl-telegram";
-                                    brandClass = "pill--telegram";
+                                    brandClass = "contact-pill--telegram";
                                 }
                                 else if (desc.Contains("дискорд") || desc.Contains("discord") || desc.Contains("дс"))
                                 {
                                     iconClass = "bx bxl-discord-alt";
-                                    brandClass = "pill--discord";
+                                    brandClass = "contact-pill--discord";
                                 }
                                 else if (desc.Contains("вк") || desc.Contains("vk"))
                                 {
                                     iconClass = "bx bxl-vk";
-                                    brandClass = "pill--vk";
+                                    brandClass = "contact-pill--vk";
                                 }
 
-                                <a class="founder-contact-pill @brandClass" href="@Html.Raw(link.Url)" target="_blank" rel="noopener">
-                                    <i class="@iconClass founder-contact-pill__icon"></i>
-                                    <div class="founder-contact-pill__labels">
-                                        <span class="founder-contact-pill__desc">@link.Description</span>
-                                        <span class="founder-contact-pill__nick">@link.Content</span>
+                                <a class="contact-pill @brandClass" href="@Html.Raw(link.Url)" target="_blank" rel="noopener">
+                                    <i class="@iconClass contact-pill__icon"></i>
+                                    <div class="contact-pill__labels">
+                                        <span class="contact-pill__desc">@link.Description</span>
+                                        <span class="contact-pill__nick">@link.Content</span>
                                     </div>
-                                    <i class='bx bx-chevron-right founder-contact-pill__arrow'></i>
+                                    <i class='bx bx-chevron-right contact-pill__arrow'></i>
                                 </a>
                             }
                         }

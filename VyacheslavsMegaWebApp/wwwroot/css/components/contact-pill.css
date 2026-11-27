@@ -1,0 +1,127 @@
+﻿.contact-pill {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 12px 18px;
+
+    color: var(--text-accent-secondary);
+    text-decoration: none;
+
+    background: var(--bg-glass-dim);
+    border: 1px solid var(--border-color-subtle);
+    border-radius: var(--radius-lg);
+
+    transition: background-color var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+}
+
+.contact-pill:hover {
+    transform: translateY(-2px);
+}
+
+.contact-pill__icon {
+    flex-shrink: 0;
+
+    font-size: 28px;
+    line-height: 1;
+
+    transition: transform var(--transition-smooth);
+}
+
+.contact-pill__desc {
+    font-size: var(--text-xxs-font-size);
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+}
+
+.contact-pill__nick {
+    overflow: hidden;
+
+    font-size: var(--text-small-font-size);
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.contact-pill__arrow {
+    flex-shrink: 0;
+    margin-left: auto;
+
+    font-size: var(--text-big-font-size);
+    color: var(--text-muted-color);
+
+    transition: transform var(--transition-smooth), color var(--transition-smooth);
+}
+
+.contact-pill:hover .contact-pill__arrow {
+    color: var(--text-accent-secondary);
+    transform: translateX(3px);
+}
+
+.contact-pill:hover .contact-pill__icon {
+    transform: scale(1.08);
+}
+
+.contact-pill--default .contact-pill__icon {
+    color: var(--text-color);
+}
+
+.contact-pill--default:hover {
+    background: var(--bg-glass-muted);
+    border-color: var(--border-color-muted);
+}
+
+.contact-pill--telegram .contact-pill__icon {
+    color: var(--color-telegram);
+}
+
+.contact-pill--telegram:hover {
+    background: var(--bg-telegram-subtle);
+    border-color: var(--border-telegram);
+}
+
+.contact-pill--discord .contact-pill__icon {
+    color: var(--color-discord);
+}
+
+.contact-pill--discord:hover {
+    background: var(--bg-discord-subtle);
+    border-color: var(--border-discord);
+}
+
+.contact-pill--vk .contact-pill__icon {
+    color: var(--color-vk);
+}
+
+.contact-pill--vk:hover {
+    background: var(--bg-vk-subtle);
+    border-color: var(--border-vk);
+}
+
+.contact-pill__labels {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: 2px;
+    min-width: 0;
+}
+
+@media (max-width: 360px) {
+    .contact-pill {
+        gap: 8px;
+        padding: 8px 10px;
+    }
+
+    .contact-pill__icon {
+        font-size: 22px;
+    }
+
+    .contact-pill__desc {
+        font-size: var(--text-micro-font-size);
+    }
+
+    .contact-pill__nick {
+        font-size: var(--text-xs-font-size);
+    }
+}

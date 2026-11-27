@@ -105,8 +105,8 @@ body.lock {
 }
 */
 .section {
-    padding: 90px 0 100px 0;
-    background: #06070a;
+    padding: 90px 0 110px 0;
+    background: var(--bg-section-dark);
     position: relative;
 }
 

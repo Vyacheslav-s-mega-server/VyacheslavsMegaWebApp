@@ -189,7 +189,7 @@
     box-sizing: border-box;
 }
 
-.contact-pill:hover {
+/*.contact-pill:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.16);
     color: #ffffff;
@@ -240,7 +240,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
+    */
 .contacts-extra-banner {
     background: #0e1118;
     border: 1px solid rgba(255, 255, 255, 0.08);
