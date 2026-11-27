@@ -46,3 +46,17 @@
     background: var(--bg-glass-hover);
     border-color: var(--border-color-strong);
 }
+
+@media (max-width: 425px){
+    .button {
+        padding: 10px 14px;
+        font-size: var(--button-mobile-font-size);
+    }
+}
+
+@media (max-width: 320px){
+    .button {
+        padding: 8px 10px;
+        font-size: var(--button-mobile-font-size-xs);
+    }
+}

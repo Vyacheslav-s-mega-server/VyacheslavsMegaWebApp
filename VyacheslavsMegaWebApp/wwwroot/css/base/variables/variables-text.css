@@ -22,7 +22,8 @@
     --title-font-weight: 900;
 
     --button-font-size: 18px;
-    --button-small-font-size: 14px;
+    --button-mobile-font-size: 14px;
+    --button-mobile-font-size-xs: 11px;
     --button-letter-spacing: 0.8px;
 
     /* Line parameters */
