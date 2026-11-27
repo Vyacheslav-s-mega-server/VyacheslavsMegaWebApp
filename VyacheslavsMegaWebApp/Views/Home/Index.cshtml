@@ -165,42 +165,42 @@
 @if (Model.PartnersData.Any(p => p.ShowPartner))
 {
     var activePartners = Model.PartnersData.Where(p => p.ShowPartner).ToList();
-    <section class="section-partners" id="partners">
+    <section class="section" id="partners">
         <div class="container">
-            <div class="partners-head">
-                <span class="partners-tag">ЭКОСИСТЕМА</span>
-                <h2 class="partners-title">Партнёры проекта VEC</h2>
-                <p class="partners-desc">Проекты, медиа и сервисы, поддерживающие наше сообщество</p>
+            <div class="partners-header">
+                <span class="partners__tag">ЭКОСИСТЕМА</span>
+                <h2 class="partners__title">Партнёры проекта VEC</h2>
+                <p class="partners__desc">Проекты, медиа и сервисы, поддерживающие наше сообщество</p>
             </div>
 
-            <div class="partner-carousel-stage">
-                <button type="button" class="carousel-arrow carousel-arrow--prev" id="partnerPrevBtn" aria-label="Предыдущий партнёр">
+            <div class="carousel">
+                <button type="button" class="carousel__arrow carousel__arrow--prev" id="partnerPrevBtn" aria-label="Предыдущий партнёр">
                     <i class='bx bx-chevron-left'></i>
                 </button>
 
-                <div class="partner-showcase-container">
+                <div class="carousel__slides">
                     @for (int i = 0; i < activePartners.Count; i++)
                     {
                         var partner = activePartners[i];
-                        <div class="partner-showcase-slide @(i == 0 ? "is-active" : "")" data-slide-index="@i">
-                            <div class="partner-showcase-card">
-                                <div class="partner-showcase-card__media">
-                                    <img class="partner-showcase-card__img" src="~/@partner.LogoFullPath" alt="@partner.Name" />
+                        <div class="partner-slide @(i == 0 ? "is-active" : "")" data-slide-index="@i">
+                            <div class="partner-card">
+                                <div class="partner-card__media">
+                                    <img class="partner-card__img" src="~/@partner.LogoFullPath" alt="@partner.Name" />
                                 </div>
 
-                                <div class="partner-showcase-card__body">
-                                    <div class="partner-showcase-card__head">
-                                        <span class="partner-showcase-card__sub">@partner.Subtitle</span>
-                                        <h3 class="partner-showcase-card__name">@partner.Name</h3>
+                                <div class="partner-card__body">
+                                    <div class="partner-card__head">
+                                        <span class="partner-card__sub">@partner.Subtitle</span>
+                                        <h3 class="partner-card__name">@partner.Name</h3>
                                     </div>
 
-                                    <p class="partner-showcase-card__desc">@partner.Description</p>
+                                    <p class="partner-card__desc">@partner.Description</p>
 
-                                    <div class="partner-showcase-card__footer">
+                                    <div class="partner-card__footer">
                                         @if (partner.Links.Any())
                                         {
                                             var link = partner.Links.First();
-                                            <a class="partner-showcase-card__btn" href="@Html.Raw(link.Url)" target="_blank" rel="noopener">
+                                            <a class="button button--secondary" href="@Html.Raw(link.Url)" target="_blank" rel="noopener">
                                                 <span>@link.Content</span>
                                                 <i class='bx bx-link-external'></i>
                                             </a>
@@ -212,16 +212,16 @@
                     }
                 </div>
 
-                <button type="button" class="carousel-arrow carousel-arrow--next" id="partnerNextBtn" aria-label="Следующий партнёр">
+                <button type="button" class="carousel__arrow carousel__arrow--next" id="partnerNextBtn" aria-label="Следующий партнёр">
                     <i class='bx bx-chevron-right'></i>
                 </button>
-            </div>
 
-            <div class="partner-carousel-dots" id="partnerDots">
-                @for (int i = 0; i < activePartners.Count; i++)
-                {
-                    <button type="button" class="carousel-dot @(i == 0 ? "is-active" : "")" data-dot-index="@i" aria-label="Слайд @(i + 1)"></button>
-                }
+                <div class="carousel__dots" id="partnerDots">
+                    @for (int i = 0; i < activePartners.Count; i++)
+                    {
+                        <button type="button" class="carousel__dot @(i == 0 ? "is-active" : "")" data-dot-index="@i" aria-label="Слайд @(i + 1)"></button>
+                    }
+                </div>
             </div>
         </div>
     </section>
@@ -242,8 +242,8 @@ function copyServerIp(ip) {
 }
 
 (function initInfinitePartnersCarousel() {
-    const slides = document.querySelectorAll('.partner-showcase-slide');
-    const dots = document.querySelectorAll('.carousel-dot');
+    const slides = document.querySelectorAll('.partner-slide');
+    const dots = document.querySelectorAll('.carousel__dot');
     const prevBtn = document.getElementById('partnerPrevBtn');
     const nextBtn = document.getElementById('partnerNextBtn');
     if (!slides.length) return;
@@ -260,11 +260,11 @@ function copyServerIp(ip) {
         const currentSlide = slides[currentIndex];
         const nextSlide = slides[targetIndex];
 
-        nextSlide.classList.remove('slide-from-left', 'slide-from-right');
+            nextSlide.classList.remove('partner-slide--from-left', 'partner-slide--from-right');
         if (direction === 'prev') {
-            nextSlide.classList.add('slide-from-left');
+                nextSlide.classList.add('partner-slide--from-left');
         } else {
-            nextSlide.classList.add('slide-from-right');
+                nextSlide.classList.add('partner-slide--from-right');
         }
 
         currentSlide.classList.remove('is-active');
